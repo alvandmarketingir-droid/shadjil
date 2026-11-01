@@ -100,7 +100,7 @@ export class OrderRepository extends BaseRepository {
       0
     );
 
-    const payStatus = input.paymentMethod === "cod" ? "paid" : "pending";
+    const payStatus = input.paymentMethod === "cod" ? "cod" : "pending";
     const { data: order, error: oErr } = await service
       .from("orders")
       .insert({

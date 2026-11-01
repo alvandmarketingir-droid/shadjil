@@ -466,8 +466,8 @@ export async function createOrderAction(payload: CreateOrderPayload) {
         variantId: row.variant_id as string,
         productId: (v?.product_id ?? prod?.id) as string,
         title,
-        sizeName: v?.size?.name as string | undefined,
-        colorName: v?.color?.name as string | undefined,
+        sizeName: (typeof v?.size === "string" ? v.size : v?.size?.name) as string | undefined,
+        colorName: (v?.color_name ?? (typeof v?.color === "string" ? v.color : v?.color?.name)) as string | undefined,
         unitPrice,
         quantity: row.quantity as number,
       };
@@ -490,10 +490,10 @@ export async function createOrderAction(payload: CreateOrderPayload) {
 
       const supabaseInc = await createClient();
 
-      // once_per_user: قبل از رزرو سراسری
+      // once_per_user + سقف — فقط چک، مصرف بعد از ثبت موفق سفارش
       const { data: dRow } = await supabaseInc
         .from("discounts")
-        .select("once_per_user")
+        .select("once_per_user, max_uses, used_count")
         .ilike("code", discountCode)
         .maybeSingle();
       if ((dRow as { once_per_user?: boolean } | null)?.once_per_user) {
@@ -511,17 +511,9 @@ export async function createOrderAction(payload: CreateOrderPayload) {
           return { ok: false as const, error: "discount_already_used" };
         }
       }
-
-      // رزرو اتمی سقف استفاده — قبل از ساخت سفارش
-      const { data: reserved, error: incErr } = await supabaseInc.rpc(
-        "increment_discount_use",
-        { p_code: discountCode },
-      );
-      if (incErr) {
-        console.error("[discount reserve]", incErr);
-        return { ok: false as const, error: "discount_reserve_failed" };
-      }
-      if (reserved !== true) {
+      const maxUses = (dRow as { max_uses?: number | null } | null)?.max_uses;
+      const usedCount = Number((dRow as { used_count?: number } | null)?.used_count ?? 0);
+      if (maxUses != null && usedCount >= Number(maxUses)) {
         return { ok: false as const, error: "discount_max_uses" };
       }
     }
@@ -582,6 +574,23 @@ export async function createOrderAction(payload: CreateOrderPayload) {
     });
 
     await cartRepo.clearCart(cartId);
+
+    // مصرف سقف کد تخفیف فقط بعد از ثبت موفق سفارش
+    if (discountCode) {
+      try {
+        const supabaseInc = await createClient();
+        const { data: reserved, error: incErr } = await supabaseInc.rpc(
+          "increment_discount_use",
+          { p_code: discountCode },
+        );
+        if (incErr || reserved !== true) {
+          console.error("[discount consume after order]", discountCode, incErr, reserved);
+        }
+      } catch (de) {
+        console.error("[discount consume after order]", de);
+      }
+    }
+
     // SMS تراکنشی (fail-soft)
     try {
       await notifyOrderPlaced({

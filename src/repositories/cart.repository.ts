@@ -57,6 +57,8 @@ export class CartRepository {
     if (vErr) throw vErr;
     if (!variant || variant.is_active === false) throw new Error("unavailable");
     const stock = Math.max(0, Number(variant.stock_quantity ?? 0));
+    // stock=0 یعنی ناموجود (نه نامحدود)
+    if (stock <= 0) throw new Error("insufficient_stock:0");
 
     const { data: existing } = await supabase
       .from("cart_items")
@@ -67,7 +69,7 @@ export class CartRepository {
 
     if (existing) {
       const next = Number(existing.quantity) + qtyAdd;
-      if (stock > 0 && next > stock) throw new Error(`insufficient_stock:${stock}`);
+      if (next > stock) throw new Error(`insufficient_stock:${stock}`);
       const { error } = await supabase
         .from("cart_items")
         .update({ quantity: next })
@@ -76,7 +78,7 @@ export class CartRepository {
       return;
     }
 
-    if (stock > 0 && qtyAdd > stock) throw new Error(`insufficient_stock:${stock}`);
+    if (qtyAdd > stock) throw new Error(`insufficient_stock:${stock}`);
     const { error } = await supabase.from("cart_items").insert({
       cart_id: cartId,
       variant_id: variantId,
@@ -99,10 +101,10 @@ export class CartRepository {
     if (vErr) throw vErr;
     if (!variant || variant.is_active === false) throw new Error("unavailable");
     const stock = Math.max(0, Number(variant.stock_quantity ?? 0));
-    const qty =
-      stock > 0
-        ? Math.min(Number(quantity) || 1, stock)
-        : Math.max(1, Number(quantity) || 1);
+    if (stock <= 0) throw new Error("insufficient_stock:0");
+    const requested = Math.max(1, Math.floor(Number(quantity) || 1));
+    if (requested > stock) throw new Error(`insufficient_stock:${stock}`);
+    const qty = requested;
 
     const { data: existing } = await supabase
       .from("cart_items")
