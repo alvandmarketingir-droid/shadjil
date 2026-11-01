@@ -1,6 +1,7 @@
 "use client";
 
 import { cartRemove, cartSetQty } from "@/lib/cart-api";
+import { mapCartError } from "@/lib/cart-errors";
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -120,46 +121,30 @@ export default function CartPage() {
     }
 
     setMsg(null);
-    // فوری UI
-    if (isLoggedIn && line.variantId) {
-      setQuantityOptimistic(line.variantId, next);
-    } else {
-      setCartQuantity(line.key, next);
+    if (!line.variantId) {
+      setMsg("تغییر تعداد ممکن نشد");
+      return;
     }
+    // مهمان و لاگین هر دو از سبد سرور استفاده می‌کنند
+    setQuantityOptimistic(line.variantId, next);
 
     setBusy(line.key, true);
     try {
-      if (isLoggedIn && line.variantId) {
-        // آخرین مقدار در صف را بفرست
-        const target = pendingQty.current[id] ?? next;
-        const res = await updateCartQuantityAction(line.variantId, target);
-        if (!res.ok) {
-          setMsg(
-            res.error?.startsWith("insufficient_stock")
-              ? "موجودی کافی نیست"
-              : "تغییر تعداد ممکن نشد",
-          );
-          void refreshServer({ force: true });
-        }
-        // بدون refresh اجباری — optimistic کافی است؛ realtime/event بعداً sync می‌کند
-        window.dispatchEvent(new Event("pm:cart-changed"));
+      const target = pendingQty.current[id] ?? next;
+      const res = await cartSetQty(line.variantId, target);
+      if (!res.ok) {
+        setMsg(mapCartError(res.error));
+        void refreshServer({ force: true });
       }
     } catch {
       setMsg("خطا در تغییر تعداد");
       void refreshServer({ force: true });
     } finally {
       setBusy(line.key, false);
-      // اگر کاربر در حین await دوباره کلیک کرده، یک بار دیگر sync
       const latest = pendingQty.current[id];
-      if (
-        isLoggedIn &&
-        line.variantId &&
-        latest != null &&
-        latest !== next &&
-        latest >= 1
-      ) {
+      if (line.variantId && latest != null && latest !== next && latest >= 1) {
         setQuantityOptimistic(line.variantId, latest);
-        void updateCartQuantityAction(line.variantId, latest).then((r) => {
+        void cartSetQty(line.variantId, latest).then((r) => {
           if (!r.ok) void refreshServer({ force: true });
         });
       }
@@ -172,7 +157,7 @@ export default function CartPage() {
     try {
       if (!line.variantId) { setMsg("حذف ممکن نشد"); return; }
       const res = await cartRemove(line.variantId);
-      if (!res.ok) setMsg("حذف ممکن نشد");
+      if (!res.ok) setMsg(mapCartError(res.error));
     } finally {
       setBusy(line.key, false);
     }
@@ -208,7 +193,7 @@ export default function CartPage() {
     setBusy(line.key, true);
     setMsg(null);
     try {
-      if (isLoggedIn && line.variantId && line.productId) {
+      if (line.variantId && line.productId) {
         const res = await swapCartVariantAction({
           oldVariantId: line.variantId,
           productId: line.productId,
