@@ -38,6 +38,8 @@ type OrderRow = {
   total_amount: number;
   discount_code?: string | null;
   discount_amount?: number | null;
+  shipping_fee?: number | null;
+  shipping_method_title?: string | null;
   shipping_name?: string | null;
   shipping_phone?: string | null;
   shipping_city?: string | null;
@@ -45,6 +47,13 @@ type OrderRow = {
   payment_status?: string | null;
   tracking_number?: string | null;
   order_items?: { title: string; quantity: number; line_total: number }[];
+};
+
+const PAY_FA: Record<string, string> = {
+  pending: "در انتظار پرداخت",
+  paid: "پرداخت‌شده",
+  cod: "پرداخت در محل",
+  failed: "ناموفق",
 };
 
 export default function AdminOrdersPage() {
@@ -302,7 +311,14 @@ export default function AdminOrdersPage() {
                       </div>
                     </td>
                     <td className="p-3 whitespace-nowrap">
-                      {Number(o.total_amount).toLocaleString("fa-IR")} تومان
+                      {Number(o.total_amount).toLocaleString("fa-IR")}
+                      <div className="text-muted-foreground mt-1 text-[10px]">
+                        {PAY_FA[String(o.payment_status || "")] || o.payment_status || "—"}
+                        {Number(o.shipping_fee) > 0
+                          ? ` · ارسال ${Number(o.shipping_fee).toLocaleString("fa-IR")}`
+                          : ""}
+                        {o.shipping_method_title ? ` · ${o.shipping_method_title}` : ""}
+                      </div> تومان
                     </td>
                     <td className="p-3">
                       {o.discount_code ? (

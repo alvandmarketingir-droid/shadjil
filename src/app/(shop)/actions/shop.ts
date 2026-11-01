@@ -583,6 +583,10 @@ export async function createOrderAction(payload: CreateOrderPayload) {
     }
     shippingMethodTitle = quoteRes.title || null;
     shippingFee = Math.max(0, Math.floor(Number(quoteRes.quote.fee) || 0));
+    const orderGrandTotal = Math.max(
+      0,
+      subtotal - Math.min(discountAmount, subtotal) + shippingFee,
+    );
 
     const orderRepo = new OrderRepository();
     const orderId = await orderRepo.createFromCart({
@@ -623,17 +627,14 @@ export async function createOrderAction(payload: CreateOrderPayload) {
       }
     }
 
-    // SMS تراکنشی (fail-soft)
+    // SMS/ایمیل با مبلغ واقعی سرور
+    const amountStr = orderGrandTotal.toLocaleString("fa-IR");
     try {
       await notifyOrderPlaced({
         customerPhone: phoneOk.text,
         customerName: nameOk.text,
         orderId,
-        amount: String(
-          (payload as { total?: number; totalAmount?: number }).total ??
-            (payload as { totalAmount?: number }).totalAmount ??
-            "",
-        ),
+        amount: amountStr,
       });
     } catch (smsErr) {
       console.warn("[sms order placed]", smsErr);
@@ -650,7 +651,7 @@ export async function createOrderAction(payload: CreateOrderPayload) {
             to: emailTo,
             customerName: nameOk.text,
             orderId,
-            amount: String((payload as { total?: number }).total ?? ""),
+            amount: amountStr,
           });
         }
       } catch (emErr) {
@@ -659,7 +660,7 @@ export async function createOrderAction(payload: CreateOrderPayload) {
 
     // ذخیره آدرس فقط برای کاربر لاگین‌شده
     if (!user?.id) {
-      return { ok: true as const, orderId };
+      return { ok: true as const, orderId, totalAmount: orderGrandTotal };
     }
     try {
       const addrRepo = new AddressRepository();
@@ -690,7 +691,7 @@ export async function createOrderAction(payload: CreateOrderPayload) {
       console.error("[createOrder save address]", ae);
     }
 
-    return { ok: true as const, orderId };
+    return { ok: true as const, orderId, totalAmount: orderGrandTotal };
   } catch (e) {
     console.error("[createOrder]", e);
     const msg =

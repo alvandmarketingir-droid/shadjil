@@ -555,9 +555,13 @@ export default function CheckoutPage() {
     orderPlacedRef.current = true;
     clearCartLocal();
     const trackCode = shortTrack(res.orderId);
+    const serverTotal =
+      typeof (res as { totalAmount?: number }).totalAmount === "number"
+        ? Number((res as { totalAmount?: number }).totalAmount)
+        : payable;
     setDoneOrder({
       id: res.orderId,
-      total: payable,
+      total: serverTotal,
       track: trackCode,
     });
     void track({
