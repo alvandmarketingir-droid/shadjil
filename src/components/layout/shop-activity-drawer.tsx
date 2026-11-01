@@ -325,13 +325,13 @@ export function ShopActivityDrawer({
                               type="button"
                               className="border-border h-7 w-7 rounded-md border text-sm"
                               onClick={() => {
-                              const vid = (p as { variantId?: string }).variantId;
-                              if (!vid) { toast.error("حذف ممکن نشد"); return; }
-                              void cartRemove(vid).then((r) => {
-                                if (!r.ok) toast.error("حذف از سبد ممکن نشد");
-                                else toast.success("از سبد حذف شد");
-                              });
-                            }}
+                                const vid = (p as { variantId?: string }).variantId;
+                                if (!vid) return;
+                                const q = Math.max(0, (p.quantity ?? 1) - 1);
+                                void cartSetQty(vid, q).then((r) => {
+                                  if (!r.ok) toast.error("تغییر تعداد ممکن نشد");
+                                });
+                              }}
                             >
                               −
                             </button>
@@ -344,8 +344,10 @@ export function ShopActivityDrawer({
                               onClick={() => {
                                 const vid = (p as { variantId?: string }).variantId;
                                 if (!vid) return;
-                                const q = Math.max(0, (p.quantity ?? 1) - 1);
-                                void cartSetQty(vid, q);
+                                const q = Math.min(99, (p.quantity ?? 1) + 1);
+                                void cartSetQty(vid, q).then((r) => {
+                                  if (!r.ok) toast.error("تغییر تعداد ممکن نشد");
+                                });
                               }}
                             >
                               +
