@@ -80,6 +80,8 @@ function mapCheckoutError(code: string | undefined): string {
     discount_bad_subtotal: "مبلغ سبد نامعتبر است.",
     discount_not_applicable: "این کد برای محصولات سبد شما قابل استفاده نیست.",
     insufficient_stock: "موجودی یکی از اقلام کافی نیست.",
+    shipping_method_required: "روش ارسال را انتخاب کنید.",
+    shipping_quote_failed: "محاسبه هزینه ارسال ممکن نشد. روش دیگری انتخاب کنید.",
   };
   if (map[code]) return map[code];
   if (code.startsWith("discount_")) return "کد تخفیف قابل اعمال نیست.";
@@ -532,6 +534,7 @@ export default function CheckoutPage() {
           .join(" | ") || undefined,
       discountCode: (discountPreview?.code || discountCode).trim() || undefined,
       paymentMethod: payMethod,
+      shippingMethodId: shipMethod || undefined,
     });
     setSubmitting(false);
 

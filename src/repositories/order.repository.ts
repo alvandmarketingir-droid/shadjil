@@ -11,6 +11,7 @@ export type CreateOrderInput = {
     unitPrice: number;
     quantity: number;
   }[];
+  sessionId?: string | null;
   shipping: {
     name: string;
     phone: string;
@@ -18,10 +19,13 @@ export type CreateOrderInput = {
     city?: string;
     postal?: string;
   };
+  shippingFee?: number;
+  shippingMethodId?: string | null;
+  shippingMethodTitle?: string | null;
   note?: string;
   discountCode?: string | null;
   discountAmount?: number;
-    paymentMethod?: "cod" | "online";
+  paymentMethod?: "cod" | "online";
 };
 
 export class OrderRepository extends BaseRepository {
@@ -33,13 +37,22 @@ export class OrderRepository extends BaseRepository {
 
     // 1) موجودی: اگر رزرو active کاربر هست → consume؛ وگرنه decrement اتمی
     await service.rpc("release_expired_stock_reservations");
-    const { data: activeRes } = input.userId
-      ? await service
-          .from("stock_reservations")
-          .select("id, variant_id, quantity")
-          .eq("user_id", input.userId)
-          .eq("status", "active")
-      : { data: [] as { id: string; variant_id: string; quantity: number }[] };
+    let activeRes: { id: string; variant_id: string; quantity: number }[] = [];
+    if (input.userId) {
+      const { data } = await service
+        .from("stock_reservations")
+        .select("id, variant_id, quantity")
+        .eq("user_id", input.userId)
+        .eq("status", "active");
+      activeRes = (data as typeof activeRes) ?? [];
+    } else if (input.sessionId) {
+      const { data } = await service
+        .from("stock_reservations")
+        .select("id, variant_id, quantity")
+        .eq("session_id", input.sessionId)
+        .eq("status", "active");
+      activeRes = (data as typeof activeRes) ?? [];
+    }
 
     const resByVariant = new Map<string, number>();
     for (const r of activeRes ?? []) {
@@ -93,12 +106,23 @@ export class OrderRepository extends BaseRepository {
       } catch (ce) {
         console.error("[createFromCart] consume reservations", ce);
       }
+    } else if (input.sessionId) {
+      try {
+        await service.rpc("consume_session_reservations", {
+          p_session_id: input.sessionId,
+        });
+      } catch (ce) {
+        console.error("[createFromCart] consume session reservations", ce);
+      }
     }
 
-    const total = input.items.reduce(
+        const itemsTotal = input.items.reduce(
       (s, i) => s + i.unitPrice * i.quantity,
       0
     );
+    const shipFee = Math.max(0, Math.floor(Number(input.shippingFee) || 0));
+    const discount = Math.max(0, Math.floor(Number(input.discountAmount) || 0));
+    const grandTotal = Math.max(0, itemsTotal - Math.min(discount, itemsTotal) + shipFee);
 
     const payStatus = input.paymentMethod === "cod" ? "cod" : "pending";
     const { data: order, error: oErr } = await service
@@ -107,9 +131,12 @@ export class OrderRepository extends BaseRepository {
         user_id: input.userId,
         status: "pending",
         payment_status: payStatus,
-        total_amount: Math.max(0, Number(total) - Number(input.discountAmount ?? 0)),
+        total_amount: grandTotal,
         discount_code: input.discountCode ?? null,
-        discount_amount: input.discountAmount ?? 0,
+        discount_amount: discount,
+        shipping_fee: shipFee,
+        shipping_method_id: input.shippingMethodId ?? null,
+        shipping_method_title: input.shippingMethodTitle ?? null,
         shipping_name: input.shipping.name,
         shipping_phone: input.shipping.phone,
         shipping_address: input.shipping.address,

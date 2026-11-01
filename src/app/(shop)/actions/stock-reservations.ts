@@ -3,6 +3,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { CartRepository } from "@/repositories/cart.repository";
+import { cookies } from "next/headers";
+import { randomUUID } from "crypto";
 
 const TTL_MINUTES = 15;
 
@@ -14,23 +16,47 @@ async function requireUid() {
   return user?.id ?? null;
 }
 
-/** ورود به checkout: موجودی سبد را ۱۵ دقیقه رزرو کن */
+/** همان cookie سبد مهمان */
+async function getSessionId() {
+  const jar = await cookies();
+  let sid = jar.get("pm_cart_sid")?.value;
+  if (!sid) {
+    sid = randomUUID();
+    jar.set("pm_cart_sid", sid, {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30,
+    });
+  }
+  return sid;
+}
+
+/**
+ * ورود به checkout: موجودی سبد را ۱۵ دقیقه رزرو کن
+ * لاگین → user_id | مهمان → session_id
+ */
 export async function reserveCheckoutStockAction() {
   try {
     const userId = await requireUid();
-    if (!userId) return { ok: false as const, error: "login_required" };
-
+    const sessionId = userId ? null : await getSessionId();
     const service = createServiceClient();
     await service.rpc("release_expired_stock_reservations");
 
     const cartRepo = new CartRepository();
-    const cartId = await cartRepo.getOrCreateCart({
-      userId,
-      sessionId: null,
-    });
+    const cartId = userId
+      ? await cartRepo.getOrCreateCart({ userId, sessionId: null })
+      : await cartRepo.getOrCreateCart({ userId: null, sessionId: sessionId! });
+
     const raw = await cartRepo.listItems(cartId);
     if (!raw.length) {
-      await service.rpc("release_all_user_reservations", { p_user_id: userId });
+      if (userId) {
+        await service.rpc("release_all_user_reservations", { p_user_id: userId });
+      } else if (sessionId) {
+        await service.rpc("release_all_session_reservations", {
+          p_session_id: sessionId,
+        });
+      }
       return { ok: false as const, error: "empty_cart" };
     }
 
@@ -43,19 +69,41 @@ export async function reserveCheckoutStockAction() {
         row.product_variants?.name ??
         variantId;
       if (!variantId || qty < 1) continue;
-      const { data: ok, error } = await service.rpc("reserve_variant_stock", {
-        p_user_id: userId,
-        p_variant_id: variantId,
-        p_qty: qty,
-        p_minutes: TTL_MINUTES,
-      });
+
+      let ok = false;
+      let error: unknown = null;
+      if (userId) {
+        const res = await service.rpc("reserve_variant_stock", {
+          p_user_id: userId,
+          p_variant_id: variantId,
+          p_qty: qty,
+          p_minutes: TTL_MINUTES,
+        });
+        ok = Boolean(res.data);
+        error = res.error;
+      } else {
+        const res = await service.rpc("reserve_variant_stock_session", {
+          p_session_id: sessionId,
+          p_variant_id: variantId,
+          p_qty: qty,
+          p_minutes: TTL_MINUTES,
+        });
+        ok = Boolean(res.data);
+        error = res.error;
+      }
       if (error || !ok) {
         failed.push(String(title));
       }
     }
 
     if (failed.length) {
-      await service.rpc("release_all_user_reservations", { p_user_id: userId });
+      if (userId) {
+        await service.rpc("release_all_user_reservations", { p_user_id: userId });
+      } else if (sessionId) {
+        await service.rpc("release_all_session_reservations", {
+          p_session_id: sessionId,
+        });
+      }
       return {
         ok: false as const,
         error: "insufficient_stock",
@@ -76,11 +124,23 @@ export async function reserveCheckoutStockAction() {
 export async function extendCheckoutReservationAction() {
   try {
     const userId = await requireUid();
-    if (!userId) return { ok: false as const, error: "login_required" };
     const service = createServiceClient();
     await service.rpc("release_expired_stock_reservations");
-    const { data, error } = await service.rpc("extend_user_reservations", {
-      p_user_id: userId,
+    if (userId) {
+      const { data, error } = await service.rpc("extend_user_reservations", {
+        p_user_id: userId,
+        p_minutes: TTL_MINUTES,
+      });
+      if (error) throw error;
+      return {
+        ok: true as const,
+        extended: Number(data ?? 0),
+        expiresAt: new Date(Date.now() + TTL_MINUTES * 60 * 1000).toISOString(),
+      };
+    }
+    const sessionId = await getSessionId();
+    const { data, error } = await service.rpc("extend_session_reservations", {
+      p_session_id: sessionId,
       p_minutes: TTL_MINUTES,
     });
     if (error) throw error;
@@ -98,9 +158,15 @@ export async function extendCheckoutReservationAction() {
 export async function releaseCheckoutReservationAction() {
   try {
     const userId = await requireUid();
-    if (!userId) return { ok: false as const, error: "login_required" };
     const service = createServiceClient();
-    await service.rpc("release_all_user_reservations", { p_user_id: userId });
+    if (userId) {
+      await service.rpc("release_all_user_reservations", { p_user_id: userId });
+      return { ok: true as const };
+    }
+    const sessionId = await getSessionId();
+    await service.rpc("release_all_session_reservations", {
+      p_session_id: sessionId,
+    });
     return { ok: true as const };
   } catch (e) {
     console.error("[releaseCheckoutReservation]", e);

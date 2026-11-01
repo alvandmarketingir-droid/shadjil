@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "@/lib/toaster";
 import { useShopStore } from "@/lib/shop-store";
 import { cartAdd } from "@/lib/cart-api";
+import { mapCartError } from "@/lib/cart-errors";
 import { subscribeStockAlertAction } from "@/app/(shop)/actions/stock-alerts";
 import { useServerCartStore } from "@/lib/server-cart-store";
 import { cn } from "@/lib/utils";
@@ -211,11 +212,7 @@ export function ProductBuyBox({
         color: selectedColor || undefined,
       });
       if (!res.ok) {
-        toast.error(
-          res.error?.startsWith("insufficient_stock")
-            ? "موجودی کافی نیست"
-            : "افزودن به سبد ممکن نشد",
-        );
+        toast.error(mapCartError(res.error));
         return;
       }
       void track({

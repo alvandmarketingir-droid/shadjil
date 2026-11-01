@@ -18,6 +18,7 @@ import { useUnifiedCart } from "@/lib/use-unified-cart";
 import { useServerCartStore } from "@/lib/server-cart-store";
 import { swapCartVariantAction } from "@/app/(shop)/actions/shop";
 import { cartRemove, cartSetQty } from "@/lib/cart-api";
+import { mapCartError } from "@/lib/cart-errors";
 import { X } from "lucide-react";
 import { NotificationsPanel } from "@/components/notifications/notifications-panel";
 
@@ -313,7 +314,7 @@ export function ShopActivityDrawer({
                               const vid = (p as { variantId?: string }).variantId;
                               if (!vid) { toast.error("حذف ممکن نشد"); return; }
                               void cartRemove(vid).then((r) => {
-                                if (!r.ok) toast.error("حذف از سبد ممکن نشد");
+                                if (!r.ok) toast.error(mapCartError(r.error));
                                 else toast.success("از سبد حذف شد");
                               });
                             }}
@@ -329,7 +330,7 @@ export function ShopActivityDrawer({
                                 if (!vid) return;
                                 const q = Math.max(0, (p.quantity ?? 1) - 1);
                                 void cartSetQty(vid, q).then((r) => {
-                                  if (!r.ok) toast.error("تغییر تعداد ممکن نشد");
+                                  if (!r.ok) toast.error(mapCartError(r.error));
                                 });
                               }}
                             >
@@ -346,7 +347,7 @@ export function ShopActivityDrawer({
                                 if (!vid) return;
                                 const q = Math.min(99, (p.quantity ?? 1) + 1);
                                 void cartSetQty(vid, q).then((r) => {
-                                  if (!r.ok) toast.error("تغییر تعداد ممکن نشد");
+                                  if (!r.ok) toast.error(mapCartError(r.error));
                                 });
                               }}
                             >

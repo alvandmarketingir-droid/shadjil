@@ -7,6 +7,7 @@ import { WishlistRepository } from "@/repositories/wishlist.repository";
 import { AddressRepository, type AddressInput } from "@/repositories/address.repository";
 import { ProductRepository } from "@/repositories/product.repository";
 import { CartRepository } from "@/repositories/cart.repository";
+import { quoteShippingAction } from "@/app/(shop)/actions/shipping";
 import { OrderRepository } from "@/repositories/order.repository";
 import { cookies } from "next/headers";
 import { assertNoLinkOrImage } from "@/lib/sanitize-user-text";
@@ -434,6 +435,7 @@ export type CreateOrderPayload = {
   note?: string;
   discountCode?: string;
   paymentMethod?: "cod" | "online";
+  shippingMethodId?: string;
 };
 
 export async function createOrderAction(payload: CreateOrderPayload) {
@@ -556,9 +558,36 @@ export async function createOrderAction(payload: CreateOrderPayload) {
       .filter(Boolean)
       .join("، ");
 
+    let shippingFee = 0;
+    let shippingMethodTitle: string | null = null;
+    const methodId = (payload.shippingMethodId || "").trim();
+    if (!methodId) {
+      return { ok: false as const, error: "shipping_method_required" };
+    }
+    const weightGrams = Math.max(
+      100,
+      (raw as any[]).reduce((s, row) => {
+        const w = Number(row.product_variants?.weight_grams ?? 0) || 300;
+        return s + w * Math.max(1, Number(row.quantity) || 1);
+      }, 0),
+    );
+    const quoteRes = await quoteShippingAction({
+      methodId,
+      weightGrams,
+      destCity: cityOk.text || undefined,
+      destProvince: provinceOk.text || undefined,
+      parcelValueToman: Math.max(0, subtotal - discountAmount),
+    });
+    if (!quoteRes.ok || !quoteRes.quote.ok) {
+      return { ok: false as const, error: "shipping_quote_failed" };
+    }
+    shippingMethodTitle = quoteRes.title || null;
+    shippingFee = Math.max(0, Math.floor(Number(quoteRes.quote.fee) || 0));
+
     const orderRepo = new OrderRepository();
     const orderId = await orderRepo.createFromCart({
       userId: user?.id ?? null,
+      sessionId: user?.id ? null : sessionId,
       items,
       shipping: {
         name: nameOk.text,
@@ -567,6 +596,9 @@ export async function createOrderAction(payload: CreateOrderPayload) {
         city: cityOk.text || undefined,
         postal: postalNorm,
       },
+      shippingFee,
+      shippingMethodId: methodId,
+      shippingMethodTitle,
       note: noteOk.text || undefined,
       discountCode,
       discountAmount,
