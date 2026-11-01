@@ -23,9 +23,12 @@ export async function adminListUsersAction(
     if (role && ["customer", "staff", "admin"].includes(role)) {
       query = query.eq("role", role);
     }
-    const q = (opts?.q || "").trim();
+    const q = (opts?.q || "").trim().slice(0, 80);
     if (q) {
-      query = query.or(`full_name.ilike.%${q}%,phone.ilike.%${q}%`);
+      const safe = q.replace(/[%_,]/g, " ").replace(/\s+/g, " ").trim();
+      if (safe) {
+        query = query.or(`full_name.ilike.%${safe}%,phone.ilike.%${safe}%`);
+      }
     }
 
     const { data, error } = await query;

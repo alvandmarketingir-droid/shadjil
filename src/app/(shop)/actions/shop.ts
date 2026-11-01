@@ -1281,12 +1281,31 @@ export async function deleteMyAccountAction() {
       error: authErr,
     } = await supabase.auth.getUser();
     if (authErr || !user) return { ok: false as const, error: "auth" };
-    // پروفایل / داده‌های مرتبط — در صورت نبود جدول، خطا را نادیده بگیر
+    const uid = user.id;
     try {
-      await supabase.from("profiles").delete().eq("id", user.id);
-    } catch {}
-    // حذف کامل auth فقط با service role ممکن است؛ فعلاً session را ببند
-    await supabase.auth.signOut();
+      await supabase.from("profiles").delete().eq("id", uid);
+    } catch (pe) {
+      console.error("[deleteMyAccount profile]", pe);
+    }
+    try {
+      const { createServiceClient } = await import("@/lib/supabase/service");
+      const service = createServiceClient();
+      const { error: delErr } = await service.auth.admin.deleteUser(uid);
+      if (delErr) {
+        console.error("[deleteMyAccount auth.admin]", delErr);
+        await supabase.auth.signOut();
+        return { ok: false as const, error: "auth_delete_failed" };
+      }
+    } catch (ae) {
+      console.error("[deleteMyAccount service]", ae);
+      await supabase.auth.signOut();
+      return { ok: false as const, error: "auth_delete_failed" };
+    }
+    try {
+      await supabase.auth.signOut();
+    } catch {
+      /* session ممکن است از قبل باطل شده باشد */
+    }
     return { ok: true as const };
   } catch (e) {
     console.error("[deleteMyAccount]", e);

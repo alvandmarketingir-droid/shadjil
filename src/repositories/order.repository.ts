@@ -333,11 +333,12 @@ export class OrderRepository extends BaseRepository {
       q = q.eq("status", opts.status);
     }
     if (opts?.q && opts.q.trim()) {
-      const term = opts.q.trim();
-      // جستجوی ساده روی نام/تلفن (ilike)
-      q = q.or(
-        `shipping_name.ilike.%${term}%,shipping_phone.ilike.%${term}%`,
-      );
+      const term = opts.q.trim().slice(0, 80).replace(/[%_,]/g, " ").replace(/\s+/g, " ").trim();
+      if (term) {
+        q = q.or(
+          `shipping_name.ilike.%${term}%,shipping_phone.ilike.%${term}%`,
+        );
+      }
     }
 
     const { data, error } = await q;
