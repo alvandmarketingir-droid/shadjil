@@ -932,8 +932,32 @@ export async function updateMyAddressAction(id: string, input: Partial<AddressIn
   try {
     const user = await requireUser();
     if (!user) return { ok: false as const, error: "login_required" };
+    if (!id?.trim()) return { ok: false as const, error: "missing_id" };
+    const patch: Partial<AddressInput> = { ...input };
+    if (input.full_name != null) {
+      const n = assertNoLinkOrImage(String(input.full_name), "نام");
+      if (!n.ok) return { ok: false as const, error: n.error };
+      patch.full_name = n.text;
+    }
+    if (input.phone != null) {
+      const phoneNorm = normalizeIranMobile(String(input.phone));
+      if (!phoneNorm) return { ok: false as const, error: "شماره موبایل نامعتبر است" };
+      const n = assertNoLinkOrImage(phoneNorm, "تلفن");
+      if (!n.ok) return { ok: false as const, error: n.error };
+      patch.phone = n.text;
+    }
+    if (input.city != null) {
+      const n = assertNoLinkOrImage(String(input.city), "شهر");
+      if (!n.ok) return { ok: false as const, error: n.error };
+      patch.city = n.text;
+    }
+    if (input.address_line != null) {
+      const n = assertNoLinkOrImage(String(input.address_line), "آدرس");
+      if (!n.ok) return { ok: false as const, error: n.error };
+      patch.address_line = n.text;
+    }
     const repo = new AddressRepository();
-    await repo.update(user.id, id, input);
+    await repo.update(user.id, id, patch);
     return { ok: true as const };
   } catch (e) {
     console.error("[updateMyAddress]", e);

@@ -46,18 +46,30 @@ export async function cancelMyOrderAction(orderId: string, reason?: string) {
       .select("variant_id, quantity")
       .eq("order_id", orderId);
 
-    const { error: upErr } = await service
+    // به‌روزرسانی اتمی: فقط اگر هنوز قابل لغو باشد (ضد race دو تب)
+    const nextPay =
+      order.payment_status === "paid"
+        ? "paid"
+        : order.payment_status === "cod"
+          ? "cod"
+          : "failed";
+    const { data: updated, error: upErr } = await service
       .from("orders")
       .update({
         status: "cancelled",
-        payment_status:
-          order.payment_status === "paid" ? order.payment_status : "failed",
+        payment_status: nextPay,
         updated_at: new Date().toISOString(),
       })
       .eq("id", orderId)
-      .eq("user_id", user.id);
+      .eq("user_id", user.id)
+      .in("status", ["pending", "paid", "processing"])
+      .select("id")
+      .maybeSingle();
 
     if (upErr) throw upErr;
+    if (!updated) {
+      return { ok: false as const, error: "not_cancellable" };
+    }
 
     // بازگردانی موجودی
     for (const it of items ?? []) {
@@ -97,7 +109,15 @@ export async function getMyOrderHistoryAction(orderId: string) {
     if (!orderId?.trim()) return { ok: false as const, error: "order_required", items: [] };
 
     const supabase = await createClient();
-    // RLS: only own order history
+    // مالکیت سفارش (دفاع لایه‌ای علاوه بر RLS)
+    const { data: own } = await supabase
+      .from("orders")
+      .select("id")
+      .eq("id", orderId)
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (!own) return { ok: false as const, error: "not_found", items: [] };
+
     const { data, error } = await supabase
       .from("order_status_history")
       .select("id, from_status, to_status, note, actor_type, created_at")
