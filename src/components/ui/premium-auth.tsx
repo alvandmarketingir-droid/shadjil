@@ -500,34 +500,44 @@ export function AuthForm({
                 },
               });
               if (pwErr) console.warn("[signup setPassword]", pwErr);
-              // اگر ادمین رمز را ست کرده، یک بار با رمز وارد شو تا مطمئن شویم
+              // اثبات: همان رمز باید فوراً برای signInWithPassword کار کند
               if (email) {
                 const check = await browser.auth.signInWithPassword({
                   email,
                   password: formData.password,
                 });
-                if (check.error) {
-                  console.warn("[signup password verify]", check.error.message);
+                if (check.error || !check.data.session) {
+                  console.error("[signup password verify]", check.error);
+                  setErrors({
+                    verificationCode:
+                      "حساب ساخته شد ولی ذخیره رمز کامل نشد؛ کد را دوباره بزنید یا با OTP وارد شوید و رمز را دوباره وارد کنید.",
+                  });
+                  setIsLoading(false);
+                  return;
                 }
               }
+            } else if (!sessionOk) {
+              setErrors({
+                verificationCode: "نشست ساخته نشد؛ کد را دوباره تأیید کنید",
+              });
+              setIsLoading(false);
+              return;
             }
           } catch (e) {
             console.error("[signup session]", e);
+            setErrors({ verificationCode: "خطا در تکمیل ثبت‌نام" });
+            setIsLoading(false);
+            return;
           }
 
           setRegistrationStep("complete");
-          setSuccessMessage("ثبت‌نام کامل شد");
+          setSuccessMessage("ثبت‌نام کامل شد — ورود به پنل مشتری…");
           try {
             void onSuccess?.({ phone: formData.phone, name: formData.name });
           } catch {}
-          const dest = resolvePostAuthDestination({
-            defaultNext: defaultNext || "/dashboard",
-            allowAdmin: false,
-          });
-          setTimeout(() => {
-            navigateAfterAuth(dest);
-          }, 600);
+          // همیشه پنل مشتری — نه تاخیر؛ مسیر ثابت /dashboard
           setIsLoading(false);
+          navigateAfterAuth("/dashboard");
           return;
         }
 

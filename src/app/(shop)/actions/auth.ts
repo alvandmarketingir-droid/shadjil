@@ -442,6 +442,7 @@ export async function verifyOtpAction(
   }
 
   // همیشه بعد از داشتن userId: رمز / ایمیل / تلفن را روی Auth بنویس
+  // (هم کاربر تازه‌ساخته، هم کاربر موجود پس از createUser conflict)
   let passwordSaved = false;
   try {
     const { data: u } = await admin.auth.admin.getUserById(userId);
@@ -480,8 +481,11 @@ export async function verifyOtpAction(
           userId,
           { password },
         );
-        if (pwOnly) console.error("[otp setPassword only]", pwOnly);
-        else passwordSaved = true;
+        if (pwOnly) {
+          console.error("[otp setPassword only]", pwOnly);
+          return { ok: false as const, error: "server" as const };
+        }
+        passwordSaved = true;
       }
     } else if (password) {
       passwordSaved = true;
@@ -490,8 +494,17 @@ export async function verifyOtpAction(
     // تأیید ثانویه: خواندن دوباره ایمیل
     const { data: again } = await admin.auth.admin.getUserById(userId);
     if (again?.user?.email) authEmail = again.user.email;
+
+    // اگر رمز خواسته شده ولی ذخیره نشد → شکست صریح (نه OTP موفقِ بدون رمز)
+    if (password && !passwordSaved) {
+      console.error("[otp] password required but not saved", { userId });
+      return { ok: false as const, error: "server" as const };
+    }
   } catch (e) {
     console.warn("[otp touch user]", e);
+    if (password) {
+      return { ok: false as const, error: "server" as const };
+    }
   }
 
   await admin.from("profiles").upsert({
