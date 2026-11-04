@@ -212,7 +212,22 @@ export function AuthForm({
           setIsLoading(false);
           return;
         }
-        const ver = await verifyOtpAction(normalizeIranMobile(formData.phone) ?? formData.phone, formData.otpCode);
+        // رمز اجباری در OTP تا بعداً signInWithPassword کار کند (بدون ست دستی در Supabase)
+        if (!formData.password || formData.password.length < 8) {
+          setErrors({ password: "رمز عبور حداقل ۸ کاراکتر برای ورود بعدی لازم است" });
+          setIsLoading(false);
+          return;
+        }
+        if (formData.password !== formData.confirmPassword) {
+          setErrors({ confirmPassword: "تکرار رمز مطابقت ندارد" });
+          setIsLoading(false);
+          return;
+        }
+        const phoneNormLogin =
+          normalizeIranMobile(formData.phone) ?? formData.phone;
+        const ver = await verifyOtpAction(phoneNormLogin, formData.otpCode, {
+          password: formData.password,
+        });
         if (!ver.ok) {
           const map: Record<string, string> = {
             invalid_phone: "شماره نامعتبر است",
@@ -227,12 +242,9 @@ export function AuthForm({
           setIsLoading(false);
           return;
         }
-                
-        
-        
+
         const tokenHash = (ver as { token_hash?: string }).token_hash;
         const email = (ver as { email?: string }).email;
-        const tempPass = (ver as { temp_password?: string }).temp_password;
         try {
           const { createBrowserClient } = await import("@supabase/ssr");
           const browser = createBrowserClient(
@@ -251,11 +263,12 @@ export function AuthForm({
               sessionOk = true;
             }
           }
-          if (!sessionOk && email && tempPass) {
-            const { data: signed, error: signErr } = await browser.auth.signInWithPassword({
-              email,
-              password: tempPass,
-            });
+          if (!sessionOk && email && formData.password) {
+            const { data: signed, error: signErr } =
+              await browser.auth.signInWithPassword({
+                email,
+                password: formData.password,
+              });
             if (signErr || !signed.session) {
               console.error("[otp signIn]", signErr);
               setErrors({ otpCode: "ورود ناموفق؛ دوباره کد بگیرید" });
@@ -269,6 +282,12 @@ export function AuthForm({
             setIsLoading(false);
             return;
           }
+          // پشتیبان: رمز را با نشست فعال هم بنویس
+          const { error: pwErr } = await browser.auth.updateUser({
+            password: formData.password,
+            data: { phone: phoneNormLogin },
+          });
+          if (pwErr) console.warn("[otp login setPassword]", pwErr);
         } catch (e) {
           console.error("[otp session]", e);
           setErrors({ otpCode: "خطا در ورود" });
@@ -382,6 +401,9 @@ export function AuthForm({
           if (formData.password !== formData.confirmPassword) {
             nextErrs.confirmPassword = "تکرار رمز مطابقت ندارد";
           }
+          if (formData.email.trim() && !isValidEmail(formData.email.trim())) {
+            nextErrs.email = "ایمیل نامعتبر است";
+          }
           if (!formData.agreeToTerms) {
             nextErrs.agreeToTerms = "پذیرش قوانین الزامی است";
           }
@@ -421,6 +443,7 @@ export function AuthForm({
           const ver = await verifyOtpAction(phoneNorm, code, {
             password: formData.password,
             fullName: formData.name.trim(),
+            email: formData.email.trim() || undefined,
           });
           if (!ver.ok) {
             const map: Record<string, string> = {
@@ -471,9 +494,22 @@ export function AuthForm({
                 data: {
                   phone: phoneNorm,
                   full_name: formData.name.trim(),
+                  ...(formData.email.trim()
+                    ? { contact_email: formData.email.trim().toLowerCase() }
+                    : {}),
                 },
               });
               if (pwErr) console.warn("[signup setPassword]", pwErr);
+              // اگر ادمین رمز را ست کرده، یک بار با رمز وارد شو تا مطمئن شویم
+              if (email) {
+                const check = await browser.auth.signInWithPassword({
+                  email,
+                  password: formData.password,
+                });
+                if (check.error) {
+                  console.warn("[signup password verify]", check.error.message);
+                }
+              }
             }
           } catch (e) {
             console.error("[signup session]", e);
@@ -741,6 +777,39 @@ export function AuthForm({
                 {errors.otpCode ? (
                   <p className="text-destructive text-xs">{errors.otpCode}</p>
                 ) : null}
+                <p className="text-muted-foreground text-xs text-right">
+                  رمز را وارد کنید تا بعداً بدون OTP با موبایل/ایمیل وارد شوید.
+                </p>
+                <div className="relative">
+                  <Lock className="text-muted-foreground absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2" />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="رمز عبور (حداقل ۸ کاراکتر) *"
+                    value={formData.password}
+                    onChange={(e) => handleInputChange("password", e.target.value)}
+                    className={cn(inputCls, "pl-10 pr-12")}
+                    autoComplete="new-password"
+                  />
+                </div>
+                {errors.password ? (
+                  <p className="text-destructive text-xs">{errors.password}</p>
+                ) : null}
+                <div className="relative">
+                  <Shield className="text-muted-foreground absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2" />
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="تکرار رمز عبور *"
+                    value={formData.confirmPassword}
+                    onChange={(e) =>
+                      handleInputChange("confirmPassword", e.target.value)
+                    }
+                    className={cn(inputCls, "pl-10 pr-12")}
+                    autoComplete="new-password"
+                  />
+                </div>
+                {errors.confirmPassword ? (
+                  <p className="text-destructive text-xs">{errors.confirmPassword}</p>
+                ) : null}
                 <button
                   type="submit"
                   disabled={isLoading}
@@ -749,7 +818,7 @@ export function AuthForm({
                   {isLoading ? (
                     <Loader2 className="mx-auto h-5 w-5 animate-spin" />
                   ) : (
-                    "ورود"
+                    "تأیید و ورود"
                   )}
                 </button>
                 <button

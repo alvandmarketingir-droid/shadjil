@@ -297,10 +297,52 @@ export async function requestOtpAction(phone: string) {
   return requestLoginOtp(phone);
 }
 
+function isValidOptionalEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+async function findAuthUserIdByEmails(
+  admin: ReturnType<typeof createServiceClient>,
+  emails: string[],
+): Promise<{ id: string; email: string } | null> {
+  for (const email of emails) {
+    try {
+      const url = new URL(
+        process.env.NEXT_PUBLIC_SUPABASE_URL + "/auth/v1/admin/users",
+      );
+      url.searchParams.set("email", email);
+      const res = await fetch(url.toString(), {
+        headers: {
+          Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+          apikey: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
+        },
+        cache: "no-store",
+      });
+      if (!res.ok) continue;
+      const body = (await res.json()) as {
+        users?: { id?: string; email?: string }[];
+        id?: string;
+        email?: string;
+      };
+      if (body.id && body.email) return { id: body.id, email: body.email };
+      const hit = (body.users ?? []).find((u) => u.id && u.email);
+      if (hit?.id && hit.email) return { id: hit.id, email: hit.email };
+    } catch (e) {
+      console.warn("[findAuthUserIdByEmails]", email, e);
+    }
+  }
+  return null;
+}
+
+/**
+ * OTP تأیید شد → کاربر Auth را پیدا/بساز و در صورت ارسال، رمز (+ایمیل اختیاری) را
+ * حتماً روی همان کاربر بنویس. باگ قبلی: اگر createUser به «کاربر موجود» می‌خورد،
+ * رمز هرگز update نمی‌شد.
+ */
 export async function verifyOtpAction(
   phone: string,
   code: string,
-  opts?: { password?: string; fullName?: string },
+  opts?: { password?: string; fullName?: string; email?: string },
 ) {
   const verified = await verifyLoginOtp(phone, code);
   if (!verified.ok) return verified;
@@ -313,8 +355,12 @@ export async function verifyOtpAction(
       ? opts.password
       : undefined;
   const fullName = (opts?.fullName || "").trim() || undefined;
+  const contactEmailRaw = (opts?.email || "").trim().toLowerCase();
+  const contactEmail =
+    contactEmailRaw && isValidOptionalEmail(contactEmailRaw)
+      ? contactEmailRaw
+      : undefined;
 
-  // پروفایل با همه فرمت‌های رایج موبایل
   const variants = phoneLookupVariants(normalized);
   const { data: profileRows } = await admin
     .from("profiles")
@@ -325,13 +371,29 @@ export async function verifyOtpAction(
 
   let userId = (profile as { id?: string } | null)?.id as string | undefined;
   let role = String((profile as { role?: string } | null)?.role || "customer");
-  let authEmail = syntheticEmail;
+  // ترجیح: ایمیل واقعی کاربر برای login با جیمیل؛ وگرنه سنتتیک OTP
+  let authEmail = contactEmail || syntheticEmail;
+
+  if (!userId) {
+    const byEmail = await findAuthUserIdByEmails(
+      admin,
+      [contactEmail, syntheticEmail].filter(Boolean) as string[],
+    );
+    if (byEmail) {
+      userId = byEmail.id;
+      authEmail = byEmail.email;
+    }
+  }
 
   if (!userId) {
     const createPayload: Parameters<typeof admin.auth.admin.createUser>[0] = {
-      email: syntheticEmail,
+      email: authEmail,
       email_confirm: true,
-      user_metadata: { phone: normalized, full_name: fullName },
+      user_metadata: {
+        phone: normalized,
+        full_name: fullName,
+        ...(contactEmail ? { contact_email: contactEmail } : {}),
+      },
       phone: `+98${normalized.slice(1)}`,
       phone_confirm: true,
     };
@@ -340,57 +402,37 @@ export async function verifyOtpAction(
       await admin.auth.admin.createUser(createPayload);
     if (createErr) {
       console.warn("[otp createUser]", createErr.message);
-      try {
-        const { data: listed } = await admin.auth.admin.listUsers({
-          page: 1,
-          perPage: 200,
-        });
-        const found = listed?.users?.find((u) => u.email === syntheticEmail);
-        userId = found?.id;
-        if (found?.email) authEmail = found.email;
-      } catch (e) {
-        console.warn("[otp listUsers]", e);
+      const found = await findAuthUserIdByEmails(admin, [
+        authEmail,
+        syntheticEmail,
+        contactEmail || "",
+      ].filter(Boolean));
+      if (found) {
+        userId = found.id;
+        authEmail = found.email;
+      } else {
+        try {
+          const { data: listed } = await admin.auth.admin.listUsers({
+            page: 1,
+            perPage: 200,
+          });
+          const hit = listed?.users?.find(
+            (u) =>
+              u.email === syntheticEmail ||
+              u.email === authEmail ||
+              (contactEmail && u.email === contactEmail) ||
+              u.phone === `+98${normalized.slice(1)}` ||
+              u.phone === `98${normalized.slice(1)}`,
+          );
+          userId = hit?.id;
+          if (hit?.email) authEmail = hit.email;
+        } catch (e) {
+          console.warn("[otp listUsers]", e);
+        }
       }
     } else {
       userId = created.user?.id;
       if (created.user?.email) authEmail = created.user.email;
-    }
-    if (userId) {
-      await admin.from("profiles").upsert({
-        id: userId,
-        phone: normalized,
-        full_name: fullName ?? null,
-        role: role === "admin" ? "admin" : "customer",
-      } as never);
-    }
-  } else {
-    try {
-      const { data: u } = await admin.auth.admin.getUserById(userId);
-      const current = u?.user?.email || "";
-      if (current) authEmail = current;
-      const patch: Parameters<typeof admin.auth.admin.updateUserById>[1] = {
-        email_confirm: true,
-        user_metadata: {
-          ...(u?.user?.user_metadata || {}),
-          phone: normalized,
-          ...(fullName ? { full_name: fullName } : {}),
-        },
-        phone: `+98${normalized.slice(1)}`,
-        phone_confirm: true,
-      };
-      // اگر کاربر رمز فرستاده (ثبت‌نام)، روی حساب موجود هم ست کن
-      if (password) patch.password = password;
-      await admin.auth.admin.updateUserById(userId, patch);
-      // نرمال‌سازی phone در profiles به فرم 09…
-      await admin
-        .from("profiles")
-        .update({
-          phone: normalized,
-          ...(fullName ? { full_name: fullName } : {}),
-        } as never)
-        .eq("id", userId);
-    } catch (e) {
-      console.warn("[otp touch user]", e);
     }
   }
 
@@ -399,7 +441,66 @@ export async function verifyOtpAction(
     return { ok: false as const, error: "server" as const };
   }
 
-  // ثبت نشست فعال (دستگاه/IP) برای ورود با OTP
+  // همیشه بعد از داشتن userId: رمز / ایمیل / تلفن را روی Auth بنویس
+  let passwordSaved = false;
+  try {
+    const { data: u } = await admin.auth.admin.getUserById(userId);
+    if (u?.user?.email) authEmail = u.user.email;
+
+    const patch: Parameters<typeof admin.auth.admin.updateUserById>[1] = {
+      email_confirm: true,
+      user_metadata: {
+        ...(u?.user?.user_metadata || {}),
+        phone: normalized,
+        ...(fullName ? { full_name: fullName } : {}),
+        ...(contactEmail ? { contact_email: contactEmail } : {}),
+      },
+      phone: `+98${normalized.slice(1)}`,
+      phone_confirm: true,
+    };
+    if (password) {
+      patch.password = password;
+    }
+    // اگر ایمیل واقعی داده شده و با ایمیل فعلی فرق دارد، ارتقا بده (login با جیمیل)
+    if (contactEmail && authEmail !== contactEmail) {
+      patch.email = contactEmail;
+      patch.email_confirm = true;
+      authEmail = contactEmail;
+    }
+
+    const { error: updErr } = await admin.auth.admin.updateUserById(
+      userId,
+      patch,
+    );
+    if (updErr) {
+      console.error("[otp updateUserById]", updErr);
+      // اگر تغییر ایمیل conflict داد، حداقل رمز را جدا ست کن
+      if (password) {
+        const { error: pwOnly } = await admin.auth.admin.updateUserById(
+          userId,
+          { password },
+        );
+        if (pwOnly) console.error("[otp setPassword only]", pwOnly);
+        else passwordSaved = true;
+      }
+    } else if (password) {
+      passwordSaved = true;
+    }
+
+    // تأیید ثانویه: خواندن دوباره ایمیل
+    const { data: again } = await admin.auth.admin.getUserById(userId);
+    if (again?.user?.email) authEmail = again.user.email;
+  } catch (e) {
+    console.warn("[otp touch user]", e);
+  }
+
+  await admin.from("profiles").upsert({
+    id: userId,
+    phone: normalized,
+    full_name: fullName ?? null,
+    role: role === "admin" ? "admin" : "customer",
+  } as never);
+
   try {
     const ip = await getClientIp();
     let ua: string | null = null;
@@ -438,6 +539,7 @@ export async function verifyOtpAction(
     role,
     email: authEmail,
     token_hash: linkData.properties.hashed_token as string,
+    password_saved: passwordSaved,
   };
 }
 
