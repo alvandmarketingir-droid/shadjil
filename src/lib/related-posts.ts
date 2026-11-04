@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 
 export type RelatedPostCard = {
   id: string;
@@ -14,7 +14,7 @@ export async function getRelatedPosts(
   limit = 4,
 ): Promise<RelatedPostCard[]> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     let q = supabase
       .from("blog_posts")
       .select("id, title, slug, excerpt, cover_url")

@@ -1,5 +1,5 @@
 import sharp from "sharp";
-import { readFile } from "fs/promises";
+import { existsSync, readFileSync } from "fs";
 import path from "path";
 
 const WEBP_QUALITY = 82;
@@ -26,6 +26,18 @@ export const PRODUCT_IMAGE_SIZES = {
 export type ProductImageSizeName = keyof typeof PRODUCT_IMAGE_SIZES;
 
 let cachedLogo: Buffer | null | undefined;
+let loggedMissing = false;
+
+function tryReadLogoFile(logoPath: string): Buffer | null {
+  try {
+    if (!existsSync(logoPath)) return null;
+    const buf = readFileSync(logoPath);
+    return buf.length > 0 ? buf : null;
+  } catch {
+    // Never throw / spam on missing paths (common on Vercel serverless)
+    return null;
+  }
+}
 
 async function loadWatermarkLogo(): Promise<Buffer | null> {
   if (cachedLogo !== undefined) return cachedLogo;
@@ -34,39 +46,52 @@ async function loadWatermarkLogo(): Promise<Buffer | null> {
     path.join(process.cwd(), "public", "brand", WATERMARK_FILE),
     path.join(process.cwd(), "brand", WATERMARK_FILE),
     path.join(process.cwd(), "public", WATERMARK_FILE),
+    // Some Vercel runtimes resolve assets relative to the function bundle
+    path.join(__dirname, "..", "..", "public", "brand", WATERMARK_FILE),
   ];
 
-  for (const logoPath of candidates) {
+  // On Vercel prefer HTTP first — public/ may not be on the function FS
+  const preferUrl = Boolean(process.env.VERCEL);
+
+  const tryUrl = async (): Promise<Buffer | null> => {
     try {
-      const buf = await readFile(logoPath);
-      if (buf.length > 0) {
-        console.info("[watermark] loaded from fs", logoPath, buf.length);
-        cachedLogo = buf;
-        return buf;
-      }
+      const res = await fetch(WATERMARK_PUBLIC_URL, { cache: "force-cache" });
+      if (!res.ok) return null;
+      const buf = Buffer.from(await res.arrayBuffer());
+      return buf.length > 0 ? buf : null;
     } catch {
-      /* next */
+      return null;
+    }
+  };
+
+  if (preferUrl) {
+    const fromUrl = await tryUrl();
+    if (fromUrl) {
+      cachedLogo = fromUrl;
+      return fromUrl;
     }
   }
 
-  try {
-    const res = await fetch(WATERMARK_PUBLIC_URL, { cache: "force-cache" });
-    if (res.ok) {
-      const ab = await res.arrayBuffer();
-      const buf = Buffer.from(ab);
-      if (buf.length > 0) {
-        console.info("[watermark] loaded from url", WATERMARK_PUBLIC_URL, buf.length);
-        cachedLogo = buf;
-        return buf;
-      }
-    } else {
-      console.warn("[watermark] fetch status", res.status, WATERMARK_PUBLIC_URL);
+  for (const logoPath of candidates) {
+    const buf = tryReadLogoFile(logoPath);
+    if (buf) {
+      cachedLogo = buf;
+      return buf;
     }
-  } catch (e) {
-    console.warn("[watermark] fetch failed", WATERMARK_PUBLIC_URL, e);
   }
 
-  console.warn("[watermark] logo missing; cwd=", process.cwd());
+  if (!preferUrl) {
+    const fromUrl = await tryUrl();
+    if (fromUrl) {
+      cachedLogo = fromUrl;
+      return fromUrl;
+    }
+  }
+
+  if (!loggedMissing) {
+    loggedMissing = true;
+    console.warn("[watermark] logo unavailable; continuing without mark");
+  }
   cachedLogo = null;
   return null;
 }
