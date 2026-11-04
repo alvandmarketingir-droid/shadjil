@@ -4,6 +4,8 @@ import {
   normalizeIranPostalCode,
   toEnglishDigits,
   toPersianDigits,
+  phoneLookupVariants,
+  otpPhoneEmail,
 } from "@/lib/numbers";
 
 describe("Iran numbers", () => {
@@ -22,5 +24,19 @@ describe("Iran numbers", () => {
   it("digit convert", () => {
     expect(toEnglishDigits("۱۲۳")).toBe("123");
     expect(toPersianDigits(45)).toBe("۴۵");
+  });
+
+  it("phone lookup variants + otp email", () => {
+    const v = phoneLookupVariants("09391926236");
+    expect(v).toContain("09391926236");
+    expect(v).toContain("+989391926236");
+    expect(v).toContain("9391926236");
+    expect(phoneLookupVariants("bad")).toEqual([]);
+    expect(otpPhoneEmail("09391926236")).toBe(
+      "09391926236@phone.pirahanmardane.ir",
+    );
+    expect(otpPhoneEmail("+989391926236")).toBe(
+      "09391926236@phone.pirahanmardane.ir",
+    );
   });
 });

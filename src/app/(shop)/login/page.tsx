@@ -4,8 +4,14 @@ import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { AuthForm } from "@/components/ui/premium-auth";
 
+function safeNextPath(raw: string): string {
+  const n = (raw || "").trim();
+  if (!n.startsWith("/") || n.startsWith("//")) return "/dashboard";
+  return n;
+}
+
 function LoginInner() {
-  const next = useSearchParams().get("next") || "";
+  const next = safeNextPath(useSearchParams().get("next") || "");
   const admin = next.startsWith("/admin");
   return (
     <div className="bg-background flex min-h-[70vh] w-full items-center justify-center px-4 py-10" dir="rtl">
@@ -13,7 +19,8 @@ function LoginInner() {
         <AuthForm
           initialMode="login"
           hideRegister={admin}
-          defaultNext={admin ? "/admin/dashboard" : "/dashboard"}
+          // پاس‌دادن خود next تا ?next=/admin/dashboard بعد از ورود حفظ شود
+          defaultNext={admin ? next || "/admin/dashboard" : next || "/dashboard"}
         />
       </div>
     </div>

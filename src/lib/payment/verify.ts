@@ -131,7 +131,12 @@ export async function verifyAndApplyPayment(
         detail: e instanceof Error ? e.message : "err",
       };
     }
-  } else if (process.env.PAYMENT_TEST_MODE === "true") {
+  } else if (
+    process.env.PAYMENT_TEST_MODE === "true" &&
+    process.env.VERCEL_ENV !== "production" &&
+    process.env.NODE_ENV !== "production"
+  ) {
+    // فقط غیرپروداکشن — در پروداکشن بدون MERCHANT_ID هرگز paid نشود
     gatewayOk = true;
     refId = `TEST-${authority.slice(0, 12)}`;
   } else {

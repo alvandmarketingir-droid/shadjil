@@ -35,7 +35,8 @@ export async function getMyOrderStatusAction(
       return { ok: false, error: "db" };
     }
     if (!data) return { ok: false, error: "not_found" };
-    if (data.user_id && data.user_id !== user.id) {
+    // فقط مالک سفارش — سفارش مهمان (user_id null) قابل خواندن با UUID توسط هر کاربر لاگین‌شده نیست
+    if (!data.user_id || data.user_id !== user.id) {
       return { ok: false, error: "forbidden" };
     }
 

@@ -8,8 +8,9 @@ export default function RegisterPage() {
       <div className="border-border bg-card w-full max-w-md rounded-2xl border shadow-sm">
         <AuthForm
           initialMode="signup"
+          defaultNext="/dashboard"
           onSuccess={() => {
-            window.location.href = "/dashboard";
+            window.location.assign("/dashboard");
           }}
         />
       </div>

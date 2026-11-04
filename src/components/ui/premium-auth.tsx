@@ -78,6 +78,51 @@ function isValidLoginId(value: string) {
   return isValidIranPhone(v);
 }
 
+/** مقصد بعد از ورود/ثبت‌نام: پنل مشتری، مگر next ادمین و کاربر مجاز */
+function resolvePostAuthDestination(opts: {
+  defaultNext?: string;
+  allowAdmin?: boolean;
+}): string {
+  const qRaw =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search).get("next")
+      : null;
+  const qNext =
+    qRaw && qRaw.startsWith("/") && !qRaw.startsWith("//") ? qRaw.trim() : null;
+  const fallback =
+    opts.defaultNext &&
+    opts.defaultNext.startsWith("/") &&
+    !opts.defaultNext.startsWith("//")
+      ? opts.defaultNext
+      : "/dashboard";
+
+  let dest = qNext || fallback;
+  if (!dest.startsWith("/") || dest.startsWith("//")) dest = "/dashboard";
+
+  // مسیرهای auth/خانه بعد از ورود → پنل مشتری
+  if (
+    dest === "/" ||
+    dest === "/login" ||
+    dest === "/ورود" ||
+    dest === "/register" ||
+    dest === "/ثبت-نام"
+  ) {
+    dest = "/dashboard";
+  }
+
+  // /admin فقط اگر صریحاً مجاز (نقش ادمین یا next/defaultNext ادمین از صفحهٔ لاگین ادمین)
+  if (dest.startsWith("/admin") && !opts.allowAdmin) {
+    dest = "/dashboard";
+  }
+  return dest;
+}
+
+function navigateAfterAuth(dest?: string) {
+  const target =
+    dest && dest.startsWith("/") && !dest.startsWith("//") ? dest : "/dashboard";
+  window.location.assign(target);
+}
+
 export function AuthForm({
   onSuccess,
   onClose,
@@ -167,7 +212,22 @@ export function AuthForm({
           setIsLoading(false);
           return;
         }
-        const ver = await verifyOtpAction(normalizeIranMobile(formData.phone) ?? formData.phone, formData.otpCode);
+        // رمز اجباری در OTP تا بعداً signInWithPassword کار کند (بدون ست دستی در Supabase)
+        if (!formData.password || formData.password.length < 8) {
+          setErrors({ password: "رمز عبور حداقل ۸ کاراکتر برای ورود بعدی لازم است" });
+          setIsLoading(false);
+          return;
+        }
+        if (formData.password !== formData.confirmPassword) {
+          setErrors({ confirmPassword: "تکرار رمز مطابقت ندارد" });
+          setIsLoading(false);
+          return;
+        }
+        const phoneNormLogin =
+          normalizeIranMobile(formData.phone) ?? formData.phone;
+        const ver = await verifyOtpAction(phoneNormLogin, formData.otpCode, {
+          password: formData.password,
+        });
         if (!ver.ok) {
           const map: Record<string, string> = {
             invalid_phone: "شماره نامعتبر است",
@@ -182,12 +242,9 @@ export function AuthForm({
           setIsLoading(false);
           return;
         }
-                
-        
-        
+
         const tokenHash = (ver as { token_hash?: string }).token_hash;
         const email = (ver as { email?: string }).email;
-        const tempPass = (ver as { temp_password?: string }).temp_password;
         try {
           const { createBrowserClient } = await import("@supabase/ssr");
           const browser = createBrowserClient(
@@ -206,11 +263,12 @@ export function AuthForm({
               sessionOk = true;
             }
           }
-          if (!sessionOk && email && tempPass) {
-            const { data: signed, error: signErr } = await browser.auth.signInWithPassword({
-              email,
-              password: tempPass,
-            });
+          if (!sessionOk && email && formData.password) {
+            const { data: signed, error: signErr } =
+              await browser.auth.signInWithPassword({
+                email,
+                password: formData.password,
+              });
             if (signErr || !signed.session) {
               console.error("[otp signIn]", signErr);
               setErrors({ otpCode: "ورود ناموفق؛ دوباره کد بگیرید" });
@@ -224,6 +282,12 @@ export function AuthForm({
             setIsLoading(false);
             return;
           }
+          // پشتیبان: رمز را با نشست فعال هم بنویس
+          const { error: pwErr } = await browser.auth.updateUser({
+            password: formData.password,
+            data: { phone: phoneNormLogin },
+          });
+          if (pwErr) console.warn("[otp login setPassword]", pwErr);
         } catch (e) {
           console.error("[otp session]", e);
           setErrors({ otpCode: "خطا در ورود" });
@@ -237,15 +301,19 @@ export function AuthForm({
         } catch {}
         const role = String((ver as { role?: string }).role || "").toLowerCase();
         const isAdmin = role === "admin";
-        const qNext = new URLSearchParams(window.location.search).get("next");
-        let dest =
-          qNext && qNext.startsWith("/") && !qNext.startsWith("//")
-            ? qNext
-            : defaultNext || (isAdmin ? "/admin/dashboard" : "/dashboard");
-        if (!dest.startsWith("/")) dest = "/dashboard";
-        if (dest.startsWith("/admin") && !isAdmin) dest = "/dashboard";
+        const qNextAdmin = (
+          new URLSearchParams(window.location.search).get("next") || ""
+        ).startsWith("/admin");
+        const dest = resolvePostAuthDestination({
+          defaultNext:
+            defaultNext || (isAdmin ? "/admin/dashboard" : "/dashboard"),
+          allowAdmin:
+            isAdmin ||
+            qNextAdmin ||
+            (defaultNext || "").startsWith("/admin"),
+        });
         setIsLoading(false);
-        window.location.assign(dest);
+        navigateAfterAuth(dest);
         return;
       }
 
@@ -261,32 +329,17 @@ export function AuthForm({
           setIsLoading(false);
           return;
         }
+        // ایمیل و موبایل هر دو از Server Action — resolve چندایمیلی + کوکی SSR یکسان
         const id = formData.loginId.trim();
+        let signedRole = "";
         try {
-          const { createBrowserClient } = await import("@supabase/ssr");
-          const browser = createBrowserClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-          );
-          if (id.includes("@")) {
-            const { data, error } = await browser.auth.signInWithPassword({
-              email: id.toLowerCase(),
-              password: formData.password,
-            });
-            if (error || !data.session) {
-              console.error("[password login]", error);
-              setErrors({ general: "ایمیل یا رمز عبور نادرست است" });
-              setIsLoading(false);
-              return;
-            }
-          } else {
-            const res = await signInAction(id, formData.password);
-            if (!res.ok) {
-              setErrors({ general: res.error || "ورود ناموفق" });
-              setIsLoading(false);
-              return;
-            }
+          const res = await signInAction(id, formData.password);
+          if (!res.ok) {
+            setErrors({ general: res.error || "ورود ناموفق" });
+            setIsLoading(false);
+            return;
           }
+          signedRole = String((res as { role?: string }).role || "");
         } catch (e) {
           console.error("[password login]", e);
           setErrors({ general: "خطا در ورود" });
@@ -297,18 +350,21 @@ export function AuthForm({
           void onSuccess?.({ email: id });
         } catch {}
         setSuccessMessage("ورود موفق");
-        const qNext = new URLSearchParams(window.location.search).get("next");
-        let dest =
-          qNext && qNext.startsWith("/") && !qNext.startsWith("//")
-            ? qNext
-            : defaultNext || "/dashboard";
-        if (!dest.startsWith("/")) dest = "/dashboard";
-        // مشتری هرگز به پنل ادمین نرود (مگر defaultNext صریحاً admin باشد و از صفحه login?next=/admin آمده باشد)
-        if (dest.startsWith("/admin") && !(defaultNext || "").startsWith("/admin") && !(qNext || "").startsWith("/admin")) {
-          dest = "/dashboard";
-        }
+        const qNext = new URLSearchParams(window.location.search).get("next") || "";
+        const qNextAdmin = qNext.startsWith("/admin");
+        const isAdmin = signedRole.toLowerCase() === "admin";
+        const allowAdmin =
+          isAdmin ||
+          qNextAdmin ||
+          (defaultNext || "").startsWith("/admin");
+        const dest = resolvePostAuthDestination({
+          defaultNext:
+            defaultNext ||
+            (isAdmin && qNextAdmin ? "/admin/dashboard" : "/dashboard"),
+          allowAdmin,
+        });
         setIsLoading(false);
-        window.location.assign(dest);
+        navigateAfterAuth(dest);
         return;
       }
 
@@ -326,7 +382,7 @@ export function AuthForm({
         return;
       }
 
-      // ——— ثبت‌نام با OTP واقعی (همان مسیر ورود) ———
+      // ——— ثبت‌نام با OTP + ذخیره رمز برای ورود بعدی با پسورد ———
       if (authMode === "signup") {
         const phoneNorm = normalizeIranMobile(formData.phone) ?? formData.phone;
         if (!phoneNorm || phoneNorm.length < 11) {
@@ -335,8 +391,27 @@ export function AuthForm({
           return;
         }
 
-        // مرحله 1: ارسال کد
+        // مرحله 1: اعتبارسنجی فرم + ارسال کد
         if (registrationStep === "details") {
+          const nextErrs: FormErrors = {};
+          if (!formData.name.trim()) nextErrs.name = "نام الزامی است";
+          if (!formData.password || formData.password.length < 8) {
+            nextErrs.password = "رمز عبور حداقل ۸ کاراکتر باشد";
+          }
+          if (formData.password !== formData.confirmPassword) {
+            nextErrs.confirmPassword = "تکرار رمز مطابقت ندارد";
+          }
+          if (formData.email.trim() && !isValidEmail(formData.email.trim())) {
+            nextErrs.email = "ایمیل نامعتبر است";
+          }
+          if (!formData.agreeToTerms) {
+            nextErrs.agreeToTerms = "پذیرش قوانین الزامی است";
+          }
+          if (Object.keys(nextErrs).length) {
+            setErrors(nextErrs);
+            setIsLoading(false);
+            return;
+          }
           const res = await requestOtpAction(phoneNorm);
           if (!res.ok) {
             const map: Record<string, string> = {
@@ -357,7 +432,7 @@ export function AuthForm({
           return;
         }
 
-        // مرحله 2: تأیید کد + ساخت نشست (مثل ورود)
+        // مرحله 2: تأیید کد + ساخت/به‌روزرسانی کاربر با رمز + نشست → داشبورد
         if (registrationStep === "verification") {
           const code = (formData.verificationCode || formData.otpCode || "").replace(/\D/g, "");
           if (!/^\d{6}$/.test(code)) {
@@ -365,7 +440,11 @@ export function AuthForm({
             setIsLoading(false);
             return;
           }
-          const ver = await verifyOtpAction(phoneNorm, code);
+          const ver = await verifyOtpAction(phoneNorm, code, {
+            password: formData.password,
+            fullName: formData.name.trim(),
+            email: formData.email.trim() || undefined,
+          });
           if (!ver.ok) {
             const map: Record<string, string> = {
               invalid_code: "کد نادرست است",
@@ -381,38 +460,84 @@ export function AuthForm({
             return;
           }
 
+          const tokenHash = (ver as { token_hash?: string }).token_hash;
           const email = (ver as { email?: string }).email;
-          const tempPass = (ver as { temp_password?: string }).temp_password;
-          if (email && tempPass) {
-            try {
-              const { createBrowserClient } = await import("@supabase/ssr");
-              const browser = createBrowserClient(
-                process.env.NEXT_PUBLIC_SUPABASE_URL!,
-                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-              );
+          try {
+            const { createBrowserClient } = await import("@supabase/ssr");
+            const browser = createBrowserClient(
+              process.env.NEXT_PUBLIC_SUPABASE_URL!,
+              process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+            );
+            let sessionOk = false;
+            if (tokenHash) {
+              const { data: verified, error: vErr } = await browser.auth.verifyOtp({
+                token_hash: tokenHash,
+                type: "email",
+              });
+              if (vErr || !verified.session) {
+                console.error("[signup verifyOtp]", vErr);
+              } else {
+                sessionOk = true;
+              }
+            }
+            if (!sessionOk && email && formData.password) {
               const { error: signErr } = await browser.auth.signInWithPassword({
                 email,
-                password: tempPass,
+                password: formData.password,
               });
               if (signErr) console.error("[signup signIn]", signErr);
-            } catch (e) {
-              console.error("[signup session]", e);
+              else sessionOk = true;
             }
+            if (sessionOk && formData.password.length >= 8) {
+              const { error: pwErr } = await browser.auth.updateUser({
+                password: formData.password,
+                data: {
+                  phone: phoneNorm,
+                  full_name: formData.name.trim(),
+                  ...(formData.email.trim()
+                    ? { contact_email: formData.email.trim().toLowerCase() }
+                    : {}),
+                },
+              });
+              if (pwErr) console.warn("[signup setPassword]", pwErr);
+              // اثبات: همان رمز باید فوراً برای signInWithPassword کار کند
+              if (email) {
+                const check = await browser.auth.signInWithPassword({
+                  email,
+                  password: formData.password,
+                });
+                if (check.error || !check.data.session) {
+                  console.error("[signup password verify]", check.error);
+                  setErrors({
+                    verificationCode:
+                      "حساب ساخته شد ولی ذخیره رمز کامل نشد؛ کد را دوباره بزنید یا با OTP وارد شوید و رمز را دوباره وارد کنید.",
+                  });
+                  setIsLoading(false);
+                  return;
+                }
+              }
+            } else if (!sessionOk) {
+              setErrors({
+                verificationCode: "نشست ساخته نشد؛ کد را دوباره تأیید کنید",
+              });
+              setIsLoading(false);
+              return;
+            }
+          } catch (e) {
+            console.error("[signup session]", e);
+            setErrors({ verificationCode: "خطا در تکمیل ثبت‌نام" });
+            setIsLoading(false);
+            return;
           }
 
           setRegistrationStep("complete");
-          setSuccessMessage("ثبت‌نام کامل شد");
+          setSuccessMessage("ثبت‌نام کامل شد — ورود به پنل مشتری…");
           try {
-            void onSuccess?.({ phone: formData.phone });
+            void onSuccess?.({ phone: formData.phone, name: formData.name });
           } catch {}
-          setTimeout(() => {
-            window.location.replace(
-              (defaultNext && defaultNext.startsWith("/") && !defaultNext.startsWith("/admin"))
-                ? defaultNext
-                : "/dashboard"
-            );
-          }, 800);
+          // همیشه پنل مشتری — نه تاخیر؛ مسیر ثابت /dashboard
           setIsLoading(false);
+          navigateAfterAuth("/dashboard");
           return;
         }
 
@@ -662,6 +787,39 @@ export function AuthForm({
                 {errors.otpCode ? (
                   <p className="text-destructive text-xs">{errors.otpCode}</p>
                 ) : null}
+                <p className="text-muted-foreground text-xs text-right">
+                  رمز را وارد کنید تا بعداً بدون OTP با موبایل/ایمیل وارد شوید.
+                </p>
+                <div className="relative">
+                  <Lock className="text-muted-foreground absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2" />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="رمز عبور (حداقل ۸ کاراکتر) *"
+                    value={formData.password}
+                    onChange={(e) => handleInputChange("password", e.target.value)}
+                    className={cn(inputCls, "pl-10 pr-12")}
+                    autoComplete="new-password"
+                  />
+                </div>
+                {errors.password ? (
+                  <p className="text-destructive text-xs">{errors.password}</p>
+                ) : null}
+                <div className="relative">
+                  <Shield className="text-muted-foreground absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2" />
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="تکرار رمز عبور *"
+                    value={formData.confirmPassword}
+                    onChange={(e) =>
+                      handleInputChange("confirmPassword", e.target.value)
+                    }
+                    className={cn(inputCls, "pl-10 pr-12")}
+                    autoComplete="new-password"
+                  />
+                </div>
+                {errors.confirmPassword ? (
+                  <p className="text-destructive text-xs">{errors.confirmPassword}</p>
+                ) : null}
                 <button
                   type="submit"
                   disabled={isLoading}
@@ -670,7 +828,7 @@ export function AuthForm({
                   {isLoading ? (
                     <Loader2 className="mx-auto h-5 w-5 animate-spin" />
                   ) : (
-                    "ورود"
+                    "تأیید و ورود"
                   )}
                 </button>
                 <button
@@ -762,12 +920,20 @@ export function AuthForm({
               type="button"
               className="bg-primary text-primary-foreground w-full rounded-xl py-3 font-medium"
               onClick={() => {
-                onClose?.();
-                onSuccess?.({
-                  phone: formData.phone,
-                  email: formData.email.trim() || undefined,
-                  name: formData.name,
-                });
+                try {
+                  onClose?.();
+                  onSuccess?.({
+                    phone: formData.phone,
+                    email: formData.email.trim() || undefined,
+                    name: formData.name,
+                  });
+                } catch {}
+                navigateAfterAuth(
+                  resolvePostAuthDestination({
+                    defaultNext: defaultNext || "/dashboard",
+                    allowAdmin: false,
+                  }),
+                );
               }}
             >
               ورود به داشبورد
