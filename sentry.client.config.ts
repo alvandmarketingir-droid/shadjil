@@ -6,7 +6,6 @@ Sentry.init({
   replaysSessionSampleRate: 0,
   replaysOnErrorSampleRate: 0.05,
   enabled: Boolean(process.env.NEXT_PUBLIC_SENTRY_DSN),
-  sendDefaultPii: false,
   beforeSend(event) {
     if (event.request?.headers) {
       const h = { ...event.request.headers };

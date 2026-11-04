@@ -294,7 +294,7 @@ export async function adminUpdateAttributeOptionAction(input: {
   try {
     const { error } = await gate.supabase
       .from("attribute_options")
-      .update(patch)
+      .update(patch as any)
       .eq("id", input.id);
     if (error) throw error;
     return { ok: true as const };

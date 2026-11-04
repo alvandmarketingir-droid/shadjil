@@ -91,7 +91,7 @@ export async function cacheDelByPrefix(prefix: string): Promise<void> {
     // Upstash از SCAN پشتیبانی می‌کند
     let cursor: number | string = 0;
     do {
-      const result = await r.scan(cursor, { match: `${prefix}*`, count: 100 });
+      const result: [string | number, string[]] = await r.scan(cursor, { match: `${prefix}*`, count: 100 }) as any;
       cursor = result[0];
       const keys = result[1];
       if (keys.length > 0) {

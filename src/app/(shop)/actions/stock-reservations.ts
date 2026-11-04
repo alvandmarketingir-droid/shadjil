@@ -82,6 +82,10 @@ export async function reserveCheckoutStockAction() {
         ok = Boolean(res.data);
         error = res.error;
       } else {
+        if (!sessionId) {
+          failed.push(String(title));
+          continue;
+        }
         const res = await service.rpc("reserve_variant_stock_session", {
           p_session_id: sessionId,
           p_variant_id: variantId,

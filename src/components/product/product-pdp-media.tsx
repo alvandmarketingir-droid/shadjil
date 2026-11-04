@@ -106,7 +106,7 @@ export function ProductPdpGalleryAndBuy({
           <ProductBuyBox
             productId={productId}
             title={productName}
-            image={cartImage}
+            image={cartImage ?? undefined}
             href={href}
             variants={variants}
             onColorChange={onColorChange}

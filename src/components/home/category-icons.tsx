@@ -1,5 +1,7 @@
 "use client";
 
+
+import type { ReactElement } from "react";
 import type { SVGProps } from "react";
 import { cn } from "@/lib/utils";
 
@@ -106,7 +108,7 @@ export function IconCategoryDefault(props: IconProps) {
   );
 }
 
-const RULES: { test: (s: string) => boolean; Icon: (p: IconProps) => JSX.Element }[] = [
+const RULES: { test: (s: string) => boolean; Icon: (p: IconProps) => ReactElement }[] = [
   { test: (s) => /پارچه|fabric|کتان|پنبه|نخ|لینن|پشم/.test(s), Icon: IconFabric },
   { test: (s) => /فیت|fit|slim|regular|سایز/.test(s), Icon: IconFit },
   { test: (s) => /اسپرت|کار|sport|work|کارگری/.test(s), Icon: IconSportWork },

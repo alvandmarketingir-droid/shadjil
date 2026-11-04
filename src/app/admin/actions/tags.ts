@@ -118,7 +118,7 @@ export async function adminUpdateProductTagAction(
     if ((patch as any).robots_index !== undefined) body.robots_index = false; // tags always noindex
     if ((patch as any).robots_follow !== undefined) body.robots_follow = !!(patch as any).robots_follow;
     if (!Object.keys(body).length) return { ok: true as const };
-    const { error } = await gate.supabase.from("product_tags").update(body).eq("id", id);
+    const { error } = await gate.supabase.from("product_tags").update(body as any).eq("id", id);
     if (error) throw error;
     return { ok: true as const };
   } catch (e) {

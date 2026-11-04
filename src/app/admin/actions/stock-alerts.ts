@@ -95,7 +95,7 @@ export async function adminSetStockAlertStatusAction(
     const service = createServiceClient();
     const patch: Record<string, unknown> = { status };
     if (status === "notified") patch.notified_at = new Date().toISOString();
-    const { error } = await service.from("stock_alerts").update(patch).eq("id", id);
+    const { error } = await service.from("stock_alerts").update(patch as any).eq("id", id);
     if (error) throw error;
     return { ok: true as const };
   } catch (e) {

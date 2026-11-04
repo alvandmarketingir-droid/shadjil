@@ -105,7 +105,7 @@ export async function adminSetReturnStatusAction(
     if (adminNote !== undefined) patch.admin_note = adminNote;
     const { error } = await gate.supabase
       .from("return_requests")
-      .update(patch)
+      .update(patch as any)
       .eq("id", id);
     if (error) throw error;
 

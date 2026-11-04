@@ -217,7 +217,6 @@ export default function AdminTicketsPage() {
           busy={bulkBusy}
           onArchive={() => void runBulkArchive()}
           onHardDelete={() => void runBulkHardDelete()}
-          onClear={() => setSelected([])}
         />
 
 

@@ -34,7 +34,7 @@ export default async function ProductsPage({
   const service = new ProductService();
   const categoryService = new CategoryService();
   const rootsResult = await categoryService.getRoots();
-  const categories = rootsResult.success
+  const categories = rootsResult.success && rootsResult.data
     ? rootsResult.data.map((c) => ({ name: c.name, slug: c.slug }))
     : [];
 
@@ -91,7 +91,7 @@ export default async function ProductsPage({
 
   const attributeService = new AttributeService();
   const facetsResult = await attributeService.getFilterableFacets();
-  const allFacets = facetsResult.success ? facetsResult.data : [];
+  const allFacets = facetsResult.success ? (facetsResult.data ?? []) : [];
   const allowed = new Set(facetSlugsForCategory(categorySlug));
   const facets = allFacets.filter((f) => allowed.has(f.slug));
 
@@ -182,6 +182,13 @@ export default async function ProductsPage({
     );
   }
 
+  if (!result.data) {
+    return (
+      <main className="w-full max-w-none mx-auto px-4 py-12">
+        <p className="text-destructive text-center">خطا در بارگذاری</p>
+      </main>
+    );
+  }
   const { data: products, total, page, totalPages } = result.data;
 
   return (

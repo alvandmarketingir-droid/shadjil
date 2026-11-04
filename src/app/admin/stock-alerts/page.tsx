@@ -164,7 +164,6 @@ export default function AdminStockAlertsPage() {
           busy={bulkBusy}
           onArchive={() => void runBulkArchive()}
           onHardDelete={() => void runBulkHardDelete()}
-          onClear={() => setSelected([])}
         />
 
 

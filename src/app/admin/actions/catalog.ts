@@ -148,7 +148,7 @@ export async function adminUpdateCategoryAction(
       body.description = (patch.description || "").trim() || null;
     if (!Object.keys(body).length) return { ok: true as const };
 
-    const { error } = await gate.supabase.from("categories").update(body).eq("id", id);
+    const { error } = await gate.supabase.from("categories").update(body as any).eq("id", id);
     if (error) throw error;
     return { ok: true as const };
   } catch (e) {
@@ -244,7 +244,7 @@ export async function adminUpdateBrandAction(
       body.description = (patch.description || "").trim() || null;
     if (!Object.keys(body).length) return { ok: true as const };
 
-    const { error } = await gate.supabase.from("brands").update(body).eq("id", id);
+    const { error } = await gate.supabase.from("brands").update(body as any).eq("id", id);
     if (error) throw error;
     return { ok: true as const };
   } catch (e) {

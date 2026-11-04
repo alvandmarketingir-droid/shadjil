@@ -224,7 +224,7 @@ export async function adminUpdatePaymentStatusAction(
     }
     const { error } = await service
       .from("orders")
-      .update(patch)
+      .update(patch as any)
       .eq("id", orderId);
     if (error) throw error;
 
@@ -275,7 +275,7 @@ export async function adminSetOrderTrackingAction(
         patch.status = "shipped";
       }
     }
-    const { error } = await service.from("orders").update(patch).eq("id", orderId);
+    const { error } = await service.from("orders").update(patch as any).eq("id", orderId);
     if (error) throw error;
 
     void adminWriteLogAction({
@@ -287,9 +287,9 @@ export async function adminSetOrderTrackingAction(
 
     // اعلان best-effort
     if (code) {
+      const repo = new OrderRepository();
+      const order = await repo.getByIdAdmin(orderId);
       try {
-        const repo = new OrderRepository();
-        const order = await repo.getByIdAdmin(orderId);
         const userId = (order as { user_id?: string | null } | null)?.user_id;
         if (userId) {
           const tpl = PREDEFINED_NOTIFICATIONS.find((x) => x.id === "order_shipped");
@@ -305,39 +305,37 @@ export async function adminSetOrderTrackingAction(
         }
       } catch (ne) {
         console.error("[adminSetOrderTracking notify]", ne);
+      }
 
-        try {
-          const phone = String((order as { shipping_phone?: string } | null)?.shipping_phone ?? "");
-          const name = String((order as { shipping_name?: string } | null)?.shipping_name ?? "مشتری");
-          await notifyShipped({ phone, name, orderId, tracking: code });
-        } catch (smsErr) {
-          console.warn("[sms shipped]", smsErr);
+      try {
+        const phone = String((order as { shipping_phone?: string } | null)?.shipping_phone ?? "");
+        const name = String((order as { shipping_name?: string } | null)?.shipping_name ?? "مشتری");
+        await notifyShipped({ phone, name, orderId, tracking: code });
+      } catch (smsErr) {
+        console.warn("[sms shipped]", smsErr);
+      }
 
-        try {
-          let emailTo = String((order as { shipping_email?: string } | null)?.shipping_email ?? "").trim();
-          if (!emailTo) {
-            const uid = String((order as { user_id?: string } | null)?.user_id ?? "");
-            if (uid) {
-              try {
-                const { data: u } = await service.auth.admin.getUserById(uid);
-                emailTo = String(u?.user?.email ?? "").trim();
-              } catch { /* */ }
-            }
+      try {
+        let emailTo = String((order as { shipping_email?: string } | null)?.shipping_email ?? "").trim();
+        if (!emailTo) {
+          const uid = String((order as { user_id?: string } | null)?.user_id ?? "");
+          if (uid) {
+            try {
+              const { data: u } = await service.auth.admin.getUserById(uid);
+              emailTo = String(u?.user?.email ?? "").trim();
+            } catch { /* */ }
           }
-          if (emailTo) {
-            await emailShipped({
-              to: emailTo,
-              customerName: String((order as { shipping_name?: string } | null)?.shipping_name ?? "مشتری"),
-              orderId,
-              tracking: code,
-            });
-          }
-        } catch (emErr) {
-          console.warn("[email shipped]", emErr);
         }
-
+        if (emailTo) {
+          await emailShipped({
+            to: emailTo,
+            customerName: String((order as { shipping_name?: string } | null)?.shipping_name ?? "مشتری"),
+            orderId,
+            tracking: code,
+          });
         }
-
+      } catch (emErr) {
+        console.warn("[email shipped]", emErr);
       }
     }
 
