@@ -52,6 +52,16 @@ export const contactRatelimit = upstashReady && redis
     })
   : null;
 
+/** محدودیت سبد — 30 افزودن در 60 ثانیه (ضد اسپم) */
+export const cartRatelimit = upstashReady && redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(30, "60 s"),
+      analytics: true,
+      prefix: "pm:cart",
+    })
+  : null;
+
 // ---------- Fallback حافظه‌ای (وقتی Upstash نیست) ----------
 type Bucket = { count: number; resetAt: number };
 const store = new Map<string, Bucket>();
@@ -91,7 +101,7 @@ export function rateLimitCleanup() {
  */
 export async function checkRateLimit(opts: {
   identifier: string;
-  type?: "api" | "auth" | "contact";
+  type?: "api" | "auth" | "contact" | "cart";
 }): Promise<{ success: boolean; remaining?: number; retryAfterSec?: number }> {
   const type = opts.type ?? "api";
   const id = opts.identifier || "anonymous";
@@ -100,6 +110,7 @@ export async function checkRateLimit(opts: {
   let limiter = apiRatelimit;
   if (type === "auth") limiter = authRatelimit;
   if (type === "contact") limiter = contactRatelimit;
+  if (type === "cart") limiter = cartRatelimit;
 
   if (limiter) {
     try {
@@ -122,6 +133,7 @@ export async function checkRateLimit(opts: {
     api: { limit: 20, windowMs: 60_000 },
     auth: { limit: 5, windowMs: 60_000 },
     contact: { limit: 5, windowMs: 5 * 60_000 },
+    cart: { limit: 30, windowMs: 60_000 },
   }[type];
 
   const result = memoryLimit({

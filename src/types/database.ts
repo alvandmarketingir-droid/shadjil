@@ -27,6 +27,11 @@ export type Database = {
           is_active: boolean;
           meta_title: string | null;
           meta_description: string | null;
+          short_description: string | null;
+          focus_keyphrases: string[] | null;
+          robots_index: boolean | null;
+          robots_follow: boolean | null;
+          canonical_url: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -41,6 +46,11 @@ export type Database = {
           is_active?: boolean;
           meta_title?: string | null;
           meta_description?: string | null;
+          short_description?: string | null;
+          focus_keyphrases?: string[] | null;
+          robots_index?: boolean | null;
+          robots_follow?: boolean | null;
+          canonical_url?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -55,6 +65,11 @@ export type Database = {
           is_active?: boolean;
           meta_title?: string | null;
           meta_description?: string | null;
+          short_description?: string | null;
+          focus_keyphrases?: string[] | null;
+          robots_index?: boolean | null;
+          robots_follow?: boolean | null;
+          canonical_url?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -68,6 +83,17 @@ export type Database = {
           logo_url: string | null;
           description: string | null;
           is_active: boolean;
+          image_url: string | null;
+          meta_title: string | null;
+          meta_description: string | null;
+          short_description: string | null;
+          focus_keyphrases: string[] | null;
+          robots_index: boolean | null;
+          robots_follow: boolean | null;
+          canonical_url: string | null;
+          og_title: string | null;
+          og_description: string | null;
+          og_image_url: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -78,6 +104,17 @@ export type Database = {
           logo_url?: string | null;
           description?: string | null;
           is_active?: boolean;
+          image_url?: string | null;
+          meta_title?: string | null;
+          meta_description?: string | null;
+          short_description?: string | null;
+          focus_keyphrases?: string[] | null;
+          robots_index?: boolean | null;
+          robots_follow?: boolean | null;
+          canonical_url?: string | null;
+          og_title?: string | null;
+          og_description?: string | null;
+          og_image_url?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -88,6 +125,17 @@ export type Database = {
           logo_url?: string | null;
           description?: string | null;
           is_active?: boolean;
+          image_url?: string | null;
+          meta_title?: string | null;
+          meta_description?: string | null;
+          short_description?: string | null;
+          focus_keyphrases?: string[] | null;
+          robots_index?: boolean | null;
+          robots_follow?: boolean | null;
+          canonical_url?: string | null;
+          og_title?: string | null;
+          og_description?: string | null;
+          og_image_url?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -111,6 +159,15 @@ export type Database = {
           average_rating: number | null;
           review_count: number;
           deleted_at: string | null;
+          size_guide_id: string | null;
+          published_at: string | null;
+          focus_keyphrases: string[] | null;
+          robots_index: boolean | null;
+          robots_follow: boolean | null;
+          canonical_url: string | null;
+          og_title: string | null;
+          og_description: string | null;
+          og_image_url: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -131,6 +188,15 @@ export type Database = {
           average_rating?: number | null;
           review_count?: number;
           deleted_at?: string | null;
+          size_guide_id?: string | null;
+          published_at?: string | null;
+          focus_keyphrases?: string[] | null;
+          robots_index?: boolean | null;
+          robots_follow?: boolean | null;
+          canonical_url?: string | null;
+          og_title?: string | null;
+          og_description?: string | null;
+          og_image_url?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -151,6 +217,15 @@ export type Database = {
           average_rating?: number | null;
           review_count?: number;
           deleted_at?: string | null;
+          size_guide_id?: string | null;
+          published_at?: string | null;
+          focus_keyphrases?: string[] | null;
+          robots_index?: boolean | null;
+          robots_follow?: boolean | null;
+          canonical_url?: string | null;
+          og_title?: string | null;
+          og_description?: string | null;
+          og_image_url?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -247,6 +322,7 @@ export type Database = {
           value: string;
           slug: string;
           sort_order: number;
+          hex: string | null;
         };
         Insert: {
           id?: string;
@@ -254,6 +330,7 @@ export type Database = {
           value: string;
           slug: string;
           sort_order?: number;
+          hex?: string | null;
         };
         Update: {
           id?: string;
@@ -261,6 +338,7 @@ export type Database = {
           value?: string;
           slug?: string;
           sort_order?: number;
+          hex?: string | null;
         };
         Relationships: [];
       };
@@ -594,6 +672,10 @@ export type Database = {
           shipping_address: string | null; shipping_city: string | null;
           shipping_postal: string | null; note: string | null; discount_code: string | null; discount_amount: number | null; paid_at: string | null;
           tracking_number: string | null; shipped_at: string | null;
+          shipping_fee: number;
+          session_id: string | null;
+          shipping_method_id: string | null;
+          shipping_method_title: string | null;
           created_at: string; updated_at: string;
         };
         Insert: {
@@ -603,6 +685,10 @@ export type Database = {
           shipping_address?: string | null; shipping_city?: string | null;
           shipping_postal?: string | null; note?: string | null; discount_code?: string | null; discount_amount?: number | null; paid_at?: string | null;
           tracking_number?: string | null; shipped_at?: string | null;
+          shipping_fee?: number;
+          session_id?: string | null;
+          shipping_method_id?: string | null;
+          shipping_method_title?: string | null;
           created_at?: string; updated_at?: string;
         };
         Update: {
@@ -612,6 +698,10 @@ export type Database = {
           shipping_address?: string | null; shipping_city?: string | null;
           shipping_postal?: string | null; note?: string | null; discount_code?: string | null; discount_amount?: number | null; paid_at?: string | null;
           tracking_number?: string | null; shipped_at?: string | null;
+          shipping_fee?: number;
+          session_id?: string | null;
+          shipping_method_id?: string | null;
+          shipping_method_title?: string | null;
           created_at?: string; updated_at?: string;
         };
         Relationships: [];
@@ -662,9 +752,9 @@ export type Database = {
         Relationships: [];
       };
       product_tags: {
-        Row: { id: string; name: string; slug: string; is_active: boolean; created_at: string; };
-        Insert: { id?: string; name: string; slug: string; is_active?: boolean; created_at?: string; };
-        Update: { id?: string; name?: string; slug?: string; is_active?: boolean; created_at?: string; };
+        Row: { id: string; name: string; slug: string; is_active: boolean; image_url: string | null; short_description: string | null; focus_keyphrases: string[] | null; robots_index: boolean | null; robots_follow: boolean | null; canonical_url: string | null; created_at: string; };
+        Insert: { id?: string; name: string; slug: string; is_active?: boolean; image_url?: string | null; short_description?: string | null; focus_keyphrases?: string[] | null; robots_index?: boolean | null; robots_follow?: boolean | null; canonical_url?: string | null; created_at?: string; };
+        Update: { id?: string; name?: string; slug?: string; is_active?: boolean; image_url?: string | null; short_description?: string | null; focus_keyphrases?: string[] | null; robots_index?: boolean | null; robots_follow?: boolean | null; canonical_url?: string | null; created_at?: string; };
         Relationships: [];
       };
       product_tag_map: {
@@ -688,6 +778,10 @@ export type Database = {
           og_description: string | null;
           og_image: string | null;
           og_image_url: string | null;
+          focus_keyphrases: string[] | null;
+          robots_index: boolean | null;
+          robots_follow: boolean | null;
+          canonical_url: string | null;
           created_at: string; updated_at: string;
         };
         Insert: {
@@ -698,6 +792,10 @@ export type Database = {
           og_description?: string | null;
           og_image?: string | null;
           og_image_url?: string | null;
+          focus_keyphrases?: string[] | null;
+          robots_index?: boolean | null;
+          robots_follow?: boolean | null;
+          canonical_url?: string | null;
           created_at?: string; updated_at?: string;
         };
         Update: {
@@ -708,6 +806,10 @@ export type Database = {
           og_description?: string | null;
           og_image?: string | null;
           og_image_url?: string | null;
+          focus_keyphrases?: string[] | null;
+          robots_index?: boolean | null;
+          robots_follow?: boolean | null;
+          canonical_url?: string | null;
           created_at?: string; updated_at?: string;
         };
         Relationships: [];
@@ -767,9 +869,9 @@ export type Database = {
         Relationships: [];
       };
       otp_challenges: {
-        Row: { id: string; phone: string; code_hash: string; expires_at: string; attempts: number; created_at: string; };
-        Insert: { id?: string; phone: string; code_hash: string; expires_at: string; attempts?: number; created_at?: string; };
-        Update: { id?: string; phone?: string; code_hash?: string; expires_at?: string; attempts?: number; created_at?: string; };
+        Row: { id: string; phone: string; code_hash: string; expires_at: string; attempts: number; consumed_at: string | null; created_at: string; };
+        Insert: { id?: string; phone: string; code_hash: string; expires_at: string; attempts?: number; consumed_at?: string | null; created_at?: string; };
+        Update: { id?: string; phone?: string; code_hash?: string; expires_at?: string; attempts?: number; consumed_at?: string | null; created_at?: string; };
         Relationships: [];
       };
       product_price_history: {

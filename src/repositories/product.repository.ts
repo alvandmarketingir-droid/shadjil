@@ -187,7 +187,7 @@ export class ProductRepository extends BaseRepository {
     const { data, error, count } = await query;
     if (error) throw error;
 
-    let items = (data ?? []) as ProductWithRelations[];
+    let items = (data ?? []) as unknown as ProductWithRelations[];
 
     // UUID فیلتر → برچسب متنی واریانت (size / color_name)
     let sizeLabel: string | null = null;
@@ -318,7 +318,7 @@ if (filters.sizeId) {
         console.error("[findBySlug exact]", normalized, error);
         throw error;
       }
-      if (data) return data as ProductWithRelations;
+      if (data) return data as unknown as ProductWithRelations;
     }
 
     // 2) raw param (اگر decode فرق داشته)
@@ -335,7 +335,7 @@ if (filters.sizeId) {
         console.error("[findBySlug raw]", raw, error);
         throw error;
       }
-      if (data) return data as ProductWithRelations;
+      if (data) return data as unknown as ProductWithRelations;
     }
 
     // 3) fallback: بین publishedها اسلاگ نرمال‌شده را پیدا کن
@@ -353,7 +353,7 @@ if (filters.sizeId) {
     const hit = (rows ?? []).find(
       (r) => normalizeProductSlug(String((r as { slug?: string }).slug ?? "")) === normalized,
     );
-    return (hit as ProductWithRelations) ?? null;
+    return (hit as unknown as ProductWithRelations) ?? null;
   }
 
   async findById(id: string) {

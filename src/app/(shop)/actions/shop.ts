@@ -13,6 +13,8 @@ import { cookies } from "next/headers";
 import { assertNoLinkOrImage } from "@/lib/sanitize-user-text";
 import { randomUUID } from "crypto";
 import { normalizePhone, normalizeIranMobile, normalizeIranPostalCode, toEnglishDigits } from "@/lib/numbers";
+import { checkRateLimit } from "@/lib/security/rate-limit";
+import { headers } from "next/headers";
 
 async function requireUser() {
   const supabase = await createClient();
@@ -22,17 +24,32 @@ async function requireUser() {
   return user;
 }
 
+const CART_SID_COOKIE = "pm_cart_sid";
+const CART_SID_MAX_AGE = 60 * 60 * 24 * 30;
+
+function cartCookieOptions() {
+  return {
+    httpOnly: true,
+    sameSite: "lax" as const,
+    path: "/",
+    maxAge: CART_SID_MAX_AGE,
+    secure: process.env.NODE_ENV === "production",
+  };
+}
+
+/** مهمان: کوکی پایدار سبد؛ در هر نوشتن سبد تمدید می‌شود */
 async function getSessionId() {
   const jar = await cookies();
-  let sid = jar.get("pm_cart_sid")?.value;
-  if (!sid) {
+  let sid = jar.get(CART_SID_COOKIE)?.value?.trim();
+  if (!sid || sid.length < 8) {
     sid = randomUUID();
-    jar.set("pm_cart_sid", sid, {
-      httpOnly: true,
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 30,
-    });
+  }
+  // همیشه set تا تمدید maxAge و secure در prod اعمال شود
+  try {
+    jar.set(CART_SID_COOKIE, sid, cartCookieOptions());
+  } catch (e) {
+    // در بعضی مسیرهای RSC set ممکن است throw کند — sid را برمی‌گردانیم
+    console.warn("[getSessionId] cookie set skipped", e);
   }
   return sid;
 }
@@ -147,10 +164,22 @@ export async function addToCartAction(variantId: string, quantity = 1) {
     if (!variantId) {
       return { ok: false as const, error: "variant_required" };
     }
+    let ip = "unknown";
+    try {
+      const h = await headers();
+      ip =
+        h.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+        h.get("x-real-ip") ||
+        "unknown";
+    } catch {}
+    const rl = await checkRateLimit({ identifier: ip, type: "cart" });
+    if (!rl.success) {
+      return { ok: false as const, error: "rate_limit" };
+    }
     const cartRepo = new CartRepository();
     const cartId = await resolveCartId(); // user یا session cookie
     await cartRepo.addItem(cartId, variantId, quantity);
-return { ok: true as const };
+    return { ok: true as const };
   } catch (e) {
     console.error("[addToCart]", e);
     const msg =
