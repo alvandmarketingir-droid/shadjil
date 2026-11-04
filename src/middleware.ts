@@ -124,8 +124,20 @@ async function lookupUrlRedirect(
   }
 }
 
+function hasSupabaseAuthCookie(request: NextRequest): boolean {
+  return request.cookies
+    .getAll()
+    .some(
+      (c) =>
+        c.name.includes("auth-token") ||
+        c.name.startsWith("sb-") ||
+        c.name.includes("supabase"),
+    );
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const rid = requestIdFrom(request);
 
   // CSRF formal: Origin / Sec-Fetch-Site روی APIهای state-changing
   if (pathname.startsWith("/api/")) {
@@ -144,6 +156,19 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // پنل ادمین: ریدایرکت سخت HTTP تا soft-redirect داخل RSC به ۵۰۰ تبدیل نشود
+  if (pathname === "/admin" || pathname === "/admin/") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/admin/dashboard";
+    return applySecurityHeaders(NextResponse.redirect(url), rid);
+  }
+  if (pathname.startsWith("/admin") && !hasSupabaseAuthCookie(request)) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    url.search = "";
+    url.searchParams.set("next", "/admin/dashboard");
+    return applySecurityHeaders(NextResponse.redirect(url), rid);
+  }
 
   // ریدایرکت formal از DB (۳۰۱ و ...)
   try {

@@ -1,6 +1,6 @@
 "use server";
 
-import { createServiceClient } from "@/lib/supabase/service";
+import { requireAdmin } from "@/lib/admin/require-admin";
 import { revalidatePath } from "next/cache";
 
 export async function createShippingMethod(input: {
@@ -11,11 +11,13 @@ export async function createShippingMethod(input: {
   provider_code?: string;
   pricing_type?: string;
 }) {
+  const gate = await requireAdmin();
+  if (!gate.ok) return { error: gate.error };
+
   const title = (input.title || "").trim();
   if (!title) return { error: "title_required" };
   const fee = Math.max(0, Math.floor(Number(input.fee) || 0));
-  const supabase = createServiceClient();
-  const { error } = await supabase.from("shipping_methods").insert({
+  const { error } = await gate.supabase.from("shipping_methods").insert({
     title,
     description: (input.description || "").trim() || null,
     fee,
@@ -43,7 +45,9 @@ export async function updateShippingMethod(
     api_config?: Record<string, unknown>;
   },
 ) {
-  const supabase = createServiceClient();
+  const gate = await requireAdmin();
+  if (!gate.ok) return { error: gate.error };
+
   const patch: Record<string, unknown> = {
     updated_at: new Date().toISOString(),
   };
@@ -61,7 +65,7 @@ export async function updateShippingMethod(
     patch.pricing_type = input.pricing_type || "fixed";
   if (input.api_config !== undefined) patch.api_config = input.api_config;
 
-  const { error } = await supabase
+  const { error } = await gate.supabase
     .from("shipping_methods")
     .update(patch)
     .eq("id", id);
@@ -71,8 +75,10 @@ export async function updateShippingMethod(
 }
 
 export async function deleteShippingMethod(id: string) {
-  const supabase = createServiceClient();
-  const { error } = await supabase
+  const gate = await requireAdmin();
+  if (!gate.ok) return { error: gate.error };
+
+  const { error } = await gate.supabase
     .from("shipping_methods")
     .delete()
     .eq("id", id);

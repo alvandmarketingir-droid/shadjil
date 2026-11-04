@@ -1,10 +1,13 @@
 "use server";
 
-import { createServiceClient } from "@/lib/supabase/service";
+import { requireAdmin } from "@/lib/admin/require-admin";
 import { revalidatePath } from "next/cache";
 
 export async function updateReviewApproval(id: string, isApproved: boolean) {
-  const supabase = createServiceClient();
+  const gate = await requireAdmin();
+  if (!gate.ok) return { error: gate.error };
+
+  const supabase = gate.supabase;
 
   const { data: prev } = await supabase
     .from("reviews")
@@ -45,8 +48,10 @@ export async function updateReviewApproval(id: string, isApproved: boolean) {
 }
 
 export async function updateReviewReply(id: string, adminReply: string) {
-  const supabase = createServiceClient();
-  const { error } = await supabase
+  const gate = await requireAdmin();
+  if (!gate.ok) return { error: gate.error };
+
+  const { error } = await gate.supabase
     .from("reviews")
     .update({ admin_reply: adminReply.trim() || null })
     .eq("id", id);
