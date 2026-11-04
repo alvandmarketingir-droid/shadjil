@@ -212,7 +212,7 @@ export function AuthForm({
           setIsLoading(false);
           return;
         }
-        // رمز اجباری در OTP تا بعداً signInWithPassword کار کند (بدون ست دستی در Supabase)
+        // رمز اجباری در OTP تا بعداً signInWithPassword کار کند
         if (!formData.password || formData.password.length < 8) {
           setErrors({ password: "رمز عبور حداقل ۸ کاراکتر برای ورود بعدی لازم است" });
           setIsLoading(false);
