@@ -42,12 +42,16 @@ export async function getRelatedProducts(
 
     const imgMap = new Map<string, string>();
     for (const img of images ?? []) {
-      if (img.is_primary && !imgMap.has(img.product_id)) {
-        imgMap.set(img.product_id, img.url);
+      const pid = img.product_id;
+      if (!pid) continue;
+      if (img.is_primary && !imgMap.has(pid)) {
+        imgMap.set(pid, img.url);
       }
     }
     for (const img of images ?? []) {
-      if (!imgMap.has(img.product_id)) imgMap.set(img.product_id, img.url);
+      const pid = img.product_id;
+      if (!pid) continue;
+      if (!imgMap.has(pid)) imgMap.set(pid, img.url);
     }
     const priceMap = new Map<string, number>();
     for (const v of variants ?? []) {

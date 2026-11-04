@@ -182,7 +182,7 @@ export async function adminSetBlogPostStatusAction(
   try {
     const patch: Record<string, unknown> = { status };
     if (status === "published") patch.published_at = new Date().toISOString();
-    const { error } = await gate.supabase.from("blog_posts").update(patch).eq("id", id);
+    const { error } = await gate.supabase.from("blog_posts").update(patch as any).eq("id", id);
     if (error) throw error;
     return { ok: true as const };
   } catch {
@@ -275,7 +275,7 @@ export async function adminUpdateBlogPostAction(
         patch.published_at = new Date().toISOString();
       }
     }
-    const { error } = await gate.supabase.from("blog_posts").update(patch).eq("id", id);
+    const { error } = await gate.supabase.from("blog_posts").update(patch as any).eq("id", id);
     if (error) throw error;
 
     if (input.tag_ids) {

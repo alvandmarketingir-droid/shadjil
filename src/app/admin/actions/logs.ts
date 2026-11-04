@@ -47,7 +47,7 @@ export async function adminWriteLogAction(input: {
       entity: input.entity ?? null,
       entity_id: input.entity_id ?? null,
       meta: input.meta ?? null,
-      actor_id: gate.user?.id ?? null,
+      actor_id: gate.userId ?? null,
     });
     if (error) throw error;
     return { ok: true as const };

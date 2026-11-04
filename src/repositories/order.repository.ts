@@ -393,7 +393,7 @@ export class OrderRepository extends BaseRepository {
     }
     const { error } = await supabase
       .from("orders")
-      .update(patch)
+      .update(patch as any)
       .eq("id", orderId);
     if (error) throw error;
     return true;

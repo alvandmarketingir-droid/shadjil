@@ -1,4 +1,6 @@
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "cn";
 
 interface About3Props {
   title?: string;
@@ -89,13 +91,15 @@ export function About3({
                 <p className="text-muted-foreground">{breakout.description}</p>
               ) : null}
             </div>
-            <Button
-              variant="outline"
-              className="border-secondary text-secondary hover:bg-secondary/10 ml-auto"
-              asChild
+            <Link
+              href={breakout.buttonUrl || "/products"}
+              className={cn(
+                buttonVariants({ variant: "outline" }),
+                "border-secondary text-secondary hover:bg-secondary/10 ml-auto",
+              )}
             >
-              <a href={breakout.buttonUrl}>{breakout.buttonText}</a>
-            </Button>
+              {breakout.buttonText}
+            </Link>
           </div>
         </div>
 

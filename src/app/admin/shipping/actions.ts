@@ -67,7 +67,7 @@ export async function updateShippingMethod(
 
   const { error } = await gate.supabase
     .from("shipping_methods")
-    .update(patch)
+    .update(patch as any)
     .eq("id", id);
   if (error) return { error: error.message };
   revalidatePath("/admin/shipping");

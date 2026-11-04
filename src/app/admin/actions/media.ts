@@ -253,7 +253,7 @@ export async function adminUpdateProductImageMetaAction(input: {
   if (!Object.keys(body).length) return { ok: true as const };
   const { error } = await gate.supabase
     .from("product_images")
-    .update(body)
+    .update(body as any)
     .eq("id", id);
   if (error) {
     console.error("[adminUpdateProductImageMeta]", error);

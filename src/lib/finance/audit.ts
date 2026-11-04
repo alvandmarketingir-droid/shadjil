@@ -22,7 +22,7 @@ export async function writeFinancialAudit(input: {
       order_id: input.orderId ?? null,
       return_id: input.returnId ?? null,
       amount: input.amount ?? null,
-      meta: input.meta ?? null,
+      meta: (input.meta ?? null) as any,
       actor_id: input.actorId ?? null,
     });
     if (error) console.error("[writeFinancialAudit]", error.message);

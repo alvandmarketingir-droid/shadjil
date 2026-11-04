@@ -20,7 +20,7 @@ export async function enqueueJob(
     .from("job_queue")
     .insert({
       job_type: jobType,
-      payload,
+      payload: payload as any,
       status: "pending",
       available_at,
       max_attempts: opts?.maxAttempts ?? 5,

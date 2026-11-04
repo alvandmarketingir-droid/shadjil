@@ -186,7 +186,7 @@ export function ProductCard({ product }: Props) {
         priceTo={maxPrice}
         originalPrice={originalPrice ?? undefined}
         showFrom={showFrom}
-        rating={typeof product.rating === 'number' ? product.rating : 0}
+        rating={typeof product.average_rating === 'number' ? product.average_rating : 0}
         reviewCount={typeof product.review_count === 'number' ? product.review_count : 0}
         images={images}
         colors={colors}

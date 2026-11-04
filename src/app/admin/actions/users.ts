@@ -21,7 +21,7 @@ export async function adminListUsersAction(
 
     const role = (opts?.role || "").trim();
     if (role && ["customer", "staff", "admin"].includes(role)) {
-      query = query.eq("role", role);
+      query = query.eq("role", role as "customer" | "admin" | "staff");
     }
     const q = (opts?.q || "").trim().slice(0, 80);
     if (q) {

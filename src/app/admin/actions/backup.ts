@@ -100,7 +100,7 @@ export async function adminBackupRestoreAction(payload: {
 
     for (let i = 0; i < rows.length; i += BATCH) {
       const chunk = rows.slice(i, i + BATCH);
-      const { error } = await gate.supabase.from(name).upsert(chunk, {
+      const { error } = await (gate.supabase.from(name) as any).upsert(chunk, {
         onConflict: "id",
         ignoreDuplicates: false,
       });

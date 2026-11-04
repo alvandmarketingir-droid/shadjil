@@ -44,7 +44,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const { data: products } = await supabase
       .from("products")
       .select("slug, updated_at")
-      .eq("is_active", true)
+      .eq("status", "published")
+      .is("deleted_at", null)
       .not("slug", "is", null)
       .limit(5000);
 
@@ -99,7 +100,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const { data: posts } = await supabase
         .from("blog_posts")
         .select("slug, updated_at, published_at")
-        .eq("is_published", true)
+        .eq("status", "published")
         .limit(1000);
       for (const post of posts ?? []) {
         const slug = (post as { slug?: string }).slug;

@@ -183,7 +183,6 @@ export default function AdminReturnsPage() {
           busy={bulkBusy}
           onArchive={() => void runBulkArchive()}
           onHardDelete={() => void runBulkHardDelete()}
-          onClear={() => setSelected([])}
         />
 
 

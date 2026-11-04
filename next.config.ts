@@ -31,8 +31,8 @@ const nextConfig: NextConfig = {
   },
 
   // Next 16+: eslint key removed from next.config (use `npm run lint` / eslint.config.mjs)
-  // Typecheck path (T-9): keep ignore until `npm run typecheck` is green; CI tracks count.
-  typescript: { ignoreBuildErrors: true },
+  // T-9: typecheck is green — fail the Next build on TS errors.
+  typescript: { ignoreBuildErrors: false },
 
   async headers() {
     return [
@@ -60,6 +60,14 @@ const nextConfig: NextConfig = {
           {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()",
+          },
+          {
+            key: "Cross-Origin-Opener-Policy",
+            value: "same-origin",
+          },
+          {
+            key: "X-DNS-Prefetch-Control",
+            value: "off",
           },
           {
             key: "Strict-Transport-Security",

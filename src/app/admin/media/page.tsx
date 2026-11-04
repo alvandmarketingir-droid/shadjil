@@ -50,7 +50,8 @@ export default function AdminMediaPage() {
     }
     setItems(res.items);
     const alts: Record<string, string> = {};
-        for (const it of res.items) {
+    const names: Record<string, string> = {};
+    for (const it of res.items) {
       alts[it.id] = it.alt_text ?? "";
       try {
         const file = (it.url || "").split("/").pop() || "";
@@ -61,7 +62,7 @@ export default function AdminMediaPage() {
       }
     }
     setDraftAlt(alts);
-    
+    void names;
   }, []);
 
   useEffect(() => {

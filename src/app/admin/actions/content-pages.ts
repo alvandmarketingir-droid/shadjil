@@ -163,7 +163,7 @@ export async function adminSaveFaqAction(items: FaqItem[]) {
   const { error } = await gate.supabase.from("site_settings").upsert(
     {
       key: CONTENT_KEYS.faq,
-      value: payload,
+      value: payload as any,
       updated_at: new Date().toISOString(),
     },
     { onConflict: "key" },
@@ -174,7 +174,7 @@ export async function adminSaveFaqAction(items: FaqItem[]) {
     const { error: err2 } = await gate.supabase.from("site_settings").upsert(
       {
         key: CONTENT_KEYS.faq,
-        value: JSON.stringify(payload) as unknown as object,
+        value: JSON.stringify(payload) as any,
         updated_at: new Date().toISOString(),
       },
       { onConflict: "key" },
@@ -214,7 +214,7 @@ export async function adminSaveTextPageAction(
   const { error } = await gate.supabase.from("site_settings").upsert(
     {
       key,
-      value: payload,
+      value: payload as any,
       updated_at: new Date().toISOString(),
     },
     { onConflict: "key" },
@@ -224,7 +224,7 @@ export async function adminSaveTextPageAction(
     const { error: err2 } = await gate.supabase.from("site_settings").upsert(
       {
         key,
-        value: JSON.stringify(payload) as unknown as object,
+        value: JSON.stringify(payload) as any,
         updated_at: new Date().toISOString(),
       },
       { onConflict: "key" },

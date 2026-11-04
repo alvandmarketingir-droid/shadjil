@@ -27,6 +27,11 @@ export type Database = {
           is_active: boolean;
           meta_title: string | null;
           meta_description: string | null;
+          short_description: string | null;
+          focus_keyphrases: string[] | null;
+          robots_index: boolean | null;
+          robots_follow: boolean | null;
+          canonical_url: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -41,6 +46,11 @@ export type Database = {
           is_active?: boolean;
           meta_title?: string | null;
           meta_description?: string | null;
+          short_description?: string | null;
+          focus_keyphrases?: string[] | null;
+          robots_index?: boolean | null;
+          robots_follow?: boolean | null;
+          canonical_url?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -55,6 +65,11 @@ export type Database = {
           is_active?: boolean;
           meta_title?: string | null;
           meta_description?: string | null;
+          short_description?: string | null;
+          focus_keyphrases?: string[] | null;
+          robots_index?: boolean | null;
+          robots_follow?: boolean | null;
+          canonical_url?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -68,6 +83,17 @@ export type Database = {
           logo_url: string | null;
           description: string | null;
           is_active: boolean;
+          image_url: string | null;
+          meta_title: string | null;
+          meta_description: string | null;
+          short_description: string | null;
+          focus_keyphrases: string[] | null;
+          robots_index: boolean | null;
+          robots_follow: boolean | null;
+          canonical_url: string | null;
+          og_title: string | null;
+          og_description: string | null;
+          og_image_url: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -78,6 +104,17 @@ export type Database = {
           logo_url?: string | null;
           description?: string | null;
           is_active?: boolean;
+          image_url?: string | null;
+          meta_title?: string | null;
+          meta_description?: string | null;
+          short_description?: string | null;
+          focus_keyphrases?: string[] | null;
+          robots_index?: boolean | null;
+          robots_follow?: boolean | null;
+          canonical_url?: string | null;
+          og_title?: string | null;
+          og_description?: string | null;
+          og_image_url?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -88,6 +125,17 @@ export type Database = {
           logo_url?: string | null;
           description?: string | null;
           is_active?: boolean;
+          image_url?: string | null;
+          meta_title?: string | null;
+          meta_description?: string | null;
+          short_description?: string | null;
+          focus_keyphrases?: string[] | null;
+          robots_index?: boolean | null;
+          robots_follow?: boolean | null;
+          canonical_url?: string | null;
+          og_title?: string | null;
+          og_description?: string | null;
+          og_image_url?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -111,6 +159,18 @@ export type Database = {
           average_rating: number | null;
           review_count: number;
           deleted_at: string | null;
+          size_guide_id: string | null;
+          published_at: string | null;
+          focus_keyphrases: string[] | null;
+          robots_index: boolean | null;
+          robots_follow: boolean | null;
+          canonical_url: string | null;
+          og_title: string | null;
+          og_description: string | null;
+          og_image_url: string | null;
+          twitter_title: string | null;
+          twitter_description: string | null;
+          is_cornerstone: boolean | null;
           created_at: string;
           updated_at: string;
         };
@@ -131,6 +191,18 @@ export type Database = {
           average_rating?: number | null;
           review_count?: number;
           deleted_at?: string | null;
+          size_guide_id?: string | null;
+          published_at?: string | null;
+          focus_keyphrases?: string[] | null;
+          robots_index?: boolean | null;
+          robots_follow?: boolean | null;
+          canonical_url?: string | null;
+          og_title?: string | null;
+          og_description?: string | null;
+          og_image_url?: string | null;
+          twitter_title?: string | null;
+          twitter_description?: string | null;
+          is_cornerstone?: boolean | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -151,10 +223,37 @@ export type Database = {
           average_rating?: number | null;
           review_count?: number;
           deleted_at?: string | null;
+          size_guide_id?: string | null;
+          published_at?: string | null;
+          focus_keyphrases?: string[] | null;
+          robots_index?: boolean | null;
+          robots_follow?: boolean | null;
+          canonical_url?: string | null;
+          og_title?: string | null;
+          og_description?: string | null;
+          og_image_url?: string | null;
+          twitter_title?: string | null;
+          twitter_description?: string | null;
+          is_cornerstone?: boolean | null;
           created_at?: string;
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          }
+        ];
       };
       product_variants: {
         Row: {
@@ -205,7 +304,15 @@ export type Database = {
           created_at?: string;
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "product_variants_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          }
+        ];
       };
       attributes: {
         Row: {
@@ -247,6 +354,7 @@ export type Database = {
           value: string;
           slug: string;
           sort_order: number;
+          hex: string | null;
         };
         Insert: {
           id?: string;
@@ -254,6 +362,7 @@ export type Database = {
           value: string;
           slug: string;
           sort_order?: number;
+          hex?: string | null;
         };
         Update: {
           id?: string;
@@ -261,6 +370,7 @@ export type Database = {
           value?: string;
           slug?: string;
           sort_order?: number;
+          hex?: string | null;
         };
         Relationships: [];
       };
@@ -291,7 +401,7 @@ export type Database = {
       product_images: {
         Row: {
           id: string;
-          product_id: string;
+          product_id: string | null;
           variant_id: string | null;
           url: string;
           alt_text: string | null;
@@ -301,7 +411,7 @@ export type Database = {
         };
         Insert: {
           id?: string;
-          product_id: string;
+          product_id?: string | null;
           variant_id?: string | null;
           url: string;
           alt_text?: string | null;
@@ -311,7 +421,7 @@ export type Database = {
         };
         Update: {
           id?: string;
-          product_id?: string;
+          product_id?: string | null;
           variant_id?: string | null;
           url?: string;
           alt_text?: string | null;
@@ -319,7 +429,15 @@ export type Database = {
           is_primary?: boolean;
           created_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "product_images_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          }
+        ];
       };
       size_guides: {
         Row: {
@@ -393,7 +511,8 @@ export type Database = {
           full_name: string | null;
           phone: string | null;
           avatar_url: string | null;
-          role: "customer" | "admin" | "staff";
+          role: "customer" | "admin" | "staff" | "superadmin";
+          is_active: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -402,7 +521,8 @@ export type Database = {
           full_name?: string | null;
           phone?: string | null;
           avatar_url?: string | null;
-          role?: "customer" | "admin" | "staff";
+          role?: "customer" | "admin" | "staff" | "superadmin";
+          is_active?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -411,7 +531,8 @@ export type Database = {
           full_name?: string | null;
           phone?: string | null;
           avatar_url?: string | null;
-          role?: "customer" | "admin" | "staff";
+          role?: "customer" | "admin" | "staff" | "superadmin";
+          is_active?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -427,6 +548,7 @@ export type Database = {
           body: string | null;
           is_verified: boolean;
           is_approved: boolean;
+          status: string | null;
           admin_reply: string | null;
           created_at: string;
           updated_at: string;
@@ -440,6 +562,7 @@ export type Database = {
           body?: string | null;
           is_verified?: boolean;
           is_approved?: boolean;
+          status?: string | null;
           admin_reply?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -453,11 +576,27 @@ export type Database = {
           body?: string | null;
           is_verified?: boolean;
           is_approved?: boolean;
+          status?: string | null;
           admin_reply?: string | null;
           created_at?: string;
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "reviews_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          }
+        ];
       };
       wishlists: {
         Row: {
@@ -590,28 +729,43 @@ export type Database = {
         Row: {
           id: string; user_id: string | null; status: string; payment_status: string;
           total_amount: number;
-          shipping_name: string | null; shipping_phone: string | null;
+          total: number | null;
+          shipping_name: string | null; shipping_phone: string | null; shipping_email: string | null;
           shipping_address: string | null; shipping_city: string | null;
           shipping_postal: string | null; note: string | null; discount_code: string | null; discount_amount: number | null; paid_at: string | null;
           tracking_number: string | null; shipped_at: string | null;
+          shipping_fee: number;
+          session_id: string | null;
+          shipping_method_id: string | null;
+          shipping_method_title: string | null;
           created_at: string; updated_at: string;
         };
         Insert: {
           id?: string; user_id?: string | null; status?: string; payment_status?: string;
           total_amount?: number;
-          shipping_name?: string | null; shipping_phone?: string | null;
+          total?: number | null;
+          shipping_name?: string | null; shipping_phone?: string | null; shipping_email?: string | null;
           shipping_address?: string | null; shipping_city?: string | null;
           shipping_postal?: string | null; note?: string | null; discount_code?: string | null; discount_amount?: number | null; paid_at?: string | null;
           tracking_number?: string | null; shipped_at?: string | null;
+          shipping_fee?: number;
+          session_id?: string | null;
+          shipping_method_id?: string | null;
+          shipping_method_title?: string | null;
           created_at?: string; updated_at?: string;
         };
         Update: {
           id?: string; user_id?: string | null; status?: string; payment_status?: string;
           total_amount?: number;
-          shipping_name?: string | null; shipping_phone?: string | null;
+          total?: number | null;
+          shipping_name?: string | null; shipping_phone?: string | null; shipping_email?: string | null;
           shipping_address?: string | null; shipping_city?: string | null;
           shipping_postal?: string | null; note?: string | null; discount_code?: string | null; discount_amount?: number | null; paid_at?: string | null;
           tracking_number?: string | null; shipped_at?: string | null;
+          shipping_fee?: number;
+          session_id?: string | null;
+          shipping_method_id?: string | null;
+          shipping_method_title?: string | null;
           created_at?: string; updated_at?: string;
         };
         Relationships: [];
@@ -632,20 +786,42 @@ export type Database = {
           title?: string; size_name?: string | null; color_name?: string | null;
           unit_price?: number; quantity?: number; line_total?: number;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          }
+        ];
       };
       notifications: {
         Row: {
           id: string; user_id: string; title: string; body: string | null;
-          type: string | null; link: string | null; read_at: string | null; created_at: string;
+          type: string | null; link: string | null; read_at: string | null; is_read: boolean; created_at: string;
         };
         Insert: {
           id?: string; user_id: string; title: string; body?: string | null;
-          type?: string | null; link?: string | null; read_at?: string | null; created_at?: string;
+          type?: string | null; link?: string | null; read_at?: string | null; is_read?: boolean; created_at?: string;
         };
         Update: {
           id?: string; user_id?: string; title?: string; body?: string | null;
-          type?: string | null; link?: string | null; read_at?: string | null; created_at?: string;
+          type?: string | null; link?: string | null; read_at?: string | null; is_read?: boolean; created_at?: string;
         };
         Relationships: [];
       };
@@ -662,21 +838,36 @@ export type Database = {
         Relationships: [];
       };
       product_tags: {
-        Row: { id: string; name: string; slug: string; is_active: boolean; created_at: string; };
-        Insert: { id?: string; name: string; slug: string; is_active?: boolean; created_at?: string; };
-        Update: { id?: string; name?: string; slug?: string; is_active?: boolean; created_at?: string; };
+        Row: { id: string; name: string; slug: string; is_active: boolean; image_url: string | null; short_description: string | null; description: string | null; meta_title: string | null; meta_description: string | null; focus_keyphrases: string[] | null; robots_index: boolean | null; robots_follow: boolean | null; canonical_url: string | null; created_at: string; };
+        Insert: { id?: string; name: string; slug: string; is_active?: boolean; image_url?: string | null; short_description?: string | null; description?: string | null; meta_title?: string | null; meta_description?: string | null; focus_keyphrases?: string[] | null; robots_index?: boolean | null; robots_follow?: boolean | null; canonical_url?: string | null; created_at?: string; };
+        Update: { id?: string; name?: string; slug?: string; is_active?: boolean; image_url?: string | null; short_description?: string | null; description?: string | null; meta_title?: string | null; meta_description?: string | null; focus_keyphrases?: string[] | null; robots_index?: boolean | null; robots_follow?: boolean | null; canonical_url?: string | null; created_at?: string; };
         Relationships: [];
       };
       product_tag_map: {
         Row: { product_id: string; tag_id: string };
         Insert: { product_id: string; tag_id: string };
         Update: { product_id?: string; tag_id?: string };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "product_tag_map_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_tag_map_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "product_tags"
+            referencedColumns: ["id"]
+          }
+        ];
       };
       blog_categories: {
-        Row: { id: string; name: string; slug: string; description: string | null; is_active: boolean; sort_order: number; created_at: string; updated_at: string; };
-        Insert: { id?: string; name: string; slug: string; description?: string | null; is_active?: boolean; sort_order?: number; created_at?: string; updated_at?: string; };
-        Update: { id?: string; name?: string; slug?: string; description?: string | null; is_active?: boolean; sort_order?: number; created_at?: string; updated_at?: string; };
+        Row: { id: string; name: string; slug: string; description: string | null; is_active: boolean; sort_order: number; meta_title: string | null; meta_description: string | null; focus_keyphrases: string[] | null; robots_index: boolean | null; robots_follow: boolean | null; canonical_url: string | null; created_at: string; updated_at: string; };
+        Insert: { id?: string; name: string; slug: string; description?: string | null; is_active?: boolean; sort_order?: number; meta_title?: string | null; meta_description?: string | null; focus_keyphrases?: string[] | null; robots_index?: boolean | null; robots_follow?: boolean | null; canonical_url?: string | null; created_at?: string; updated_at?: string; };
+        Update: { id?: string; name?: string; slug?: string; description?: string | null; is_active?: boolean; sort_order?: number; meta_title?: string | null; meta_description?: string | null; focus_keyphrases?: string[] | null; robots_index?: boolean | null; robots_follow?: boolean | null; canonical_url?: string | null; created_at?: string; updated_at?: string; };
         Relationships: [];
       };
       blog_posts: {
@@ -688,6 +879,13 @@ export type Database = {
           og_description: string | null;
           og_image: string | null;
           og_image_url: string | null;
+          focus_keyphrases: string[] | null;
+          robots_index: boolean | null;
+          robots_follow: boolean | null;
+          canonical_url: string | null;
+          twitter_title: string | null;
+          twitter_description: string | null;
+          is_cornerstone: boolean | null;
           created_at: string; updated_at: string;
         };
         Insert: {
@@ -698,6 +896,13 @@ export type Database = {
           og_description?: string | null;
           og_image?: string | null;
           og_image_url?: string | null;
+          focus_keyphrases?: string[] | null;
+          robots_index?: boolean | null;
+          robots_follow?: boolean | null;
+          canonical_url?: string | null;
+          twitter_title?: string | null;
+          twitter_description?: string | null;
+          is_cornerstone?: boolean | null;
           created_at?: string; updated_at?: string;
         };
         Update: {
@@ -708,21 +913,51 @@ export type Database = {
           og_description?: string | null;
           og_image?: string | null;
           og_image_url?: string | null;
+          focus_keyphrases?: string[] | null;
+          robots_index?: boolean | null;
+          robots_follow?: boolean | null;
+          canonical_url?: string | null;
+          twitter_title?: string | null;
+          twitter_description?: string | null;
+          is_cornerstone?: boolean | null;
           created_at?: string; updated_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "blog_posts_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "blog_categories"
+            referencedColumns: ["id"]
+          }
+        ];
       };
       blog_tags: {
-        Row: { id: string; name: string; slug: string; is_active: boolean; created_at: string; };
-        Insert: { id?: string; name: string; slug: string; is_active?: boolean; created_at?: string; };
-        Update: { id?: string; name?: string; slug?: string; is_active?: boolean; created_at?: string; };
+        Row: { id: string; name: string; slug: string; is_active: boolean; meta_title: string | null; meta_description: string | null; focus_keyphrases: string[] | null; robots_index: boolean | null; robots_follow: boolean | null; created_at: string; };
+        Insert: { id?: string; name: string; slug: string; is_active?: boolean; meta_title?: string | null; meta_description?: string | null; focus_keyphrases?: string[] | null; robots_index?: boolean | null; robots_follow?: boolean | null; created_at?: string; };
+        Update: { id?: string; name?: string; slug?: string; is_active?: boolean; meta_title?: string | null; meta_description?: string | null; focus_keyphrases?: string[] | null; robots_index?: boolean | null; robots_follow?: boolean | null; created_at?: string; };
         Relationships: [];
       };
       blog_tag_map: {
         Row: { post_id: string; tag_id: string };
         Insert: { post_id: string; tag_id: string };
         Update: { post_id?: string; tag_id?: string };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "blog_tag_map_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blog_tag_map_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "blog_tags"
+            referencedColumns: ["id"]
+          }
+        ];
       };
       support_tickets: {
         Row: { id: string; user_id: string; subject: string; status: string; priority: string | null; category: string | null; order_id: string | null; created_at: string; updated_at: string; };
@@ -737,9 +972,9 @@ export type Database = {
         Relationships: [];
       };
       return_requests: {
-        Row: { id: string; user_id: string; order_id: string | null; order_item_id: string | null; status: string; reason: string | null; admin_note: string | null; created_at: string; updated_at: string; };
-        Insert: { id?: string; user_id: string; order_id?: string | null; order_item_id?: string | null; status?: string; reason?: string | null; admin_note?: string | null; created_at?: string; updated_at?: string; };
-        Update: { id?: string; user_id?: string; order_id?: string | null; order_item_id?: string | null; status?: string; reason?: string | null; admin_note?: string | null; created_at?: string; updated_at?: string; };
+        Row: { id: string; user_id: string; order_id: string | null; order_item_id: string | null; status: string; reason: string | null; admin_note: string | null; refunded_at: string | null; created_at: string; updated_at: string; };
+        Insert: { id?: string; user_id: string; order_id?: string | null; order_item_id?: string | null; status?: string; reason?: string | null; admin_note?: string | null; refunded_at?: string | null; created_at?: string; updated_at?: string; };
+        Update: { id?: string; user_id?: string; order_id?: string | null; order_item_id?: string | null; status?: string; reason?: string | null; admin_note?: string | null; refunded_at?: string | null; created_at?: string; updated_at?: string; };
         Relationships: [];
       };
       addresses: {
@@ -767,15 +1002,15 @@ export type Database = {
         Relationships: [];
       };
       otp_challenges: {
-        Row: { id: string; phone: string; code_hash: string; expires_at: string; attempts: number; created_at: string; };
-        Insert: { id?: string; phone: string; code_hash: string; expires_at: string; attempts?: number; created_at?: string; };
-        Update: { id?: string; phone?: string; code_hash?: string; expires_at?: string; attempts?: number; created_at?: string; };
+        Row: { id: string; phone: string; code_hash: string; expires_at: string; attempts: number; consumed_at: string | null; created_at: string; };
+        Insert: { id?: string; phone: string; code_hash: string; expires_at: string; attempts?: number; consumed_at?: string | null; created_at?: string; };
+        Update: { id?: string; phone?: string; code_hash?: string; expires_at?: string; attempts?: number; consumed_at?: string | null; created_at?: string; };
         Relationships: [];
       };
       product_price_history: {
-        Row: { id: string; product_id: string; price: number; recorded_at: string; };
-        Insert: { id?: string; product_id: string; price: number; recorded_at?: string; };
-        Update: { id?: string; product_id?: string; price?: number; recorded_at?: string; };
+        Row: { id: string; product_id: string; variant_id: string | null; price: number; recorded_at: string; };
+        Insert: { id?: string; product_id: string; variant_id?: string | null; price: number; recorded_at?: string; };
+        Update: { id?: string; product_id?: string; variant_id?: string | null; price?: number; recorded_at?: string; };
         Relationships: [];
       };
 
@@ -857,9 +1092,9 @@ export type Database = {
         Relationships: [];
       };
       shipping_zones: {
-        Row: { id: string; name: string; is_active: boolean; created_at: string; };
-        Insert: { id?: string; name: string; is_active?: boolean; created_at?: string; };
-        Update: { id?: string; name?: string; is_active?: boolean; created_at?: string; };
+        Row: { id: string; name: string; description: string | null; is_active: boolean; sort_order: number; created_at: string; };
+        Insert: { id?: string; name: string; description?: string | null; is_active?: boolean; sort_order?: number; created_at?: string; };
+        Update: { id?: string; name?: string; description?: string | null; is_active?: boolean; sort_order?: number; created_at?: string; };
         Relationships: [];
       };
       shipping_zone_locations: {
@@ -919,6 +1154,7 @@ export type Database = {
           phone: string | null;
           notified_at: string | null;
           status: string;
+          is_active: boolean;
           created_at: string;
         };
         Insert: {
@@ -930,6 +1166,7 @@ export type Database = {
           phone?: string | null;
           notified_at?: string | null;
           status?: string;
+          is_active?: boolean;
           created_at?: string;
         };
         Update: {
@@ -941,6 +1178,7 @@ export type Database = {
           phone?: string | null;
           notified_at?: string | null;
           status?: string;
+          is_active?: boolean;
           created_at?: string;
         };
         Relationships: [];
@@ -953,7 +1191,673 @@ export type Database = {
         Relationships: [];
       };
 
+      contact_messages: {
+        Row: {
+          id: string;
+          created_at: string;
+          name: string;
+          company: string | null;
+          email: string;
+          message: string;
+          status: string;
+          admin_note: string | null;
+        };
+        Insert: {
+          id?: string;
+          created_at?: string;
+          name: string;
+          company?: string | null;
+          email: string;
+          message: string;
+          status?: string;
+          admin_note?: string | null;
+        };
+        Update: {
+          id?: string;
+          created_at?: string;
+          name?: string;
+          company?: string | null;
+          email?: string;
+          message?: string;
+          status?: string;
+          admin_note?: string | null;
+        };
+        Relationships: [];
+      };
+
+      job_queue: {
+        Row: {
+          id: string;
+          job_type: string;
+          payload: Json;
+          status: string;
+          attempts: number;
+          max_attempts: number;
+          available_at: string;
+          locked_at: string | null;
+          last_error: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          job_type: string;
+          payload?: Json;
+          status?: string;
+          attempts?: number;
+          max_attempts?: number;
+          available_at?: string;
+          locked_at?: string | null;
+          last_error?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          job_type?: string;
+          payload?: Json;
+          status?: string;
+          attempts?: number;
+          max_attempts?: number;
+          available_at?: string;
+          locked_at?: string | null;
+          last_error?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+
+      newsletter_subscribers: {
+        Row: {
+          id: string;
+          phone: string;
+          email: string | null;
+          source: string | null;
+          ip: string | null;
+          unsubscribed_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          phone: string;
+          email?: string | null;
+          source?: string | null;
+          ip?: string | null;
+          unsubscribed_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          phone?: string;
+          email?: string | null;
+          source?: string | null;
+          ip?: string | null;
+          unsubscribed_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+
+      analytics_events: {
+        Row: {
+          id: string;
+          event_name: string;
+          session_id: string | null;
+          user_id: string | null;
+          product_id: string | null;
+          variant_id: string | null;
+          order_id: string | null;
+          quantity: number | null;
+          value: number | null;
+          currency: string;
+          search_term: string | null;
+          result_count: number | null;
+          path: string | null;
+          device: string | null;
+          meta: Json;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          event_name: string;
+          session_id?: string | null;
+          user_id?: string | null;
+          product_id?: string | null;
+          variant_id?: string | null;
+          order_id?: string | null;
+          quantity?: number | null;
+          value?: number | null;
+          currency?: string;
+          search_term?: string | null;
+          result_count?: number | null;
+          path?: string | null;
+          device?: string | null;
+          meta?: Json;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          event_name?: string;
+          session_id?: string | null;
+          user_id?: string | null;
+          product_id?: string | null;
+          variant_id?: string | null;
+          order_id?: string | null;
+          quantity?: number | null;
+          value?: number | null;
+          currency?: string;
+          search_term?: string | null;
+          result_count?: number | null;
+          path?: string | null;
+          device?: string | null;
+          meta?: Json;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+
+      seo_page_settings: {
+        Row: {
+          id: string;
+          page_key: string;
+          title: string | null;
+          meta_title: string | null;
+          meta_description: string | null;
+          focus_keyphrases: string[] | null;
+          canonical_url: string | null;
+          robots_index: boolean | null;
+          robots_follow: boolean | null;
+          og_title: string | null;
+          og_description: string | null;
+          og_image_url: string | null;
+          body_preview: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          page_key: string;
+          title?: string | null;
+          meta_title?: string | null;
+          meta_description?: string | null;
+          focus_keyphrases?: string[] | null;
+          canonical_url?: string | null;
+          robots_index?: boolean | null;
+          robots_follow?: boolean | null;
+          og_title?: string | null;
+          og_description?: string | null;
+          og_image_url?: string | null;
+          body_preview?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          page_key?: string;
+          title?: string | null;
+          meta_title?: string | null;
+          meta_description?: string | null;
+          focus_keyphrases?: string[] | null;
+          canonical_url?: string | null;
+          robots_index?: boolean | null;
+          robots_follow?: boolean | null;
+          og_title?: string | null;
+          og_description?: string | null;
+          og_image_url?: string | null;
+          body_preview?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+
+
+      payment_webhook_events: {
+        Row: {
+          id: string;
+          provider: string;
+          event_key: string;
+          authority: string | null;
+          ref_id: string | null;
+          order_id: string | null;
+          amount: number | null;
+          status: string;
+          payload: Json | null;
+          verified: boolean;
+          error_message: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          provider?: string;
+          event_key: string;
+          authority?: string | null;
+          ref_id?: string | null;
+          order_id?: string | null;
+          amount?: number | null;
+          status?: string;
+          payload?: Json | null;
+          verified?: boolean;
+          error_message?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          provider?: string;
+          event_key?: string;
+          authority?: string | null;
+          ref_id?: string | null;
+          order_id?: string | null;
+          amount?: number | null;
+          status?: string;
+          payload?: Json | null;
+          verified?: boolean;
+          error_message?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+
+      url_redirects: {
+        Row: {
+          id: string;
+          from_path: string;
+          to_path: string;
+          status_code: number;
+          is_active: boolean;
+          note: string | null;
+          source: string;
+          hit_count: number;
+          last_hit_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          from_path: string;
+          to_path: string;
+          status_code?: number;
+          is_active?: boolean;
+          note?: string | null;
+          source?: string;
+          hit_count?: number;
+          last_hit_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          from_path?: string;
+          to_path?: string;
+          status_code?: number;
+          is_active?: boolean;
+          note?: string | null;
+          source?: string;
+          hit_count?: number;
+          last_hit_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+
+      search_queries: {
+        Row: {
+          id: string;
+          query: string;
+          normalized_query: string | null;
+          result_count: number;
+          user_id: string | null;
+          source: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          query: string;
+          normalized_query?: string | null;
+          result_count?: number;
+          user_id?: string | null;
+          source?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          query?: string;
+          normalized_query?: string | null;
+          result_count?: number;
+          user_id?: string | null;
+          source?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+
+      audit_logs: {
+        Row: {
+          id: string;
+          table_name: string;
+          record_id: string | null;
+          action: string;
+          old_data: Json | null;
+          new_data: Json | null;
+          actor_id: string | null;
+          ip_address: string | null;
+          user_agent: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          table_name: string;
+          record_id?: string | null;
+          action: string;
+          old_data?: Json | null;
+          new_data?: Json | null;
+          actor_id?: string | null;
+          ip_address?: string | null;
+          user_agent?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          table_name?: string;
+          record_id?: string | null;
+          action?: string;
+          old_data?: Json | null;
+          new_data?: Json | null;
+          actor_id?: string | null;
+          ip_address?: string | null;
+          user_agent?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+
+      financial_audit_logs: {
+        Row: {
+          id: string;
+          event_type: string;
+          order_id: string | null;
+          return_id: string | null;
+          amount: number | null;
+          currency: string;
+          meta: Json | null;
+          actor_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          event_type: string;
+          order_id?: string | null;
+          return_id?: string | null;
+          amount?: number | null;
+          currency?: string;
+          meta?: Json | null;
+          actor_id?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          event_type?: string;
+          order_id?: string | null;
+          return_id?: string | null;
+          amount?: number | null;
+          currency?: string;
+          meta?: Json | null;
+          actor_id?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+
+      order_notes: {
+        Row: {
+          id: string;
+          order_id: string;
+          body: string;
+          visibility: string;
+          actor_type: string;
+          actor_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          order_id: string;
+          body: string;
+          visibility?: string;
+          actor_type?: string;
+          actor_id?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          order_id?: string;
+          body?: string;
+          visibility?: string;
+          actor_type?: string;
+          actor_id?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+
+      sms_outbox: {
+        Row: {
+          id: string;
+          phone: string;
+          body: string;
+          status: string;
+          meta: Json | null;
+          created_at: string;
+          sent_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          phone: string;
+          body: string;
+          status?: string;
+          meta?: Json | null;
+          created_at?: string;
+          sent_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          phone?: string;
+          body?: string;
+          status?: string;
+          meta?: Json | null;
+          created_at?: string;
+          sent_at?: string | null;
+        };
+        Relationships: [];
+      };
+
+      stock_reservations: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          session_id: string | null;
+          variant_id: string;
+          quantity: number;
+          status: string;
+          expires_at: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          session_id?: string | null;
+          variant_id: string;
+          quantity: number;
+          status?: string;
+          expires_at: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string | null;
+          session_id?: string | null;
+          variant_id?: string;
+          quantity?: number;
+          status?: string;
+          expires_at?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+
+      discount_uses: {
+        Row: {
+          id: string;
+          discount_id: string;
+          user_id: string | null;
+          order_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          discount_id: string;
+          user_id?: string | null;
+          order_id?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          discount_id?: string;
+          user_id?: string | null;
+          order_id?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+
+      discount_reservations: {
+        Row: {
+          id: string;
+          discount_id: string;
+          user_id: string | null;
+          session_id: string | null;
+          expires_at: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          discount_id: string;
+          user_id?: string | null;
+          session_id?: string | null;
+          expires_at: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          discount_id?: string;
+          user_id?: string | null;
+          session_id?: string | null;
+          expires_at?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+
+      content_pages: {
+        Row: {
+          id: string;
+          slug: string;
+          title: string;
+          body: string | null;
+          status: string;
+          is_published: boolean;
+          meta_title: string | null;
+          meta_description: string | null;
+          focus_keyphrases: string[] | null;
+          robots_index: boolean | null;
+          robots_follow: boolean | null;
+          canonical_url: string | null;
+          blocks: Json | null;
+          published_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          slug: string;
+          title: string;
+          body?: string | null;
+          status?: string;
+          is_published?: boolean;
+          meta_title?: string | null;
+          meta_description?: string | null;
+          focus_keyphrases?: string[] | null;
+          robots_index?: boolean | null;
+          robots_follow?: boolean | null;
+          canonical_url?: string | null;
+          blocks?: Json | null;
+          published_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          slug?: string;
+          title?: string;
+          body?: string | null;
+          status?: string;
+          is_published?: boolean;
+          meta_title?: string | null;
+          meta_description?: string | null;
+          focus_keyphrases?: string[] | null;
+          robots_index?: boolean | null;
+          robots_follow?: boolean | null;
+          canonical_url?: string | null;
+          blocks?: Json | null;
+          published_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+
+      media_assets: {
+        Row: {
+          id: string;
+          url: string;
+          path: string | null;
+          alt_text: string | null;
+          mime_type: string | null;
+          width: number | null;
+          height: number | null;
+          size_bytes: number | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          url: string;
+          path?: string | null;
+          alt_text?: string | null;
+          mime_type?: string | null;
+          width?: number | null;
+          height?: number | null;
+          size_bytes?: number | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          url?: string;
+          path?: string | null;
+          alt_text?: string | null;
+          mime_type?: string | null;
+          width?: number | null;
+          height?: number | null;
+          size_bytes?: number | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+
+
     };
+    // Keep Views empty: a non-empty Views map breaks `.from(tableUnion)` overload
+    // resolution in admin/backup helpers. Cast view queries at call sites instead.
     Views: Record<string, never>;
     Functions: {
       increment_discount_use: {
@@ -965,11 +1869,24 @@ export type Database = {
         Returns: undefined;
       };
       reserve_variant_stock: {
-        Args: { p_variant_id: string; p_qty: number; p_user_id?: string };
-        Returns: undefined;
+        Args: { p_variant_id: string; p_qty: number; p_user_id: string; p_minutes?: number };
+        Returns: boolean;
+      };
+      reserve_variant_stock_session: {
+        Args: {
+          p_variant_id: string;
+          p_qty: number;
+          p_session_id: string;
+          p_minutes?: number;
+        };
+        Returns: boolean;
       };
       release_all_user_reservations: {
         Args: { p_user_id: string };
+        Returns: undefined;
+      };
+      release_all_session_reservations: {
+        Args: { p_session_id: string };
         Returns: undefined;
       };
       release_expired_stock_reservations: {
@@ -977,7 +1894,27 @@ export type Database = {
         Returns: undefined;
       };
       extend_user_reservations: {
+        Args: { p_user_id: string; p_minutes?: number };
+        Returns: undefined;
+      };
+      extend_session_reservations: {
+        Args: { p_session_id: string; p_minutes?: number };
+        Returns: undefined;
+      };
+      decrement_variant_stock: {
+        Args: { p_variant_id: string; p_qty: number };
+        Returns: boolean;
+      };
+      consume_user_reservations: {
         Args: { p_user_id: string };
+        Returns: undefined;
+      };
+      consume_session_reservations: {
+        Args: { p_session_id: string };
+        Returns: undefined;
+      };
+      recompute_product_review_stats: {
+        Args: { p_product_id: string };
         Returns: undefined;
       };
     };

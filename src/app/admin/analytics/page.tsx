@@ -85,7 +85,8 @@ export default function AdminAnalyticsPage() {
         setDevices(deviceCount);
         setTotalRevenue(revenue);
 
-        const { data: products, error: e2 } = await supabase
+        // View not in generated Database.Views (keeps .from(tableUnion) working).
+        const { data: products, error: e2 } = await (supabase as any)
           .from("admin_product_performance")
           .select("*")
           .gt("views", 5)
@@ -96,7 +97,7 @@ export default function AdminAnalyticsPage() {
           setLowConvertProducts([]);
         } else {
           const low = (products || [])
-            .filter((p) => p.conversion_rate < 3)
+            .filter((p: { conversion_rate?: number }) => Number(p.conversion_rate) < 3)
             .slice(0, 10);
           setLowConvertProducts(low);
         }
@@ -253,7 +254,7 @@ export default function AdminAnalyticsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {lowConvertProducts.map((p) => (
+                    {lowConvertProducts.map((p: any) => (
                       <tr key={p.product_id} className="border-b last:border-0">
                         <td className="py-3 font-mono text-xs">{p.product_id}</td>
                         <td className="py-3">{p.views}</td>

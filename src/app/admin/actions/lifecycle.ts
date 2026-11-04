@@ -594,7 +594,7 @@ export async function adminArchiveTicketsAction(ids: string[]) {
   const list = cleanIds(ids);
   if (!list.length) return { ok: false as const, error: "empty" as const };
   try {
-    const { error } = await gate.supabase.from("tickets").update({ status: "closed" }).in("id", list);
+    const { error } = await gate.supabase.from("support_tickets").update({ status: "closed" }).in("id", list);
     if (error) throw error;
     return { ok: true as const, count: list.length };
   } catch (e) {
@@ -609,8 +609,8 @@ export async function adminHardDeleteTicketsAction(ids: string[]) {
   const list = cleanIds(ids);
   if (!list.length) return { ok: false as const, error: "empty" as const };
   try {
-    try { await gate.supabase.from("ticket_messages").delete().in("ticket_id", list); } catch { /* ignore */ }
-    const { error } = await gate.supabase.from("tickets").delete().in("id", list);
+    try { await gate.supabase.from("support_ticket_messages").delete().in("ticket_id", list); } catch { /* ignore */ }
+    const { error } = await gate.supabase.from("support_tickets").delete().in("id", list);
     if (error) throw error;
     return { ok: true as const, count: list.length };
   } catch (e) {

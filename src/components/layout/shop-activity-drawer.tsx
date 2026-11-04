@@ -361,7 +361,7 @@ export function ShopActivityDrawer({
                       <button
                         type="button"
                         className="text-destructive mt-1 text-xs"
-                        onClick={() => toggleWishlist(p)}
+                        onClick={() => toggleWishlist(p as any)}
                       >
                         حذف
                       </button>
@@ -370,7 +370,7 @@ export function ShopActivityDrawer({
                       <button
                         type="button"
                         className="text-destructive mt-1 text-xs"
-                        onClick={() => toggleCompare(p)}
+                        onClick={() => toggleCompare(p as any)}
                       >
                         حذف از مقایسه
                       </button>

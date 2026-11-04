@@ -67,11 +67,11 @@ export default async function HomePage() {
     console.error("[home] section failed", i, s.reason);
     return fallback;
   };
-  const featuredResult = pick(0, { success: false as const, data: null });
-  const newResult = pick(1, { success: false as const, data: null });
-  const bestsellerResult = pick(2, { success: false as const, data: null });
-  const categoriesResult = pick(3, { success: false as const, data: null });
-  const brandsResult = pick(4, { success: false as const, data: null });
+  const featuredResult = pick(0, { success: false as const, data: null as { data: ProductWithRelations[]; total: number; page: number; pageSize: number; totalPages: number } | null });
+  const newResult = pick(1, { success: false as const, data: null as { data: ProductWithRelations[]; total: number; page: number; pageSize: number; totalPages: number } | null });
+  const bestsellerResult = pick(2, { success: false as const, data: null as { data: ProductWithRelations[]; total: number; page: number; pageSize: number; totalPages: number } | null });
+  const categoriesResult = pick(3, { success: false as const, data: null as Array<{ id: string; name: string; slug: string; parent_id: string | null; image_url?: string | null }> | null });
+  const brandsResult = pick(4, { success: false as const, data: null as Array<{ id: string; name: string; slug: string; logo_url?: string | null; name_fa?: string }> | null });
 
   const pageData = (r: { success?: boolean; data?: unknown }) => {
     if (!r?.success || !r.data || typeof r.data !== "object") return [] as ProductWithRelations[];

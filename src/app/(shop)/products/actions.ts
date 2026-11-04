@@ -55,6 +55,16 @@ export async function loadProductsPage(input: {
     };
   }
 
+  if (!result.data) {
+    return {
+      success: false,
+      products: [],
+      page: input.page,
+      totalPages: 0,
+      hasMore: false,
+      error: result.error ?? undefined,
+    };
+  }
   const { data, page, totalPages } = result.data;
 
   return {

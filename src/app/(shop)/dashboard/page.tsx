@@ -1108,7 +1108,7 @@ useEffect(() => {
                     className="bg-destructive text-destructive-foreground h-10 w-full rounded-lg text-sm disabled:opacity-40"
                     onClick={async () => {
                       setDeleteBusy(true);
-                      const res = await deleteMyAccountAction(deleteConfirm);
+                      const res = await deleteMyAccountAction();
                       setDeleteBusy(false);
                       if (res.ok) window.location.href = "/";
                       else setProfileMsg(res.error || "حذف ناموفق");

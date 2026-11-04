@@ -27,7 +27,7 @@ export async function getFreeShippingSettingsAction() {
     }
 
     const map = new Map(
-      (data ?? []).map((r: { key: string; value: string }) => [r.key, r.value]),
+      (data ?? []).map((r: { key: string; value: unknown }) => [r.key, String(r.value ?? "")]),
     );
     return {
       ok: true as const,
@@ -65,7 +65,7 @@ export async function saveFreeShippingSettingsAction(input: {
     ];
 
     for (const row of rows) {
-      const { error } = await supabase.from("site_settings").upsert(row, {
+      const { error } = await supabase.from("site_settings").upsert(row as any, {
         onConflict: "key",
       });
       if (error) {

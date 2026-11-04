@@ -169,7 +169,7 @@ export async function adminSetProductFlagsAction(
       body.deleted_at = null;
       body.status = patch.status;
     }
-    const { error } = await gate.supabase.from("products").update(body).eq("id", id);
+    const { error } = await gate.supabase.from("products").update(body as any).eq("id", id);
     if (error) throw error;
     return { ok: true as const };
   } catch {
@@ -602,7 +602,7 @@ export async function adminUpdateProductAction(
     if (Object.keys(patch).length) {
       const { error: pErr } = await gate.supabase
         .from("products")
-        .update(patch)
+        .update(patch as any)
         .eq("id", id);
       if (pErr) {
         console.error("[adminUpdateProduct products]", pErr);
@@ -680,7 +680,7 @@ export async function adminUpdateProductAction(
           const { notifyStockAlertsForVariant } = await import(
             "@/lib/stock-alerts/notify"
           );
-          await notifyStockAlertsForVariant(variants[0].id as string);
+          await notifyStockAlertsForVariant(firstSimple.id as string);
         } catch (ne) {
           console.error("[adminUpdateProduct stock alert]", ne);
         }
@@ -816,7 +816,7 @@ export async function adminSoftDeleteProductAction(id: string) {
       action: "product_soft_delete",
       entity: "product",
       entity_id: id,
-      meta: null,
+      meta: undefined,
     });
     return { ok: true as const };
   } catch (e) {
@@ -1015,29 +1015,17 @@ export async function adminSyncProductVariantsAction(
         if (error) {
           // اگر unique خورد، دوباره با size+color پیدا کن و update کن
           if (String(error.message || "").includes("product_variants_product_id_size_color_name")) {
-            const { data: again } = await gate.supabase
+            let qAgain = gate.supabase
               .from("product_variants")
               .select("id")
-              .eq("product_id", productId)
-              .is("size", v.size)
-              .is("color_name", v.color_name);
-            // .is با null؛ برای مقدار غیر null از eq
-            let foundId: string | undefined;
-            if (v.size == null && v.color_name == null) {
-              foundId = (again as { id: string }[] | null)?.[0]?.id;
-            } else {
-              let q = gate.supabase
-                .from("product_variants")
-                .select("id")
-                .eq("product_id", productId);
-              q = v.size == null ? q.is("size", null) : q.eq("size", v.size);
-              q =
-                v.color_name == null
-                  ? q.is("color_name", null)
-                  : q.eq("color_name", v.color_name);
-              const { data: hit2 } = await q.limit(1);
-              foundId = (hit2 as { id: string }[] | null)?.[0]?.id;
-            }
+              .eq("product_id", productId);
+            qAgain = v.size == null ? qAgain.is("size", null) : qAgain.eq("size", v.size as string);
+            qAgain =
+              v.color_name == null
+                ? qAgain.is("color_name", null)
+                : qAgain.eq("color_name", v.color_name as string);
+            const { data: again } = await qAgain.limit(1);
+            const foundId = (again as { id: string }[] | null)?.[0]?.id;
             if (foundId) {
               const { error: u2 } = await gate.supabase
                 .from("product_variants")
