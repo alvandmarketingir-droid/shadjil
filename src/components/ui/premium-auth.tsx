@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useState, useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { signInAction, signUpAction, resetPasswordAction, requestOtpAction, verifyOtpAction } from "@/app/(shop)/actions/auth";
+import { signInAction, resetPasswordAction, requestOtpAction, verifyOtpAction } from "@/app/(shop)/actions/auth";
 import { isValidIranMobile, normalizeIranMobile, onlyDigits } from "@/lib/numbers";
 import {
   Mail,
@@ -134,6 +134,7 @@ export function AuthForm({
   const [authMode, setAuthMode] = useState<AuthMode>(initialMode);
   const [loginMethod, setLoginMethod] = useState<LoginMethod>("password");
   const [otpStep, setOtpStep] = useState<OtpStep>("phone");
+  const [resetStep, setResetStep] = useState<"id" | "code">("id");
   const [otpCooldown, setOtpCooldown] = useState(0);
 
   useEffect(() => {
@@ -189,9 +190,6 @@ export function AuthForm({
               invalid_phone: "شماره موبایل معتبر نیست",
               rate_limit: "کمی صبر کنید و دوباره تلاش کنید",
               send_failed: "ارسال پیامک ناموفق بود",
-              config: "تنظیمات SMS ناقص است (env)",
-              server: "خطای سرور",
-              send_failed: "ارسال پیامک ناموفق بود",
               config: "پیکربندی پیامک ناقص است",
               server: "خطای سرور",
             };
@@ -212,22 +210,10 @@ export function AuthForm({
           setIsLoading(false);
           return;
         }
-        // رمز اجباری در OTP تا بعداً signInWithPassword کار کند
-        if (!formData.password || formData.password.length < 8) {
-          setErrors({ password: "رمز عبور حداقل ۸ کاراکتر برای ورود بعدی لازم است" });
-          setIsLoading(false);
-          return;
-        }
-        if (formData.password !== formData.confirmPassword) {
-          setErrors({ confirmPassword: "تکرار رمز مطابقت ندارد" });
-          setIsLoading(false);
-          return;
-        }
+        // ورود OTP خالص — رمز اجباری نیست (رمز در ثبت‌نام ذخیره می‌شود)
         const phoneNormLogin =
           normalizeIranMobile(formData.phone) ?? formData.phone;
-        const ver = await verifyOtpAction(phoneNormLogin, formData.otpCode, {
-          password: formData.password,
-        });
+        const ver = await verifyOtpAction(phoneNormLogin, formData.otpCode);
         if (!ver.ok) {
           const map: Record<string, string> = {
             invalid_phone: "شماره نامعتبر است",
@@ -263,31 +249,11 @@ export function AuthForm({
               sessionOk = true;
             }
           }
-          if (!sessionOk && email && formData.password) {
-            const { data: signed, error: signErr } =
-              await browser.auth.signInWithPassword({
-                email,
-                password: formData.password,
-              });
-            if (signErr || !signed.session) {
-              console.error("[otp signIn]", signErr);
-              setErrors({ otpCode: "ورود ناموفق؛ دوباره کد بگیرید" });
-              setIsLoading(false);
-              return;
-            }
-            sessionOk = true;
-          }
           if (!sessionOk) {
             setErrors({ otpCode: "خطا در ساخت نشست؛ دوباره تلاش کنید" });
             setIsLoading(false);
             return;
           }
-          // پشتیبان: رمز را با نشست فعال هم بنویس
-          const { error: pwErr } = await browser.auth.updateUser({
-            password: formData.password,
-            data: { phone: phoneNormLogin },
-          });
-          if (pwErr) console.warn("[otp login setPassword]", pwErr);
         } catch (e) {
           console.error("[otp session]", e);
           setErrors({ otpCode: "خطا در ورود" });
@@ -368,17 +334,130 @@ export function AuthForm({
         return;
       }
 
-      // ——— بازیابی ———
+      // ——— بازیابی رمز (ایمیل: لینک؛ موبایل: OTP + رمز جدید) ———
       if (authMode === "reset") {
-        if (!isValidLoginId(formData.loginId) && !isValidIranPhone(formData.phone)) {
-          const id = formData.loginId || formData.phone;
-          if (!isValidLoginId(id)) {
+        const idRaw = (formData.loginId || formData.phone || "").trim();
+        if (resetStep === "id") {
+          if (!isValidLoginId(idRaw)) {
             setErrors({ loginId: "موبایل یا ایمیل معتبر وارد کنید" });
+            setIsLoading(false);
             return;
           }
+          if (idRaw.includes("@")) {
+            const res = await resetPasswordAction(idRaw);
+            if (!res.ok) {
+              setErrors({
+                general: res.error || "ارسال لینک بازیابی ناموفق بود",
+              });
+              setIsLoading(false);
+              return;
+            }
+            setSuccessMessage("اگر حساب با این ایمیل باشد، لینک بازیابی ارسال شد");
+            setTimeout(() => {
+              setAuthMode("login");
+              setResetStep("id");
+            }, 1800);
+            setIsLoading(false);
+            return;
+          }
+          const phoneNorm = normalizeIranMobile(idRaw);
+          if (!phoneNorm) {
+            setErrors({ loginId: "شماره موبایل معتبر نیست" });
+            setIsLoading(false);
+            return;
+          }
+          const res = await requestOtpAction(phoneNorm);
+          if (!res.ok) {
+            const map: Record<string, string> = {
+              invalid_phone: "شماره موبایل نامعتبر است",
+              rate_limit: "کمی صبر کنید و دوباره تلاش کنید",
+              send_failed: "ارسال پیامک ناموفق بود",
+              config: "پیکربندی پیامک ناقص است",
+              server: "خطای سرور",
+            };
+            setErrors({ loginId: map[res.error] || "ارسال کد ناموفق بود" });
+            setIsLoading(false);
+            return;
+          }
+          setFormData((p) => ({ ...p, phone: phoneNorm, loginId: phoneNorm }));
+          setResetStep("code");
+          setSuccessMessage("کد تأیید ارسال شد؛ رمز جدید را وارد کنید");
+          setOtpCooldown(60);
+          setIsLoading(false);
+          return;
         }
-        setSuccessMessage("لینک / کد بازیابی ارسال شد");
-        setTimeout(() => setAuthMode("login"), 1500);
+
+        // resetStep === "code": OTP + رمز جدید → ذخیره روی Auth → داشبورد
+        const phoneNorm =
+          normalizeIranMobile(formData.phone || formData.loginId) || "";
+        const code = onlyDigits(formData.otpCode, 6);
+        if (!/^\d{6}$/.test(code)) {
+          setErrors({ otpCode: "کد ۶ رقمی را وارد کنید" });
+          setIsLoading(false);
+          return;
+        }
+        if (!formData.password || formData.password.length < 8) {
+          setErrors({ password: "رمز جدید حداقل ۸ کاراکتر باشد" });
+          setIsLoading(false);
+          return;
+        }
+        if (formData.password !== formData.confirmPassword) {
+          setErrors({ confirmPassword: "تکرار رمز مطابقت ندارد" });
+          setIsLoading(false);
+          return;
+        }
+        const ver = await verifyOtpAction(phoneNorm, code, {
+          password: formData.password,
+        });
+        if (!ver.ok) {
+          setErrors({
+            otpCode:
+              (ver as { error?: string }).error === "invalid_code"
+                ? "کد نادرست است"
+                : "تأیید ناموفق؛ دوباره تلاش کنید",
+          });
+          setIsLoading(false);
+          return;
+        }
+        const tokenHash = (ver as { token_hash?: string }).token_hash;
+        const email = (ver as { email?: string }).email;
+        try {
+          const { createBrowserClient } = await import("@supabase/ssr");
+          const browser = createBrowserClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+          );
+          let sessionOk = false;
+          if (tokenHash) {
+            const { data: verified, error: vErr } = await browser.auth.verifyOtp({
+              token_hash: tokenHash,
+              type: "email",
+            });
+            if (!vErr && verified.session) sessionOk = true;
+          }
+          if (!sessionOk && email) {
+            const { error: signErr } = await browser.auth.signInWithPassword({
+              email,
+              password: formData.password,
+            });
+            if (!signErr) sessionOk = true;
+          }
+          if (sessionOk) {
+            await browser.auth.updateUser({ password: formData.password });
+          } else {
+            setErrors({ general: "نشست ساخته نشد؛ دوباره تلاش کنید" });
+            setIsLoading(false);
+            return;
+          }
+        } catch (e) {
+          console.error("[reset otp]", e);
+          setErrors({ general: "خطا در بازیابی رمز" });
+          setIsLoading(false);
+          return;
+        }
+        setSuccessMessage("رمز به‌روز شد");
+        setIsLoading(false);
+        navigateAfterAuth("/dashboard");
         return;
       }
 
@@ -510,7 +589,7 @@ export function AuthForm({
                   console.error("[signup password verify]", check.error);
                   setErrors({
                     verificationCode:
-                      "حساب ساخته شد ولی ذخیره رمز کامل نشد؛ کد را دوباره بزنید یا با OTP وارد شوید و رمز را دوباره وارد کنید.",
+                      "حساب ساخته شد ولی ذخیره رمز کامل نشد؛ از «فراموشی رمز؟» رمز جدید بگذارید یا ثبت‌نام را دوباره کامل کنید.",
                   });
                   setIsLoading(false);
                   return;
@@ -667,33 +746,104 @@ export function AuthForm({
         {/* بازیابی */}
         {authMode === "reset" ? (
           <>
-            <div className="relative">
-              <Phone className="text-muted-foreground absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="موبایل یا ایمیل"
-                value={formData.loginId}
-                onChange={(e) => handleInputChange("loginId", e.target.value)}
-                className={inputCls}
-              />
-            </div>
-            {errors.loginId ? (
-              <p className="text-destructive text-xs">{errors.loginId}</p>
-            ) : null}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="bg-primary text-primary-foreground w-full rounded-xl py-3 font-medium disabled:opacity-50"
-            >
-              {isLoading ? (
-                <Loader2 className="mx-auto h-5 w-5 animate-spin" />
-              ) : (
-                "ارسال کد بازیابی"
-              )}
-            </button>
+            {resetStep === "id" ? (
+              <>
+                <div className="relative">
+                  <Phone className="text-muted-foreground absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="موبایل یا ایمیل"
+                    value={formData.loginId}
+                    onChange={(e) => handleInputChange("loginId", e.target.value)}
+                    className={inputCls}
+                  />
+                </div>
+                {errors.loginId ? (
+                  <p className="text-destructive text-xs">{errors.loginId}</p>
+                ) : null}
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="bg-primary text-primary-foreground w-full rounded-xl py-3 font-medium disabled:opacity-50"
+                >
+                  {isLoading ? (
+                    <Loader2 className="mx-auto h-5 w-5 animate-spin" />
+                  ) : (
+                    "ادامه بازیابی"
+                  )}
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="text-muted-foreground text-center text-sm">
+                  کد به <strong>{formData.phone || formData.loginId}</strong> ارسال شد
+                </p>
+                <input
+                  type="text"
+                  maxLength={6}
+                  placeholder="کد ۶ رقمی"
+                  value={formData.otpCode}
+                  onChange={(e) =>
+                    handleInputChange("otpCode", onlyDigits(e.target.value, 6))
+                  }
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  className={inputCls + " text-center font-mono text-lg tracking-widest"}
+                  dir="ltr"
+                />
+                {errors.otpCode ? (
+                  <p className="text-destructive text-xs">{errors.otpCode}</p>
+                ) : null}
+                <div className="relative">
+                  <Lock className="text-muted-foreground absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2" />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="رمز جدید *"
+                    value={formData.password}
+                    onChange={(e) => handleInputChange("password", e.target.value)}
+                    className={cn(inputCls, "pl-10 pr-12")}
+                    autoComplete="new-password"
+                  />
+                </div>
+                {errors.password ? (
+                  <p className="text-destructive text-xs">{errors.password}</p>
+                ) : null}
+                <div className="relative">
+                  <Shield className="text-muted-foreground absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2" />
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="تکرار رمز جدید *"
+                    value={formData.confirmPassword}
+                    onChange={(e) =>
+                      handleInputChange("confirmPassword", e.target.value)
+                    }
+                    className={cn(inputCls, "pl-10 pr-12")}
+                    autoComplete="new-password"
+                  />
+                </div>
+                {errors.confirmPassword ? (
+                  <p className="text-destructive text-xs">{errors.confirmPassword}</p>
+                ) : null}
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="bg-primary text-primary-foreground w-full rounded-xl py-3 font-medium disabled:opacity-50"
+                >
+                  {isLoading ? (
+                    <Loader2 className="mx-auto h-5 w-5 animate-spin" />
+                  ) : (
+                    "ذخیره رمز و ورود"
+                  )}
+                </button>
+              </>
+            )}
             <button
               type="button"
-              onClick={() => setAuthMode("login")}
+              onClick={() => {
+                setAuthMode("login");
+                setResetStep("id");
+                setFormData((p) => ({ ...p, otpCode: "" }));
+              }}
               className="text-primary w-full text-sm"
             >
               بازگشت به ورود
@@ -787,39 +937,6 @@ export function AuthForm({
                 {errors.otpCode ? (
                   <p className="text-destructive text-xs">{errors.otpCode}</p>
                 ) : null}
-                <p className="text-muted-foreground text-xs text-right">
-                  رمز را وارد کنید تا بعداً بدون OTP با موبایل/ایمیل وارد شوید.
-                </p>
-                <div className="relative">
-                  <Lock className="text-muted-foreground absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2" />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="رمز عبور (حداقل ۸ کاراکتر) *"
-                    value={formData.password}
-                    onChange={(e) => handleInputChange("password", e.target.value)}
-                    className={cn(inputCls, "pl-10 pr-12")}
-                    autoComplete="new-password"
-                  />
-                </div>
-                {errors.password ? (
-                  <p className="text-destructive text-xs">{errors.password}</p>
-                ) : null}
-                <div className="relative">
-                  <Shield className="text-muted-foreground absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2" />
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    placeholder="تکرار رمز عبور *"
-                    value={formData.confirmPassword}
-                    onChange={(e) =>
-                      handleInputChange("confirmPassword", e.target.value)
-                    }
-                    className={cn(inputCls, "pl-10 pr-12")}
-                    autoComplete="new-password"
-                  />
-                </div>
-                {errors.confirmPassword ? (
-                  <p className="text-destructive text-xs">{errors.confirmPassword}</p>
-                ) : null}
                 <button
                   type="submit"
                   disabled={isLoading}
@@ -828,7 +945,7 @@ export function AuthForm({
                   {isLoading ? (
                     <Loader2 className="mx-auto h-5 w-5 animate-spin" />
                   ) : (
-                    "تأیید و ورود"
+                    "ورود"
                   )}
                 </button>
                 <button
@@ -1096,7 +1213,16 @@ export function AuthForm({
                 <button
                   type="button"
                   className="text-primary"
-                  onClick={() => setAuthMode("reset")}
+                  onClick={() => {
+                    setAuthMode("reset");
+                    setResetStep("id");
+                    setFormData((p) => ({
+                      ...p,
+                      otpCode: "",
+                      password: "",
+                      confirmPassword: "",
+                    }));
+                  }}
                 >
                   فراموشی رمز؟
                 </button>
