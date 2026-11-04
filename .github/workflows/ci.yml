@@ -18,7 +18,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps --no-audit --no-fund
+        run: bash -c 'unset npm_config_cache_dir NPM_CONFIG_CACHE_DIR; npm install --no-audit --no-fund'
 
       - name: Unit + integration
         run: npm test
@@ -39,13 +39,10 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps --no-audit --no-fund
-
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder
-          NEXT_PUBLIC_SITE_URL: https://pirahanmardane.ir
+        run: bash -c 'unset npm_config_cache_dir NPM_CONFIG_CACHE_DIR; npm install --no-audit --no-fund'
 
       - name: Build
-        run: npm run build
+        run: bash -c 'unset npm_config_cache_dir NPM_CONFIG_CACHE_DIR; npm run build'
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder
@@ -78,7 +75,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps --no-audit --no-fund
+        run: bash -c 'unset npm_config_cache_dir NPM_CONFIG_CACHE_DIR; npm install --no-audit --no-fund'
 
       - name: Install Playwright Chromium
         run: npx playwright install chromium --with-deps

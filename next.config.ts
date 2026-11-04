@@ -30,7 +30,7 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  eslint: { ignoreDuringBuilds: true },
+  // Next 16+: eslint key removed from next.config (use `npm run lint` / eslint.config.mjs)
   typescript: { ignoreBuildErrors: true },
 
   async headers() {
