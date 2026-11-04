@@ -26,7 +26,11 @@ export async function listActiveShippingMethodsAction(input?: {
       .order("sort_order", { ascending: true });
 
     if (error) throw error;
-    const all = (data ?? []) as ShippingMethodRow[];
+    // هرگز api_config (کلید/توکن ارائه‌دهنده) را به کلاینت برنگردان
+    const all = ((data ?? []) as ShippingMethodRow[]).map((m) => ({
+      ...m,
+      api_config: null,
+    }));
 
     const province = (input?.province || "").trim();
     const city = (input?.city || "").trim();

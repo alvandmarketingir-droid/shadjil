@@ -12,7 +12,11 @@ import {
   clearLoginFailures,
 } from "@/lib/security/login-lockout";
 import { headers } from "next/headers";
-import { onlyDigits, normalizeIranMobile } from "@/lib/numbers";
+import {
+  normalizeIranMobile,
+  phoneLookupVariants,
+  otpPhoneEmail,
+} from "@/lib/numbers";
 import { recordUserSession } from "@/lib/security/sessions";
 
 async function getClientIp(): Promise<string> {
@@ -28,9 +32,76 @@ async function getClientIp(): Promise<string> {
   }
 }
 
-
 function otpEmail(phone: string) {
-  return `${onlyDigits(phone)}@phone.pirahanmardane.ir`;
+  return otpPhoneEmail(phone);
+}
+
+async function findAuthEmailByPhone(phone09: string): Promise<string | null> {
+  const admin = createServiceClient();
+  const variants = phoneLookupVariants(phone09);
+  if (!variants.length) return null;
+
+  // 1) پروفایل با هر فرمت رایج
+  const { data: profiles } = await admin
+    .from("profiles")
+    .select("id, phone")
+    .in("phone", variants)
+    .limit(5);
+
+  for (const row of profiles ?? []) {
+    const uid = (row as { id?: string }).id;
+    if (!uid) continue;
+    const { data, error } = await admin.auth.admin.getUserById(uid);
+    if (!error && data?.user?.email) return data.user.email;
+  }
+
+  // 2) Auth user با phone E.164 (+98…) — REST admin API
+  const e164 = `+98${phone09.slice(1)}`;
+  try {
+    const url = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL + "/auth/v1/admin/users");
+    url.searchParams.set("phone", e164);
+    const res = await fetch(url.toString(), {
+      headers: {
+        Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+        apikey: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
+      },
+      cache: "no-store",
+    });
+    if (res.ok) {
+      const body = (await res.json()) as {
+        users?: { email?: string; phone?: string }[];
+        email?: string;
+      };
+      const users = body.users ?? (body.email ? [body as { email?: string }] : []);
+      const hit = users.find((u) => u.email);
+      if (hit?.email) return hit.email;
+    }
+  } catch (e) {
+    console.warn("[resolveAuthEmail phone lookup]", e);
+  }
+
+  // 3) ایمیل سنتتیک مسیر OTP
+  return otpEmail(phone09);
+}
+
+async function authEmailExists(email: string): Promise<boolean | null> {
+  try {
+    const url = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL + "/auth/v1/admin/users");
+    url.searchParams.set("email", email);
+    const res = await fetch(url.toString(), {
+      headers: {
+        Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+        apikey: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
+      },
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    const body = (await res.json()) as { users?: unknown[]; id?: string };
+    if (Array.isArray(body.users)) return body.users.length > 0;
+    return Boolean(body.id);
+  } catch {
+    return null;
+  }
 }
 
 async function resolveAuthEmail(loginId: string): Promise<string | null> {
@@ -40,20 +111,7 @@ async function resolveAuthEmail(loginId: string): Promise<string | null> {
 
   const phone = normalizeIranMobile(raw);
   if (!phone) return null;
-
-  const admin = createServiceClient();
-  const { data: profile } = await admin
-    .from("profiles")
-    .select("id")
-    .eq("phone", phone)
-    .maybeSingle();
-
-  const uid = (profile as { id?: string } | null)?.id;
-  if (uid) {
-    const { data, error } = await admin.auth.admin.getUserById(uid);
-    if (!error && data?.user?.email) return data.user.email;
-  }
-  return otpEmail(phone);
+  return findAuthEmailByPhone(phone);
 }
 
 export async function signInAction(loginId: string, password: string) {
@@ -77,6 +135,21 @@ export async function signInAction(loginId: string, password: string) {
       error: "به دلیل تلاش‌های ناموفق، ورود تا حدود " + min + " دقیقه قفل است.",
     };
   }
+
+  // تشخیص «کاربر نیست» از «رمز غلط» — بدون لو دادن جزئیات حساس
+  const exists = await authEmailExists(email);
+  if (exists === false) {
+    logger.warn("[auth] no auth user for resolved email", {
+      phoneLogin: !loginId.includes("@"),
+    });
+    return {
+      ok: false as const,
+      error:
+        "حسابی با این موبایل/ایمیل یافت نشد. ابتدا ثبت‌نام کنید یا با OTP وارد شوید.",
+      code: "user_not_found" as const,
+    };
+  }
+
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({
     email,
@@ -91,10 +164,16 @@ export async function signInAction(loginId: string, password: string) {
         error: "ورود موقتاً قفل شد. حدود " + min + " دقیقه دیگر تلاش کنید.",
       };
     }
-    logger.warn("[auth] bad credentials");
+    logger.warn("[auth] bad credentials", {
+      phoneLogin: !String(loginId).includes("@"),
+      msg: error.message,
+    });
+    // کاربران ساخته‌شده فقط با OTP اغلب password ندارند
     return {
       ok: false as const,
-      error: "ایمیل/موبایل یا رمز عبور نادرست است",
+      error:
+        "رمز عبور نادرست است یا برای این حساب رمز تنظیم نشده. از «ورود با OTP» استفاده کنید یا رمز را در تنظیمات حساب/پنل Auth بازنشانی کنید.",
+      code: "bad_password" as const,
     };
   }
   await clearLoginFailures(lockKey);
@@ -162,32 +241,47 @@ export async function requestOtpAction(phone: string) {
   return requestLoginOtp(phone);
 }
 
-export async function verifyOtpAction(phone: string, code: string) {
+export async function verifyOtpAction(
+  phone: string,
+  code: string,
+  opts?: { password?: string; fullName?: string },
+) {
   const verified = await verifyLoginOtp(phone, code);
   if (!verified.ok) return verified;
 
   const normalized = verified.phone;
   const syntheticEmail = otpEmail(normalized);
   const admin = createServiceClient();
+  const password =
+    typeof opts?.password === "string" && opts.password.length >= 8
+      ? opts.password
+      : undefined;
+  const fullName = (opts?.fullName || "").trim() || undefined;
 
-  const { data: profile } = await admin
+  // پروفایل با همه فرمت‌های رایج موبایل
+  const variants = phoneLookupVariants(normalized);
+  const { data: profileRows } = await admin
     .from("profiles")
-    .select("id, role")
-    .eq("phone", normalized)
-    .maybeSingle();
+    .select("id, role, phone")
+    .in("phone", variants)
+    .limit(5);
+  const profile = (profileRows ?? [])[0] ?? null;
 
   let userId = (profile as { id?: string } | null)?.id as string | undefined;
   let role = String((profile as { role?: string } | null)?.role || "customer");
   let authEmail = syntheticEmail;
 
   if (!userId) {
-    const { data: created, error: createErr } = await admin.auth.admin.createUser({
+    const createPayload: Parameters<typeof admin.auth.admin.createUser>[0] = {
       email: syntheticEmail,
       email_confirm: true,
-      user_metadata: { phone: normalized },
+      user_metadata: { phone: normalized, full_name: fullName },
       phone: `+98${normalized.slice(1)}`,
       phone_confirm: true,
-    });
+    };
+    if (password) createPayload.password = password;
+    const { data: created, error: createErr } =
+      await admin.auth.admin.createUser(createPayload);
     if (createErr) {
       console.warn("[otp createUser]", createErr.message);
       try {
@@ -209,6 +303,7 @@ export async function verifyOtpAction(phone: string, code: string) {
       await admin.from("profiles").upsert({
         id: userId,
         phone: normalized,
+        full_name: fullName ?? null,
         role: role === "admin" ? "admin" : "customer",
       } as never);
     }
@@ -217,15 +312,27 @@ export async function verifyOtpAction(phone: string, code: string) {
       const { data: u } = await admin.auth.admin.getUserById(userId);
       const current = u?.user?.email || "";
       if (current) authEmail = current;
-      await admin.auth.admin.updateUserById(userId, {
+      const patch: Parameters<typeof admin.auth.admin.updateUserById>[1] = {
         email_confirm: true,
         user_metadata: {
           ...(u?.user?.user_metadata || {}),
           phone: normalized,
+          ...(fullName ? { full_name: fullName } : {}),
         },
         phone: `+98${normalized.slice(1)}`,
         phone_confirm: true,
-      });
+      };
+      // اگر کاربر رمز فرستاده (ثبت‌نام)، روی حساب موجود هم ست کن
+      if (password) patch.password = password;
+      await admin.auth.admin.updateUserById(userId, patch);
+      // نرمال‌سازی phone در profiles به فرم 09…
+      await admin
+        .from("profiles")
+        .update({
+          phone: normalized,
+          ...(fullName ? { full_name: fullName } : {}),
+        } as never)
+        .eq("id", userId);
     } catch (e) {
       console.warn("[otp touch user]", e);
     }

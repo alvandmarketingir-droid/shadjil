@@ -48,6 +48,34 @@ export function isValidIranMobile(input: string): boolean {
   return normalizeIranMobile(input) !== null;
 }
 
+/** همه شکل‌های رایج ذخیره‌سازی موبایل در DB / Auth برای lookup */
+export function phoneLookupVariants(phone09: string): string[] {
+  const phone = normalizeIranMobile(phone09);
+  if (!phone) return [];
+  const national = phone.slice(1); // 9xxxxxxxxx
+  return Array.from(
+    new Set([
+      phone,
+      `+98${national}`,
+      `98${national}`,
+      national,
+      `0098${national}`,
+      `0${national}`,
+    ]),
+  );
+}
+
+/** ایمیل سنتتیک مسیر OTP — همیشه بر پایه 09… */
+export function otpPhoneEmail(phone: string): string {
+  const normalized =
+    normalizeIranMobile(phone) ??
+    (() => {
+      const d = digitsOnly(phone);
+      return d.length === 10 && d.startsWith("9") ? `0${d}` : d;
+    })();
+  return `${digitsOnly(normalized)}@phone.pirahanmardane.ir`;
+}
+
 /** کد پستی ایران: ۱۰ رقم */
 export function normalizeIranPostalCode(input: string): string | null {
   const d = toEnglishDigits(String(input ?? "")).replace(/\D/g, "");
