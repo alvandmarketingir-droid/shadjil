@@ -1213,7 +1213,16 @@ export function AuthForm({
                 <button
                   type="button"
                   className="text-primary"
-                  onClick={() => setAuthMode("reset")}
+                  onClick={() => {
+                    setAuthMode("reset");
+                    setResetStep("id");
+                    setFormData((p) => ({
+                      ...p,
+                      otpCode: "",
+                      password: "",
+                      confirmPassword: "",
+                    }));
+                  }}
                 >
                   فراموشی رمز؟
                 </button>
