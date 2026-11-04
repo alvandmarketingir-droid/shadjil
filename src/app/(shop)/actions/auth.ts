@@ -18,6 +18,7 @@ import {
   otpPhoneEmail,
 } from "@/lib/numbers";
 import { recordUserSession } from "@/lib/security/sessions";
+import { findAuthUserByPhoneOrEmails } from "@/lib/auth/find-user-by-phone";
 
 async function getClientIp(): Promise<string> {
   try {
@@ -449,20 +450,17 @@ export async function verifyOtpAction(
         authEmail = found.email;
       } else {
         try {
-          const { data: listed } = await admin.auth.admin.listUsers({
-            page: 1,
-            perPage: 200,
+          const hit = await findAuthUserByPhoneOrEmails(admin, {
+            emails: [authEmail, syntheticEmail, contactEmail || ""].filter(
+              Boolean,
+            ) as string[],
+            phoneE164: `+98${normalized.slice(1)}`,
+            phoneAlt: `98${normalized.slice(1)}`,
           });
-          const hit = listed?.users?.find(
-            (u) =>
-              u.email === syntheticEmail ||
-              u.email === authEmail ||
-              (contactEmail && u.email === contactEmail) ||
-              u.phone === `+98${normalized.slice(1)}` ||
-              u.phone === `98${normalized.slice(1)}`,
-          );
-          userId = hit?.id;
-          if (hit?.email) authEmail = hit.email;
+          if (hit) {
+            userId = hit.id;
+            if (hit.email) authEmail = hit.email;
+          }
         } catch (e) {
           console.warn("[otp listUsers]", e);
         }

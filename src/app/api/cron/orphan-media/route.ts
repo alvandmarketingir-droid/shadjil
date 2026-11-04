@@ -1,21 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { runOrphanMediaCleanup } from "@/lib/media/orphan-cleanup";
+import { assertCronBearer } from "@/lib/security/cron-auth";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
-function authorize(req: NextRequest): boolean {
-  const secret = process.env.CRON_SECRET?.trim();
-  if (!secret) return false;
-  const auth = req.headers.get("authorization") || "";
-  if (auth === `Bearer ${secret}`) return true;
-  const q = req.nextUrl.searchParams.get("secret");
-  return q === secret;
-}
-
 /**
  * GET /api/cron/orphan-media
- * Auth: Authorization: Bearer CRON_SECRET  یا  ?secret=
+ * Auth: Authorization: Bearer CRON_SECRET only
  *
  * Query:
  *   dryRun=1     فقط گزارش (پیشنهاد هفته اول)
@@ -24,7 +16,7 @@ function authorize(req: NextRequest): boolean {
  *   maxDelete    پیش‌فرض 50
  */
 export async function GET(req: NextRequest) {
-  if (!authorize(req)) {
+  if (!assertCronBearer(req)) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 

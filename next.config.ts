@@ -31,6 +31,7 @@ const nextConfig: NextConfig = {
   },
 
   // Next 16+: eslint key removed from next.config (use `npm run lint` / eslint.config.mjs)
+  // Typecheck path (T-9): keep ignore until `npm run typecheck` is green; CI tracks count.
   typescript: { ignoreBuildErrors: true },
 
   async headers() {

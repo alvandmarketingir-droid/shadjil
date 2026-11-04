@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { r2PutObject } from "@/lib/r2";
+import { assertCronBearer } from "@/lib/security/cron-auth";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -16,17 +17,8 @@ const TABLES = [
 
 const ROW_LIMIT = 10000;
 
-function authorize(req: NextRequest): boolean {
-  const secret = process.env.CRON_SECRET?.trim();
-  if (!secret) return false;
-  const auth = req.headers.get("authorization") || "";
-  if (auth === `Bearer ${secret}`) return true;
-  const q = req.nextUrl.searchParams.get("secret");
-  return q === secret;
-}
-
 export async function GET(req: NextRequest) {
-  if (!authorize(req)) {
+  if (!assertCronBearer(req)) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 

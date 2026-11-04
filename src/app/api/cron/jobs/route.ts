@@ -1,20 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { processPendingJobs } from "@/lib/queue/jobs";
+import { assertCronBearer } from "@/lib/security/cron-auth";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-function authorized(req: NextRequest) {
-  const secret = process.env.CRON_SECRET?.trim();
-  if (!secret) return false;
-  const auth = req.headers.get("authorization") || "";
-  if (auth === `Bearer ${secret}`) return true;
-  const q = req.nextUrl.searchParams.get("secret");
-  return q === secret;
-}
-
 export async function GET(req: NextRequest) {
-  if (!authorized(req)) {
+  if (!assertCronBearer(req)) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
   try {
