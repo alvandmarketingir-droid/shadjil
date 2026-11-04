@@ -55,19 +55,22 @@ async function findAuthEmailByPhone(phone09: string): Promise<string | null> {
     if (!error && data?.user?.email) return data.user.email;
   }
 
-  // 2) Auth user با phone E.164 (+98…) — REST admin API
-  const e164 = `+98${phone09.slice(1)}`;
-  try {
-    const url = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL + "/auth/v1/admin/users");
-    url.searchParams.set("phone", e164);
-    const res = await fetch(url.toString(), {
-      headers: {
-        Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
-        apikey: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
-      },
-      cache: "no-store",
-    });
-    if (res.ok) {
+  // 2) Auth user با phone — هم +98… و هم 98… (فرمت ذخیره‌شده در داشبورد)
+  const phoneCandidates = [`+98${phone09.slice(1)}`, `98${phone09.slice(1)}`, phone09];
+  for (const phoneQ of phoneCandidates) {
+    try {
+      const url = new URL(
+        process.env.NEXT_PUBLIC_SUPABASE_URL + "/auth/v1/admin/users",
+      );
+      url.searchParams.set("phone", phoneQ);
+      const res = await fetch(url.toString(), {
+        headers: {
+          Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+          apikey: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
+        },
+        cache: "no-store",
+      });
+      if (!res.ok) continue;
       const body = (await res.json()) as {
         users?: { email?: string; phone?: string }[];
         email?: string;
@@ -75,12 +78,12 @@ async function findAuthEmailByPhone(phone09: string): Promise<string | null> {
       const users = body.users ?? (body.email ? [body as { email?: string }] : []);
       const hit = users.find((u) => u.email);
       if (hit?.email) return hit.email;
+    } catch (e) {
+      console.warn("[resolveAuthEmail phone lookup]", phoneQ, e);
     }
-  } catch (e) {
-    console.warn("[resolveAuthEmail phone lookup]", e);
   }
 
-  // 3) ایمیل سنتتیک مسیر OTP
+  // 3) ایمیل سنتتیک مسیر OTP (همان identity ایمیل در Auth)
   return otpEmail(phone09);
 }
 
