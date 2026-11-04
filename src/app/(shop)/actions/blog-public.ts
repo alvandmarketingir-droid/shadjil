@@ -1,10 +1,11 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 
+/** Published blog reads — anon client, no cookies() (keeps /blog ISR-friendly). */
 export async function listPublishedPostsAction(limit = 20) {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("blog_posts")
       .select(
@@ -23,7 +24,7 @@ export async function listPublishedPostsAction(limit = 20) {
 
 export async function getPublishedPostBySlugAction(slug: string) {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("blog_posts")
       .select(
@@ -35,7 +36,7 @@ export async function getPublishedPostBySlugAction(slug: string) {
     if (error) throw error;
     if (!data) return { ok: false as const, post: null, error: "not_found" };
     // cast: generated DB types may lag behind real columns (robots_*, og_*)
-    return { ok: true as const, post: data as Record<string, unknown> };
+    return { ok: true as const, post: data as unknown as Record<string, unknown> };
   } catch (e) {
     console.error("[getPublishedPost]", e);
     return { ok: false as const, post: null, error: "server" };
