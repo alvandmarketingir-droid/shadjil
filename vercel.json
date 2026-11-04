@@ -2,6 +2,8 @@
   "regions": [
     "fra1"
   ],
+  "installCommand": "bash -c 'unset npm_config_cache_dir NPM_CONFIG_CACHE_DIR; npm install --no-audit --no-fund'",
+  "buildCommand": "bash -c 'unset npm_config_cache_dir NPM_CONFIG_CACHE_DIR; npm run build'",
   "headers": [
     {
       "source": "/hero/(.*)",

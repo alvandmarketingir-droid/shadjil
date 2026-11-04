@@ -6,9 +6,10 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:e2e:smoke": "playwright test e2e/smoke.spec.ts"
   },
   "dependencies": {
     "@ark-ui/react": "^5.39.2",
