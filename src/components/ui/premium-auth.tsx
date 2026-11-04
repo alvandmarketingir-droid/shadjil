@@ -78,31 +78,46 @@ function isValidLoginId(value: string) {
   return isValidIranPhone(v);
 }
 
-/** مقصد بعد از ورود/ثبت‌نام مشتری: پنل مشتری مگر next صریحِ ادمین برای ادمین */
+/** مقصد بعد از ورود/ثبت‌نام: پنل مشتری، مگر next ادمین و کاربر مجاز */
 function resolvePostAuthDestination(opts: {
   defaultNext?: string;
   allowAdmin?: boolean;
 }): string {
-  const qNext =
+  const qRaw =
     typeof window !== "undefined"
       ? new URLSearchParams(window.location.search).get("next")
       : null;
-  let dest =
-    qNext && qNext.startsWith("/") && !qNext.startsWith("//")
-      ? qNext
-      : opts.defaultNext || "/dashboard";
+  const qNext =
+    qRaw && qRaw.startsWith("/") && !qRaw.startsWith("//") ? qRaw.trim() : null;
+  const fallback =
+    opts.defaultNext &&
+    opts.defaultNext.startsWith("/") &&
+    !opts.defaultNext.startsWith("//")
+      ? opts.defaultNext
+      : "/dashboard";
+
+  let dest = qNext || fallback;
   if (!dest.startsWith("/") || dest.startsWith("//")) dest = "/dashboard";
-  // مسیرهای عمومی فروشگاه بعد از auth → پنل مشتری
-  if (dest === "/" || dest === "/login" || dest === "/ورود" || dest === "/register" || dest === "/ثبت-نام") {
+
+  // مسیرهای auth/خانه بعد از ورود → پنل مشتری
+  if (
+    dest === "/" ||
+    dest === "/login" ||
+    dest === "/ورود" ||
+    dest === "/register" ||
+    dest === "/ثبت-نام"
+  ) {
     dest = "/dashboard";
   }
+
+  // /admin فقط اگر صریحاً مجاز (نقش ادمین یا next/defaultNext ادمین از صفحهٔ لاگین ادمین)
   if (dest.startsWith("/admin") && !opts.allowAdmin) {
     dest = "/dashboard";
   }
   return dest;
 }
 
-function goToCustomerPanel(dest?: string) {
+function navigateAfterAuth(dest?: string) {
   const target =
     dest && dest.startsWith("/") && !dest.startsWith("//") ? dest : "/dashboard";
   window.location.assign(target);
@@ -266,13 +281,23 @@ export function AuthForm({
           void onSuccess?.({ phone: formData.phone });
         } catch {}
         const role = String((ver as { role?: string }).role || "").toLowerCase();
-        const isAdmin = role === "admin" || role === "staff";
+        const isAdmin = role === "admin";
+        const qNextAdmin = (new URLSearchParams(window.location.search).get("next") || "").startsWith(
+          "/admin",
+        );
         const dest = resolvePostAuthDestination({
-          defaultNext: defaultNext || (isAdmin ? "/admin/dashboard" : "/dashboard"),
-          allowAdmin: isAdmin,
+          defaultNext:
+            defaultNext ||
+            (isAdmin && qNextAdmin
+              ? "/admin/dashboard"
+              : isAdmin && (defaultNext || "").startsWith("/admin")
+                ? defaultNext
+                : "/dashboard"),
+          // next=/admin… از صفحهٔ لاگین ادمین، یا نقش admin
+          allowAdmin: isAdmin || qNextAdmin || (defaultNext || "").startsWith("/admin"),
         });
         setIsLoading(false);
-        goToCustomerPanel(dest);
+        navigateAfterAuth(dest);
         return;
       }
 
@@ -289,6 +314,7 @@ export function AuthForm({
           return;
         }
         const id = formData.loginId.trim();
+        let signedRole = "";
         try {
           const { createBrowserClient } = await import("@supabase/ssr");
           const browser = createBrowserClient(
@@ -306,6 +332,15 @@ export function AuthForm({
               setIsLoading(false);
               return;
             }
+            // نقش از پروفایل بعد از نشست
+            try {
+              const { data: prof } = await browser
+                .from("profiles")
+                .select("role")
+                .eq("id", data.user!.id)
+                .maybeSingle();
+              signedRole = String((prof as { role?: string } | null)?.role || "");
+            } catch {}
           } else {
             const res = await signInAction(id, formData.password);
             if (!res.ok) {
@@ -313,6 +348,7 @@ export function AuthForm({
               setIsLoading(false);
               return;
             }
+            signedRole = String((res as { role?: string }).role || "");
           }
         } catch (e) {
           console.error("[password login]", e);
@@ -324,18 +360,21 @@ export function AuthForm({
           void onSuccess?.({ email: id });
         } catch {}
         setSuccessMessage("ورود موفق");
+        const qNext = new URLSearchParams(window.location.search).get("next") || "";
+        const qNextAdmin = qNext.startsWith("/admin");
+        const isAdmin = signedRole.toLowerCase() === "admin";
         const allowAdmin =
-          (defaultNext || "").startsWith("/admin") ||
-          (typeof window !== "undefined" &&
-            (new URLSearchParams(window.location.search).get("next") || "").startsWith(
-              "/admin",
-            ));
+          isAdmin ||
+          qNextAdmin ||
+          (defaultNext || "").startsWith("/admin");
         const dest = resolvePostAuthDestination({
-          defaultNext: defaultNext || "/dashboard",
+          defaultNext:
+            defaultNext ||
+            (isAdmin && qNextAdmin ? "/admin/dashboard" : "/dashboard"),
           allowAdmin,
         });
         setIsLoading(false);
-        goToCustomerPanel(dest);
+        navigateAfterAuth(dest);
         return;
       }
 
@@ -479,7 +518,7 @@ export function AuthForm({
             allowAdmin: false,
           });
           setTimeout(() => {
-            goToCustomerPanel(dest);
+            navigateAfterAuth(dest);
           }, 600);
           setIsLoading(false);
           return;
@@ -839,7 +878,7 @@ export function AuthForm({
                     name: formData.name,
                   });
                 } catch {}
-                goToCustomerPanel(
+                navigateAfterAuth(
                   resolvePostAuthDestination({
                     defaultNext: defaultNext || "/dashboard",
                     allowAdmin: false,

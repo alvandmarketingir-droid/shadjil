@@ -183,6 +183,7 @@ export async function signInAction(loginId: string, password: string) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  let role = "customer";
   if (user?.id) {
     let ua: string | null = null;
     try {
@@ -190,9 +191,22 @@ export async function signInAction(loginId: string, password: string) {
       ua = h.get("user-agent");
     } catch {}
     await recordUserSession({ userId: user.id, userAgent: ua, ipAddress: ip });
+    try {
+      const admin = createServiceClient();
+      const { data: prof } = await admin
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (prof && (prof as { role?: string }).role) {
+        role = String((prof as { role: string }).role);
+      }
+    } catch (e) {
+      console.warn("[signIn role]", e);
+    }
   }
   logger.info("[auth] sign-in ok");
-  return { ok: true as const };
+  return { ok: true as const, role };
 }
 
 export async function signUpAction(
