@@ -27,6 +27,45 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder
           NEXT_PUBLIC_SITE_URL: https://pirahanmardane.ir
 
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install dependencies
+        run: bash -c 'unset npm_config_cache_dir NPM_CONFIG_CACHE_DIR; npm install --no-audit --no-fund'
+      - name: ESLint
+        run: npm run lint
+        continue-on-error: true
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install dependencies
+        run: bash -c 'unset npm_config_cache_dir NPM_CONFIG_CACHE_DIR; npm install --no-audit --no-fund'
+      - name: Typecheck (track to zero; ignoreBuildErrors still on next build)
+        run: |
+          set +e
+          npm run typecheck 2>&1 | tee tsc.log
+          code=${PIPESTATUS[0]}
+          count=$(grep -c 'error TS' tsc.log || true)
+          echo "tsc_error_count=$count" >> "$GITHUB_STEP_SUMMARY"
+          echo "TypeScript errors: $count (baseline ~470; path to green under T-9)"
+          # Soft until green: do not fail the workflow on existing debt
+          exit 0
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder
+          NEXT_PUBLIC_SITE_URL: https://pirahanmardane.ir
+
   build:
     runs-on: ubuntu-latest
     needs: [unit-and-integration]
