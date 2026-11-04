@@ -1,4 +1,4 @@
-import { createServiceClient } from "@/lib/supabase/service";
+import { requireAdmin } from "@/lib/admin/require-admin";
 import { formatJalaliDateTime } from "@/lib/dates/jalali";
 import { toPersianDigits } from "@/lib/numbers";
 import { ContactMessageActions } from "./actions-client";
@@ -7,7 +7,15 @@ import { ContactMessagesRealtimeRefresh } from "./realtime-refresh";
 export const dynamic = "force-dynamic";
 
 export default async function ContactMessagesAdminPage() {
-  const supabase = createServiceClient();
+  const gate = await requireAdmin();
+  if (!gate.ok) {
+    return (
+      <div className="p-6 text-sm text-destructive" dir="rtl">
+        دسترسی غیرمجاز
+      </div>
+    );
+  }
+  const supabase = gate.supabase;
   const { data, error } = await supabase
     .from("contact_messages")
     .select("id, created_at, name, company, email, message, status, admin_note")

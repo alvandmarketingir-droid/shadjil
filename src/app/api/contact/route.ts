@@ -1,6 +1,7 @@
 import { createServiceClient } from "@/lib/supabase/service";
 import { checkRateLimit } from "@/lib/security/rate-limit";
 import { beginApiRequest, apiJson } from "@/lib/api-request";
+import { emailSchema } from "@/lib/validation/common";
 
 export async function POST(req: Request) {
   const { requestId, log } = beginApiRequest(req);
@@ -29,13 +30,18 @@ export async function POST(req: Request) {
 
     const body = await req.json();
     const name = String(body.name || "").trim().slice(0, 120);
-    const company = String(body.company || "").trim().slice(0, 120);
-    const email = String(body.email || "").trim().slice(0, 200);
+    const company = String(body.company || "")
+      .trim()
+      .replace(/[<>]/g, "")
+      .slice(0, 120);
+    const emailRaw = String(body.email || "").trim().slice(0, 200);
     const message = String(body.message || "").trim().slice(0, 4000);
+    const emailParsed = emailSchema.safeParse(emailRaw);
 
-    if (!name || !email || !message) {
+    if (!name || name.length < 2 || !message || message.length < 5 || !emailParsed.success) {
       return apiJson({ error: "invalid", requestId }, { status: 400, requestId });
     }
+    const email = emailParsed.data;
 
     const supabase = createServiceClient();
     const { error } = await supabase.from("contact_messages").insert({
