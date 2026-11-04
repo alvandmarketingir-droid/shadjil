@@ -107,14 +107,34 @@ async function authEmailExists(email: string): Promise<boolean | null> {
   }
 }
 
-async function resolveAuthEmail(loginId: string): Promise<string | null> {
+/** همه ایمیل‌های محتمل برای یک شناسه ورود (ایمیل یا موبایل) */
+async function resolveAuthEmailCandidates(loginId: string): Promise<string[]> {
   const raw = (loginId || "").trim();
-  if (!raw) return null;
-  if (raw.includes("@")) return raw.toLowerCase();
+  if (!raw) return [];
+  if (raw.includes("@")) return [raw.toLowerCase()];
 
   const phone = normalizeIranMobile(raw);
-  if (!phone) return null;
-  return findAuthEmailByPhone(phone);
+  if (!phone) return [];
+
+  const out: string[] = [];
+  const push = (e: string | null | undefined) => {
+    const v = (e || "").trim().toLowerCase();
+    if (v && v.includes("@") && !out.includes(v)) out.push(v);
+  };
+
+  try {
+    push(await findAuthEmailByPhone(phone));
+  } catch (e) {
+    console.warn("[resolveAuthEmailCandidates]", e);
+  }
+  // همیشه ایمیل سنتتیک OTP را هم امتحان کن (ممکن است پروفایل به ایمیل دیگری اشاره کند)
+  push(otpEmail(phone));
+  return out;
+}
+
+async function resolveAuthEmail(loginId: string): Promise<string | null> {
+  const list = await resolveAuthEmailCandidates(loginId);
+  return list[0] ?? null;
 }
 
 export async function signInAction(loginId: string, password: string) {
@@ -124,11 +144,13 @@ export async function signInAction(loginId: string, password: string) {
     logger.warn("[auth] rate limited", { ip });
     return { ok: false as const, error: "تعداد تلاش بیش از حد مجاز. کمی بعد دوباره تلاش کنید." };
   }
-  const email = await resolveAuthEmail(loginId);
-  if (!email) {
+  const candidates = await resolveAuthEmailCandidates(loginId);
+  if (!candidates.length) {
     return { ok: false as const, error: "شناسه ورود نامعتبر است" };
   }
-  const lockKey = email.toLowerCase() + "|" + ip;
+
+  // قفل روی اولین کاندید (موبایل/ایمیل اصلی)
+  const lockKey = candidates[0].toLowerCase() + "|" + ip;
   const lock = await getLoginLockStatus(lockKey);
   if (lock.locked) {
     const sec = lock.retryAfterSec ?? 900;
@@ -139,11 +161,63 @@ export async function signInAction(loginId: string, password: string) {
     };
   }
 
-  // تشخیص «کاربر نیست» از «رمز غلط» — بدون لو دادن جزئیات حساس
-  const exists = await authEmailExists(email);
-  if (exists === false) {
-    logger.warn("[auth] no auth user for resolved email", {
-      phoneLogin: !loginId.includes("@"),
+  const supabase = await createClient();
+  let lastError: string | null = null;
+  let anyExists: boolean | null = null;
+
+  for (const email of candidates) {
+    const exists = await authEmailExists(email);
+    if (exists === false) {
+      if (anyExists !== true) anyExists = false;
+      continue;
+    }
+    if (exists === true) anyExists = true;
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (!error) {
+      await clearLoginFailures(lockKey);
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      let role = "customer";
+      if (user?.id) {
+        let ua: string | null = null;
+        try {
+          const h = await headers();
+          ua = h.get("user-agent");
+        } catch {}
+        await recordUserSession({
+          userId: user.id,
+          userAgent: ua,
+          ipAddress: ip,
+        });
+        try {
+          const admin = createServiceClient();
+          const { data: prof } = await admin
+            .from("profiles")
+            .select("role")
+            .eq("id", user.id)
+            .maybeSingle();
+          if (prof && (prof as { role?: string }).role) {
+            role = String((prof as { role: string }).role);
+          }
+        } catch (e) {
+          console.warn("[signIn role]", e);
+        }
+      }
+      logger.info("[auth] sign-in ok", { via: email.includes("@phone.") ? "synthetic" : "email" });
+      return { ok: true as const, role };
+    }
+    lastError = error.message;
+  }
+
+  if (anyExists === false) {
+    logger.warn("[auth] no auth user for candidates", {
+      phoneLogin: !String(loginId).includes("@"),
+      n: candidates.length,
     });
     return {
       ok: false as const,
@@ -153,60 +227,25 @@ export async function signInAction(loginId: string, password: string) {
     };
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-  if (error) {
-    const fail = await recordLoginFailure(lockKey);
-    if (fail.locked) {
-      const min = Math.max(1, Math.ceil((fail.retryAfterSec ?? 900) / 60));
-      return {
-        ok: false as const,
-        error: "ورود موقتاً قفل شد. حدود " + min + " دقیقه دیگر تلاش کنید.",
-      };
-    }
-    logger.warn("[auth] bad credentials", {
-      phoneLogin: !String(loginId).includes("@"),
-      msg: error.message,
-    });
-    // کاربران ساخته‌شده فقط با OTP اغلب password ندارند
+  const fail = await recordLoginFailure(lockKey);
+  if (fail.locked) {
+    const min = Math.max(1, Math.ceil((fail.retryAfterSec ?? 900) / 60));
     return {
       ok: false as const,
-      error:
-        "رمز عبور نادرست است یا برای این حساب رمز تنظیم نشده. از «ورود با OTP» استفاده کنید یا رمز را در تنظیمات حساب/پنل Auth بازنشانی کنید.",
-      code: "bad_password" as const,
+      error: "ورود موقتاً قفل شد. حدود " + min + " دقیقه دیگر تلاش کنید.",
     };
   }
-  await clearLoginFailures(lockKey);
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  let role = "customer";
-  if (user?.id) {
-    let ua: string | null = null;
-    try {
-      const h = await headers();
-      ua = h.get("user-agent");
-    } catch {}
-    await recordUserSession({ userId: user.id, userAgent: ua, ipAddress: ip });
-    try {
-      const admin = createServiceClient();
-      const { data: prof } = await admin
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .maybeSingle();
-      if (prof && (prof as { role?: string }).role) {
-        role = String((prof as { role: string }).role);
-      }
-    } catch (e) {
-      console.warn("[signIn role]", e);
-    }
-  }
-  logger.info("[auth] sign-in ok");
-  return { ok: true as const, role };
+  logger.warn("[auth] bad credentials", {
+    phoneLogin: !String(loginId).includes("@"),
+    msg: lastError,
+    tried: candidates.length,
+  });
+  return {
+    ok: false as const,
+    error:
+      "رمز عبور نادرست است یا برای این حساب رمز تنظیم نشده. از «ورود با OTP» استفاده کنید یا در Supabase Auth برای همان کاربر OTP رمز را مستقیم Set کنید.",
+    code: "bad_password" as const,
+  };
 }
 
 export async function signUpAction(
@@ -418,19 +457,24 @@ export async function changeMyPasswordAction(
   if (!user?.email) {
     return { ok: false as const, error: "login_required" as const };
   }
-  const { error: checkErr } = await supabase.auth.signInWithPassword({
-    email: user.email,
-    password: cur,
-  });
-  if (checkErr) {
-    return { ok: false as const, error: "bad_current" as const };
+
+  // کاربران OTP اغلب رمز قبلی ندارند — با نشست فعال می‌توانند اولین رمز را ست کنند
+  if (cur) {
+    const { error: checkErr } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: cur,
+    });
+    if (checkErr) {
+      return { ok: false as const, error: "bad_current" as const };
+    }
   }
+
   const { error: updErr } = await supabase.auth.updateUser({ password: next });
   if (updErr) {
     console.error("[changeMyPassword]", updErr);
     return { ok: false as const, error: "server" as const };
   }
-  return { ok: true as const };
+  return { ok: true as const, firstSet: !cur };
 }
 
 export async function resendEmailVerificationAction() {

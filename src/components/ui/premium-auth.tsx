@@ -282,19 +282,16 @@ export function AuthForm({
         } catch {}
         const role = String((ver as { role?: string }).role || "").toLowerCase();
         const isAdmin = role === "admin";
-        const qNextAdmin = (new URLSearchParams(window.location.search).get("next") || "").startsWith(
-          "/admin",
-        );
+        const qNextAdmin = (
+          new URLSearchParams(window.location.search).get("next") || ""
+        ).startsWith("/admin");
         const dest = resolvePostAuthDestination({
           defaultNext:
-            defaultNext ||
-            (isAdmin && qNextAdmin
-              ? "/admin/dashboard"
-              : isAdmin && (defaultNext || "").startsWith("/admin")
-                ? defaultNext
-                : "/dashboard"),
-          // next=/admin… از صفحهٔ لاگین ادمین، یا نقش admin
-          allowAdmin: isAdmin || qNextAdmin || (defaultNext || "").startsWith("/admin"),
+            defaultNext || (isAdmin ? "/admin/dashboard" : "/dashboard"),
+          allowAdmin:
+            isAdmin ||
+            qNextAdmin ||
+            (defaultNext || "").startsWith("/admin"),
         });
         setIsLoading(false);
         navigateAfterAuth(dest);
@@ -313,43 +310,17 @@ export function AuthForm({
           setIsLoading(false);
           return;
         }
+        // ایمیل و موبایل هر دو از Server Action — resolve چندایمیلی + کوکی SSR یکسان
         const id = formData.loginId.trim();
         let signedRole = "";
         try {
-          const { createBrowserClient } = await import("@supabase/ssr");
-          const browser = createBrowserClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-          );
-          if (id.includes("@")) {
-            const { data, error } = await browser.auth.signInWithPassword({
-              email: id.toLowerCase(),
-              password: formData.password,
-            });
-            if (error || !data.session) {
-              console.error("[password login]", error);
-              setErrors({ general: "ایمیل یا رمز عبور نادرست است" });
-              setIsLoading(false);
-              return;
-            }
-            // نقش از پروفایل بعد از نشست
-            try {
-              const { data: prof } = await browser
-                .from("profiles")
-                .select("role")
-                .eq("id", data.user!.id)
-                .maybeSingle();
-              signedRole = String((prof as { role?: string } | null)?.role || "");
-            } catch {}
-          } else {
-            const res = await signInAction(id, formData.password);
-            if (!res.ok) {
-              setErrors({ general: res.error || "ورود ناموفق" });
-              setIsLoading(false);
-              return;
-            }
-            signedRole = String((res as { role?: string }).role || "");
+          const res = await signInAction(id, formData.password);
+          if (!res.ok) {
+            setErrors({ general: res.error || "ورود ناموفق" });
+            setIsLoading(false);
+            return;
           }
+          signedRole = String((res as { role?: string }).role || "");
         } catch (e) {
           console.error("[password login]", e);
           setErrors({ general: "خطا در ورود" });

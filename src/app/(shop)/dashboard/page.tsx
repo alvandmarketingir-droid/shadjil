@@ -926,10 +926,10 @@ useEffect(() => {
                 <div className="border-border mt-8 space-y-3 rounded-xl border p-4">
                   <p className="text-sm font-medium">تغییر رمز عبور</p>
                   <p className="text-muted-foreground text-xs">
-                    رمز جدید حداقل ۸ کاراکتر باشد.
+                    رمز جدید حداقل ۸ کاراکتر. اگر با OTP وارد شده‌اید و هنوز رمز ندارید، «رمز فعلی» را خالی بگذارید.
                   </p>
                   <div>
-                    <label className="mb-1 block text-xs">رمز فعلی</label>
+                    <label className="mb-1 block text-xs">رمز فعلی (اختیاری اگر اولین بار است)</label>
                     <input
                       type="password"
                       className="border-input bg-background h-10 w-full rounded-lg border px-3 text-sm"
