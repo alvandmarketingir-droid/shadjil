@@ -36,6 +36,43 @@ function otpEmail(phone: string) {
   return otpPhoneEmail(phone);
 }
 
+/** اثبات واقعی: grant_type=password باید access_token بدهد */
+async function provePasswordLogin(
+  email: string,
+  password: string,
+): Promise<boolean> {
+  const base = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
+  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!base || !anon || !email || !password) return false;
+  try {
+    const res = await fetch(`${base}/auth/v1/token?grant_type=password`, {
+      method: "POST",
+      headers: {
+        apikey: anon,
+        Authorization: `Bearer ${anon}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      console.warn(
+        "[provePasswordLogin]",
+        email.includes("@phone.") ? "synthetic" : "email",
+        res.status,
+        body.slice(0, 180),
+      );
+      return false;
+    }
+    const json = (await res.json()) as { access_token?: string };
+    return Boolean(json.access_token);
+  } catch (e) {
+    console.warn("[provePasswordLogin]", e);
+    return false;
+  }
+}
+
 async function findAuthEmailByPhone(phone09: string): Promise<string | null> {
   const admin = createServiceClient();
   const variants = phoneLookupVariants(phone09);
@@ -499,6 +536,36 @@ export async function verifyOtpAction(
     if (password && !passwordSaved) {
       console.error("[otp] password required but not saved", { userId });
       return { ok: false as const, error: "server" as const };
+    }
+
+    // اثبات واقعی ورود با همان رمز (signup + فراموشی رمز)
+    if (password && passwordSaved) {
+      let proved = await provePasswordLogin(authEmail, password);
+      if (!proved) {
+        const { error: retryPw } = await admin.auth.admin.updateUserById(
+          userId,
+          { password },
+        );
+        if (retryPw) {
+          console.error("[otp retry setPassword]", retryPw);
+          return { ok: false as const, error: "server" as const };
+        }
+        proved = await provePasswordLogin(authEmail, password);
+      }
+      if (!proved) {
+        const syn = otpEmail(normalized);
+        if (syn !== authEmail) {
+          proved = await provePasswordLogin(syn, password);
+          if (proved) authEmail = syn;
+        }
+      }
+      if (!proved) {
+        console.error("[otp] password saved but login grant failed", {
+          userId,
+          via: authEmail.includes("@phone.") ? "synthetic" : "email",
+        });
+        return { ok: false as const, error: "server" as const };
+      }
     }
   } catch (e) {
     console.warn("[otp touch user]", e);
