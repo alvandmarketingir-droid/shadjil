@@ -13,6 +13,7 @@ import { getFlashSaleEndsAtAction } from "@/app/admin/actions/flash-sale";
 import { NewsletterSmsBox } from "@/components/home/newsletter-sms-box";
 import { OrderTrackBox } from "@/components/home/order-track-box";
 import { HeroScroll } from "@/components/home/hero-scroll";
+import { HomeClothingRail } from "@/components/home/home-clothing-rail";
 import { HomeAfterHero } from "@/components/home/home-after-hero";
 import { CarouselLinks } from "@/components/ui/carousel-cards";
 import { ProductCarousel } from "@/components/ui/product-carousel";
@@ -132,6 +133,8 @@ export default async function HomePage() {
               </div>
             ))}
           </section>
+
+          <HomeClothingRail />
 
                     <CarouselLinks
             title="برندها"
