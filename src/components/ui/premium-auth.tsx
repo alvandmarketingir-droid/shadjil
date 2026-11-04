@@ -410,11 +410,24 @@ export function AuthForm({
           password: formData.password,
         });
         if (!ver.ok) {
+          const err = (ver as { error?: string }).error;
+          const map: Record<string, string> = {
+            invalid_code: "کد نادرست است",
+            expired: "کد منقضی شده؛ دوباره درخواست کنید",
+            too_many_attempts: "تلاش بیش از حد؛ کمی بعد دوباره",
+            invalid_phone: "شماره نامعتبر است",
+            server: "ذخیره رمز ناموفق بود؛ کد تازه بگیرید و دوباره تلاش کنید",
+          };
           setErrors({
-            otpCode:
-              (ver as { error?: string }).error === "invalid_code"
-                ? "کد نادرست است"
-                : "تأیید ناموفق؛ دوباره تلاش کنید",
+            otpCode: map[err || ""] || "تأیید ناموفق؛ دوباره تلاش کنید",
+          });
+          setIsLoading(false);
+          return;
+        }
+        if (!(ver as { password_saved?: boolean }).password_saved) {
+          setErrors({
+            general:
+              "رمز روی حساب ذخیره نشد؛ کد تازه بگیرید و دوباره تلاش کنید",
           });
           setIsLoading(false);
           return;
@@ -427,26 +440,47 @@ export function AuthForm({
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
             process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
           );
+          // اول خودِ رمز را ثابت کن (هدف فراموشی رمز)
           let sessionOk = false;
-          if (tokenHash) {
+          if (email) {
+            const { data: signed, error: signErr } =
+              await browser.auth.signInWithPassword({
+                email,
+                password: formData.password,
+              });
+            if (!signErr && signed.session) sessionOk = true;
+            else if (signErr) console.warn("[reset signIn]", signErr.message);
+          }
+          if (!sessionOk && tokenHash) {
             const { data: verified, error: vErr } = await browser.auth.verifyOtp({
               token_hash: tokenHash,
               type: "email",
             });
-            if (!vErr && verified.session) sessionOk = true;
+            if (!vErr && verified.session) {
+              const { error: pwErr } = await browser.auth.updateUser({
+                password: formData.password,
+              });
+              if (pwErr) console.warn("[reset updateUser]", pwErr);
+              if (email) {
+                const check = await browser.auth.signInWithPassword({
+                  email,
+                  password: formData.password,
+                });
+                if (!check.error && check.data.session) sessionOk = true;
+              } else {
+                sessionOk = true;
+              }
+            }
           }
-          if (!sessionOk && email) {
-            const { error: signErr } = await browser.auth.signInWithPassword({
-              email,
-              password: formData.password,
+          if (!sessionOk) {
+            setErrors({
+              general:
+                "رمز ذخیره شد اما ورود خودکار نشد؛ با همین رمز از تب «رمز عبور» وارد شوید",
             });
-            if (!signErr) sessionOk = true;
-          }
-          if (sessionOk) {
-            await browser.auth.updateUser({ password: formData.password });
-          } else {
-            setErrors({ general: "نشست ساخته نشد؛ دوباره تلاش کنید" });
             setIsLoading(false);
+            setAuthMode("login");
+            setLoginMethod("password");
+            setResetStep("id");
             return;
           }
         } catch (e) {
@@ -455,7 +489,7 @@ export function AuthForm({
           setIsLoading(false);
           return;
         }
-        setSuccessMessage("رمز به‌روز شد");
+        setSuccessMessage("رمز جدید ذخیره شد");
         setIsLoading(false);
         navigateAfterAuth("/dashboard");
         return;
@@ -748,14 +782,25 @@ export function AuthForm({
           <>
             {resetStep === "id" ? (
               <>
+                <p className="text-muted-foreground mb-2 text-center text-sm">
+                  موبایل را وارد کنید تا کد پیامک شود؛ بعد رمز جدید می‌گذارید.
+                </p>
                 <div className="relative">
                   <Phone className="text-muted-foreground absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2" />
                   <input
                     type="text"
                     placeholder="موبایل یا ایمیل"
                     value={formData.loginId}
-                    onChange={(e) => handleInputChange("loginId", e.target.value)}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      handleInputChange(
+                        "loginId",
+                        v.includes("@") ? v : onlyDigits(v, 11),
+                      );
+                    }}
                     className={inputCls}
+                    inputMode="tel"
+                    autoComplete="username"
                   />
                 </div>
                 {errors.loginId ? (
@@ -769,14 +814,15 @@ export function AuthForm({
                   {isLoading ? (
                     <Loader2 className="mx-auto h-5 w-5 animate-spin" />
                   ) : (
-                    "ادامه بازیابی"
+                    "ارسال کد بازیابی"
                   )}
                 </button>
               </>
             ) : (
               <>
                 <p className="text-muted-foreground text-center text-sm">
-                  کد به <strong>{formData.phone || formData.loginId}</strong> ارسال شد
+                  کد به <strong dir="ltr">{formData.phone || formData.loginId}</strong>{" "}
+                  رسید. کد + رمز جدید (≥۸ کاراکتر) را وارد کنید.
                 </p>
                 <input
                   type="text"
@@ -804,6 +850,17 @@ export function AuthForm({
                     className={cn(inputCls, "pl-10 pr-12")}
                     autoComplete="new-password"
                   />
+                  <button
+                    type="button"
+                    className="text-muted-foreground absolute top-1/2 right-3 -translate-y-1/2"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
                 </div>
                 {errors.password ? (
                   <p className="text-destructive text-xs">{errors.password}</p>
@@ -820,6 +877,17 @@ export function AuthForm({
                     className={cn(inputCls, "pl-10 pr-12")}
                     autoComplete="new-password"
                   />
+                  <button
+                    type="button"
+                    className="text-muted-foreground absolute top-1/2 right-3 -translate-y-1/2"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
                 </div>
                 {errors.confirmPassword ? (
                   <p className="text-destructive text-xs">{errors.confirmPassword}</p>
@@ -834,6 +902,36 @@ export function AuthForm({
                   ) : (
                     "ذخیره رمز و ورود"
                   )}
+                </button>
+                <button
+                  type="button"
+                  disabled={otpCooldown > 0 || isLoading}
+                  onClick={async () => {
+                    const phoneNorm =
+                      normalizeIranMobile(formData.phone || formData.loginId) ||
+                      "";
+                    if (!phoneNorm) return;
+                    setIsLoading(true);
+                    setErrors({});
+                    const res = await requestOtpAction(phoneNorm);
+                    setIsLoading(false);
+                    if (!res.ok) {
+                      setErrors({
+                        general:
+                          res.error === "rate_limit"
+                            ? "کمی صبر کنید و دوباره تلاش کنید"
+                            : "ارسال مجدد ناموفق بود",
+                      });
+                      return;
+                    }
+                    setSuccessMessage("کد جدید ارسال شد");
+                    setOtpCooldown(60);
+                  }}
+                  className="text-primary w-full text-sm disabled:opacity-50"
+                >
+                  {otpCooldown > 0
+                    ? `ارسال مجدد تا ${otpCooldown}ث`
+                    : "ارسال مجدد کد"}
                 </button>
               </>
             )}
@@ -1216,12 +1314,17 @@ export function AuthForm({
                   onClick={() => {
                     setAuthMode("reset");
                     setResetStep("id");
-                    setFormData((p) => ({
-                      ...p,
-                      otpCode: "",
-                      password: "",
-                      confirmPassword: "",
-                    }));
+                    setFormData((p) => {
+                      const id = (p.loginId || p.phone || "").trim();
+                      return {
+                        ...p,
+                        loginId: id,
+                        phone: normalizeIranMobile(id) || p.phone,
+                        otpCode: "",
+                        password: "",
+                        confirmPassword: "",
+                      };
+                    });
                   }}
                 >
                   فراموشی رمز؟
