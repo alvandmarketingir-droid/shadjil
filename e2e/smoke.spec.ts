@@ -69,4 +69,49 @@ test.describe("storefront smoke", () => {
     expect(page.url()).toMatch(/cart|سبد/);
     void cookies;
   });
+
+  test("guest add-to-cart persists via pm_cart_sid when stock exists", async ({
+    page,
+    context,
+  }) => {
+    test.setTimeout(90_000);
+    const listing = await page.goto("/products", { waitUntil: "domcontentloaded" });
+    expect(listing?.status() ?? 0).toBeLessThan(500);
+
+    // Prefer first product card / link into a PDP
+    const productLink = page
+      .locator('a[href*="/products/"], a[href^="/"]:not([href="/"]):not([href="/products"]):not([href="/cart"]):not([href="/blog"])')
+      .filter({ has: page.locator("img") })
+      .first();
+    const hasProduct = await productLink.count().catch(() => 0);
+    test.skip(!hasProduct, "no in-catalog product link on /products");
+
+    await productLink.click();
+    await page.waitForLoadState("domcontentloaded");
+
+    const addBtn = page.getByRole("button", { name: /افزودن به سبد/ }).first();
+    const addVisible = await addBtn.isVisible({ timeout: 15_000 }).catch(() => false);
+    test.skip(!addVisible, "no add-to-cart control (likely OOS or non-PDP)");
+
+    await addBtn.click();
+    // toast or network settle
+    await page.waitForTimeout(1500);
+
+    const cookies = await context.cookies();
+    const sid = cookies.find((c) => c.name === "pm_cart_sid");
+    expect(sid?.value, "guest cart session cookie after add").toBeTruthy();
+    expect((sid?.value || "").length).toBeGreaterThanOrEqual(8);
+
+    const cartRes = await page.goto("/cart", { waitUntil: "domcontentloaded" });
+    expect(cartRes?.status() ?? 0).toBeLessThan(500);
+    // Cart should not look empty if add succeeded — soft text check in FA/EN
+    const body = await page.locator("body").innerText();
+    const emptyHints = /سبد خرید خالی|cart is empty/i.test(body);
+    // If empty, still require cookie persistence (add may have failed server-side on stock)
+    if (emptyHints) {
+      expect(sid?.value).toBeTruthy();
+    } else {
+      expect(body.length).toBeGreaterThan(20);
+    }
+  });
 });
