@@ -88,10 +88,10 @@ const nextConfig: NextConfig = {
 
   async rewrites() {
     return [
-      { source: "/علاقه-مندی-ها", destination: "/wishlist" },
-      { source: "/مقایسه", destination: "/compare" },
+      { source: "/علاقه-مندی-ها", destination: "/dashboard?tab=wishlist" },
+      { source: "/مقایسه", destination: "/dashboard?tab=compare" },
       { source: "/سبد-خرید", destination: "/cart" },
-      { source: "/آخرین-مشاهده-ها", destination: "/recently-viewed" },
+      { source: "/آخرین-مشاهده-ها", destination: "/dashboard?tab=recent" },
       { source: "/محصولات", destination: "/products" },
       { source: "/ورود", destination: "/login" },
       { source: "/%D9%88%D8%B1%D9%88%D8%AF", destination: "/login" },

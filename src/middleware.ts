@@ -7,10 +7,10 @@ import { assertApiCsrf } from "@/lib/security/csrf-origin";
 const PERSIAN_ROUTES: Record<string, string> = {
   "/ورود": "/login",
   "/ثبت-نام": "/register",
-  "/علاقه-مندی-ها": "/wishlist",
-  "/مقایسه": "/compare",
+  "/علاقه-مندی-ها": "/dashboard?tab=wishlist",
+  "/مقایسه": "/dashboard?tab=compare",
   "/سبد-خرید": "/cart",
-  "/آخرین-مشاهده-ها": "/recently-viewed",
+  "/آخرین-مشاهده-ها": "/dashboard?tab=recent",
   "/محصولات": "/products",
   "/تماس": "/contact",
   "/درباره-ما": "/about",
@@ -51,10 +51,17 @@ function requestIdFrom(request: NextRequest): string {
   return resolveRequestId(request.headers.get(REQUEST_ID_HEADER));
 }
 
-async function sessionRewrite(request: NextRequest, pathname: string) {
+async function sessionRewrite(request: NextRequest, dest: string) {
   const rid = requestIdFrom(request);
   const url = request.nextUrl.clone();
-  url.pathname = pathname;
+  const qIndex = dest.indexOf("?");
+  if (qIndex >= 0) {
+    url.pathname = dest.slice(0, qIndex) || "/";
+    const params = new URLSearchParams(dest.slice(qIndex + 1));
+    params.forEach((value, key) => url.searchParams.set(key, value));
+  } else {
+    url.pathname = dest;
+  }
   const sessionRes = await updateSession(request);
   const rewrite = NextResponse.rewrite(url);
   sessionRes.cookies.getAll().forEach((c) => rewrite.cookies.set(c.name, c.value));
@@ -124,8 +131,20 @@ async function lookupUrlRedirect(
   }
 }
 
+function hasSupabaseAuthCookie(request: NextRequest): boolean {
+  return request.cookies
+    .getAll()
+    .some(
+      (c) =>
+        c.name.includes("auth-token") ||
+        c.name.startsWith("sb-") ||
+        c.name.includes("supabase"),
+    );
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const rid = requestIdFrom(request);
 
   // CSRF formal: Origin / Sec-Fetch-Site روی APIهای state-changing
   if (pathname.startsWith("/api/")) {
@@ -144,6 +163,19 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // پنل ادمین: ریدایرکت سخت HTTP تا soft-redirect داخل RSC به ۵۰۰ تبدیل نشود
+  if (pathname === "/admin" || pathname === "/admin/") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/admin/dashboard";
+    return applySecurityHeaders(NextResponse.redirect(url), rid);
+  }
+  if (pathname.startsWith("/admin") && !hasSupabaseAuthCookie(request)) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    url.search = "";
+    url.searchParams.set("next", "/admin/dashboard");
+    return applySecurityHeaders(NextResponse.redirect(url), rid);
+  }
 
   // ریدایرکت formal از DB (۳۰۱ و ...)
   try {

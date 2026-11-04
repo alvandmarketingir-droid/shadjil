@@ -14,7 +14,14 @@ export const requireAdmin = cache(async () => {
     return { ok: false as const, error: "login_required" as const };
   }
 
-  const admin = createServiceClient();
+  let admin;
+  try {
+    admin = createServiceClient();
+  } catch (e) {
+    console.error("[requireAdmin service]", e);
+    return { ok: false as const, error: "server" as const };
+  }
+
   const { data: profile, error } = await admin
     .from("profiles")
     .select("role")

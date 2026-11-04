@@ -19,7 +19,7 @@ export default function DashboardWithSidebar({ isAdmin = false }: Props) {
     : [
         { icon: Home, label: "داشبورد", href: "/dashboard" },
         { icon: ShoppingCart, label: "سفارش‌های من", href: "/dashboard?tab=orders" },
-        { icon: Package, label: "علاقه‌مندی‌ها", href: "/علاقه-مندی-ها" },
+        { icon: Package, label: "علاقه‌مندی‌ها", href: "/dashboard?tab=wishlist" },
         { icon: Settings, label: "تنظیمات", href: "/dashboard?tab=profile" },
       ];
 

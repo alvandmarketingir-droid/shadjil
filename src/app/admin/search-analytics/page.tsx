@@ -1,13 +1,18 @@
-import { createServiceClient } from "@/lib/supabase/service";
 import { requireAdmin } from "@/lib/admin/require-admin";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
 export default async function SearchAnalyticsPage() {
-  await requireAdmin();
-  const service = createServiceClient();
-  const { data: rows } = await service
+  const gate = await requireAdmin();
+  if (!gate.ok) {
+    return (
+      <div className="p-6 text-sm text-destructive" dir="rtl">
+        دسترسی غیرمجاز
+      </div>
+    );
+  }
+  const { data: rows } = await gate.supabase
     .from("search_queries")
     .select("query, result_count, source, created_at")
     .order("created_at", { ascending: false })

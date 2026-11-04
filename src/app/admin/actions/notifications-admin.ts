@@ -1,26 +1,9 @@
 "use server";
 import { normalizeIranMobile, normalizePhone } from "@/lib/numbers";
 
-import { createClient } from "@/lib/supabase/server";
-import { createServiceClient } from "@/lib/supabase/service";
+import { requireAdmin } from "@/lib/admin/require-admin";
 
 import { PREDEFINED_NOTIFICATIONS } from "@/lib/notifications/templates";
-
-async function requireAdmin() {
-  const supabase = await createClient();
-  const { data: auth } = await supabase.auth.getUser();
-  if (!auth.user) return { ok: false as const, error: "auth" };
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", auth.user.id)
-    .maybeSingle();
-  const role = (profile as { role?: string } | null)?.role;
-  if (role !== "admin" && role !== "superadmin") {
-    return { ok: false as const, error: "forbidden" };
-  }
-  return { ok: true as const, userId: auth.user.id };
-}
 
 export async function adminSendNotificationAction(input: {
   templateId?: string;
@@ -47,7 +30,7 @@ export async function adminSendNotificationAction(input: {
   const body = useCustom ? customBody : (tpl!.body as string);
   const type = useCustom ? "custom" : (tpl!.type as string);
 
-  const service = createServiceClient();
+  const service = gate.supabase;
 
   if (input.mode === "user") {
     const target = (input.target || "").trim();
@@ -114,7 +97,7 @@ export async function adminSendNotificationAction(input: {
 export async function adminListRecentNotificationsAction(limit = 40) {
   const gate = await requireAdmin();
   if (!gate.ok) return { ...gate, items: [] as any[] };
-  const service = createServiceClient();
+  const service = gate.supabase;
   const { data, error } = await service
     .from("notifications")
     .select("id, user_id, title, body, type, read_at, created_at")

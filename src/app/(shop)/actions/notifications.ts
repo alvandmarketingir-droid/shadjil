@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { createServiceClient } from "@/lib/supabase/service";
+import { createNotificationForUser } from "@/lib/notifications/create";
 
 export type NotificationDTO = {
   id: string;
@@ -71,30 +71,6 @@ export async function markAllNotificationsReadAction() {
     .eq("user_id", userId)
     .is("read_at", null);
   return { ok: !error };
-}
-
-/** سرور: ثبت اعلان برای کاربر (تست / سفارش / سیستم) */
-export async function createNotificationForUser(input: {
-  userId: string;
-  title: string;
-  body?: string;
-  type?: string;
-  link?: string;
-}) {
-  const service = createServiceClient();
-  const { data, error } = await service
-    .from("notifications")
-    .insert({
-      user_id: input.userId,
-      title: input.title,
-      body: input.body ?? null,
-      type: input.type ?? "system",
-      link: input.link ?? null,
-    })
-    .select("id")
-    .single();
-  if (error) return { ok: false as const, error: error.message };
-  return { ok: true as const, id: data.id as string };
 }
 
 /** تست: اعلان برای کاربر فعلی */
