@@ -34,7 +34,7 @@ function TitleContent({ text }: { text: string }) {
   if (text === "استایلی که فکر شده") {
     return (
       <>
-        <span className="text-[40px] md:text-[55px] lg:text-[90px]">استایلی</span>{" "}
+        <span className="text-[40px] text-white md:text-[55px] lg:text-[90px]">استایلی</span>{" "}
         <span className="text-[20px] font-thin text-white md:text-[30px] lg:text-[40px]">که فکر شده</span>
       </>
     );
@@ -43,12 +43,12 @@ function TitleContent({ text }: { text: string }) {
     return (
       <>
         <span className="text-[20px] font-thin text-white md:text-[30px] lg:text-[40px]">انواع</span>{" "}
-        <span className="text-[40px] md:text-[55px] lg:text-[90px]">کیفیت و برند</span>
+        <span className="text-[40px] text-white md:text-[55px] lg:text-[90px]">کیفیت و برند</span>
       </>
     );
   }
   if (text === "پیراهن مردانه") {
-    return <span className="text-[40px] md:text-[55px] lg:text-[90px]">پیراهن مردانه</span>;
+    return <span className="text-[40px] text-white md:text-[55px] lg:text-[90px]">پیراهن مردانه</span>;
   }
   return <>{text}</>;
 }
@@ -265,7 +265,7 @@ export function HeroScroll() {
               return (
                 <p
                   key={i}
-                  className="absolute inset-x-0 font-black leading-relaxed text-[#023047] [-webkit-text-stroke:1px_#ffffff] dark:text-[#13ABC4] dark:[-webkit-text-stroke:1px_#212529]"
+                  className="absolute inset-x-0 font-black leading-relaxed text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.55)]"
                   style={{
                     opacity: op,
                     transition: "opacity 40ms linear, transform 120ms linear",
