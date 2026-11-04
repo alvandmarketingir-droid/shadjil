@@ -243,7 +243,7 @@ export async function signInAction(loginId: string, password: string) {
   return {
     ok: false as const,
     error:
-      "رمز عبور نادرست است یا برای این حساب رمز تنظیم نشده. از «ورود با OTP» استفاده کنید یا در Supabase Auth برای همان کاربر OTP رمز را مستقیم Set کنید.",
+      "رمز عبور نادرست است یا هنوز برای این حساب ذخیره نشده. یک‌بار از تب «ورود با OTP» وارد شوید و همان‌جا رمز را وارد کنید؛ بعد می‌توانید با موبایل/ایمیل و رمز وارد شوید.",
     code: "bad_password" as const,
   };
 }
