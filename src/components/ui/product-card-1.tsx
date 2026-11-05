@@ -24,9 +24,9 @@ import { toggleWishlistAction } from "@/app/(shop)/actions/shop";
 import { cartAdd } from "@/lib/cart-api";
 import { useServerCartStore } from "@/lib/server-cart-store";
 
-import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { productImageUrlForSize } from "@/lib/product-image-url";
 
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
@@ -392,15 +392,20 @@ if (res.ok === false && res.error === "login_required") {
         {/* بج‌ها افقی: جدید | دسته | برند */}
         {/* لایک + مقایسه کنار هم */}
         {hasImage ? (
-          <motion.img
+          // Plain img + CSS fade (same 250ms as former motion.img); prefer -small.webp.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
             key={currentImageIndex}
-            src={safeImages[currentImageIndex]}
+            src={productImageUrlForSize(safeImages[currentImageIndex], "small")}
             alt={name}
-            className="z-0 absolute inset-0 h-full w-full object-cover object-center"
-            
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.25 }}
+            width={480}
+            height={480}
+            loading="lazy"
+            decoding="async"
+            className="z-0 absolute inset-0 h-full w-full object-cover object-center opacity-0 transition-opacity duration-[250ms] data-[ready=true]:opacity-100"
+            onLoad={(e) => {
+              e.currentTarget.dataset.ready = "true";
+            }}
           />
         ) : (
           <div className="text-muted-foreground flex h-full w-full items-center justify-center px-4 text-center text-sm">

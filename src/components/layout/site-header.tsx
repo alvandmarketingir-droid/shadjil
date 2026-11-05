@@ -11,7 +11,7 @@ import { SmartSearch } from "@/components/layout/smart-search";
 import { CountBadge, useShopCounts } from "@/components/layout/header-badges";
 import { useShopStore } from "@/lib/shop-store";
 import { ShopActivityDrawer, type ActivityTab } from "@/components/layout/shop-activity-drawer";
-import { Heart, GitCompareArrows, ShoppingCart, History, Menu, X, Sun, Moon, UserRound, ChevronDown, Shirt, Sparkles, Tag, Layers, Bell} from "lucide-react";
+import { Heart, GitCompareArrows, ShoppingCart, History, Menu, X, Sun, Moon, UserRound, ChevronDown, Sparkles, Bell} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CategorySvgIcon } from "@/components/home/category-icons"; const MAIN_NAV = [
   { href: "/", label: "خانه", mega: null as null | "categories" | "brands" | "sale" },
@@ -22,9 +22,8 @@ import { CategorySvgIcon } from "@/components/home/category-icons"; const MAIN_N
   { href: "/brands", label: "برندها", mega: "brands" as const },
   { href: "/products?featured=1", label: "شگفت‌انگیز", mega: null },
 ]; const EXTRA_NAV = [ { href: "/blog", label: "بلاگ" }, { href: "/about", label: "درباره ما" }, { href: "/contact", label: "تماس با ما" },
-]; const CATEGORY_MEGA = [ { title: "پیراهن رسمی", desc: "اداری و مجلسی", href: "/products", icon: Shirt }, { title: "پیراهن کژوال", desc: "روزمره و راحت", href: "/products", icon: Layers }, { title: "پیراهن جین", desc: "استایل خیابانی", href: "/products", icon: Tag }, { title: "همه محصولات", desc: "مشاهده فروشگاه", href: "/products", icon: Sparkles },
-]; const BRAND_MEGA = [ { title: "همه برندها", href: "/brands" }, { title: "فروشگاه", href: "/products" },
-]; function ThemeToggle() { const [dark, setDark] = useState(false); useEffect(() => { const root = document.documentElement; const stored = localStorage.getItem("theme"); const isDark = stored === "dark" || (!stored && root.classList.contains("dark")); setDark(isDark); root.classList.toggle("dark", isDark); }, []); function toggle() { const next = !dark; setDark(next); document.documentElement.classList.toggle("dark", next); localStorage.setItem("theme", next ? "dark" : "light"); } return ( <button type="button" onClick={toggle} className="border-border hover:bg-primary hover:text-primary-foreground relative inline-flex h-10 w-10 items-center justify-center rounded-xl border bg-background" aria-label="تغییر تم" > {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />} </button> );
+];
+function ThemeToggle() { const [dark, setDark] = useState(false); useEffect(() => { const root = document.documentElement; const stored = localStorage.getItem("theme"); const isDark = stored === "dark" || (!stored && root.classList.contains("dark")); setDark(isDark); root.classList.toggle("dark", isDark); }, []); function toggle() { const next = !dark; setDark(next); document.documentElement.classList.toggle("dark", next); localStorage.setItem("theme", next ? "dark" : "light"); } return ( <button type="button" onClick={toggle} className="border-border hover:bg-primary hover:text-primary-foreground relative inline-flex h-10 w-10 items-center justify-center rounded-xl border bg-background" aria-label="تغییر تم" > {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />} </button> );
 } function HeaderIcons({ onOpenPanel, hideCart }: { onOpenPanel?: (tab: string) => void; hideCart?: boolean }) { const counts = useShopCounts(); const item = "border-border hover:bg-primary hover:text-primary-foreground relative inline-flex h-10 w-10 items-center justify-center rounded-xl border bg-background"; return ( <div className="flex flex-wrap items-center justify-center gap-1.5"> <button type="button" className={item} title="علاقه‌مندی‌ها" onClick={() => onOpenPanel?.("wishlist")}> <Heart className="h-4 w-4" /> <CountBadge count={counts.wishlist} /> </button> <button type="button" className={item} title="مقایسه" onClick={() => onOpenPanel?.("compare")}> <GitCompareArrows className="h-4 w-4" /> <CountBadge count={counts.compare} /> </button> <button type="button" className={item} title="بازدیدهای اخیر" onClick={() => onOpenPanel?.("recent")}> <History className="h-4 w-4" /> <CountBadge count={counts.recent} /> </button> <ThemeToggle /> <button type="button" className={item} title="اعلان‌ها" onClick={() => onOpenPanel?.("notifications")}><Bell className="h-4 w-4" /><NotificationCountBadge /></button> 
 {!hideCart ? (
     <button type="button" className={item} title="سبد خرید" onClick={() => onOpenPanel?.("cart")}>
@@ -43,8 +42,6 @@ import { CategorySvgIcon } from "@/components/home/category-icons"; const MAIN_N
   categories?: { name: string; href: string; slug?: string; children?: { name: string; href: string; slug?: string }[] }[];
   brands?: { name: string; href: string; slug?: string; logoUrl?: string | null }[];
 }) {
-  const catIcons = [Shirt, Layers, Tag, Sparkles, Heart, ShoppingCart];
-
   if (type === "sale") {
     return (
       <div className="py-5">

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import {
   ShieldCheck,
   Truck,
@@ -8,30 +9,44 @@ import {
 import { ProductService } from "@/services/product.service";
 import { CategoryService } from "@/services/category.service";
 import { BrandService } from "@/services/brand.service";
-import { FlashSalePromoCard } from "@/components/home/flash-sale-promo-card";
 import { getFlashSaleEndsAtAction } from "@/app/admin/actions/flash-sale";
-import { NewsletterSmsBox } from "@/components/home/newsletter-sms-box";
-import { OrderTrackBox } from "@/components/home/order-track-box";
 import { HeroScroll } from "@/components/home/hero-scroll";
-import { HomeClothingRail } from "@/components/home/home-clothing-rail";
 import { HomeAfterHero } from "@/components/home/home-after-hero";
-import { CarouselLinks } from "@/components/ui/carousel-cards";
-import { ProductCarousel } from "@/components/ui/product-carousel";
 import type { ProductWithRelations } from "@/repositories/product.repository";
+
+// Below-fold client islands — SSR HTML kept; JS deferred from critical path.
+const HomeClothingRail = dynamic(
+  () =>
+    import("@/components/home/home-clothing-rail").then((m) => m.HomeClothingRail),
+  { ssr: true },
+);
+const CarouselLinks = dynamic(
+  () => import("@/components/ui/carousel-cards").then((m) => m.CarouselLinks),
+  { ssr: true },
+);
+const ProductCarousel = dynamic(
+  () => import("@/components/ui/product-carousel").then((m) => m.ProductCarousel),
+  { ssr: true },
+);
+const FlashSalePromoCard = dynamic(
+  () =>
+    import("@/components/home/flash-sale-promo-card").then(
+      (m) => m.FlashSalePromoCard,
+    ),
+  { ssr: true },
+);
+const NewsletterSmsBox = dynamic(
+  () =>
+    import("@/components/home/newsletter-sms-box").then((m) => m.NewsletterSmsBox),
+  { ssr: true },
+);
+const OrderTrackBox = dynamic(
+  () => import("@/components/home/order-track-box").then((m) => m.OrderTrackBox),
+  { ssr: true },
+);
 
 // ISR: HTML کش‌شده ۶۰ ثانیه — هیرو دست‌نخورده
 export const revalidate = 60;
-
-const HOME_BRAND_SLIDES = [
-  { id: "لاکوست", label: "Lacoste", href: "/لاکوست", imageUrl: "/brands/lacoste.webp" },
-  { id: "آرمانی", label: "Armani", href: "/آرمانی", imageUrl: "/brands/armani.webp" },
-  { id: "زارا", label: "Zara", href: "/زارا", imageUrl: "/brands/zara.webp" },
-  { id: "پولو", label: "Polo Ralph Lauren", href: "/پولو", imageUrl: "/brands/polo.webp" },
-  { id: "بروکس-برادرز", label: "Brooks Brothers", href: "/بروکس-برادرز", imageUrl: "/brands/brooks-brothers.webp" },
-  { id: "کلوین-کلاین", label: "Calvin Klein", href: "/کلوین-کلاین", imageUrl: "/brands/calvin-klein.webp" },
-  { id: "هوگو-باس", label: "Hugo Boss", href: "/هوگو-باس", imageUrl: "/brands/hugo-boss.webp" },
-] as const;
-
 
 export const metadata: Metadata = {
   title: "فروشگاه تخصصی پیراهن مردانه",
@@ -39,12 +54,21 @@ export const metadata: Metadata = {
     "خرید پیراهن مردانه، کروات، پاپیون و اکسسوری از فروشگاه تخصصی پیراهن مردانه",
 };
 
-
 function HomeHeroPreloads() {
   return (
     <>
-      <link rel="preload" as="image" href="/hero/hero-poster.webp" type="image/webp" />
-      <link rel="preload" as="image" href="/hero/frames/frame-001.webp" type="image/webp" />
+      <link
+        rel="preload"
+        as="image"
+        href="/hero/hero-poster.webp"
+        type="image/webp"
+      />
+      <link
+        rel="preload"
+        as="image"
+        href="/hero/frames/frame-001.webp"
+        type="image/webp"
+      />
     </>
   );
 }
@@ -67,19 +91,69 @@ export default async function HomePage() {
     console.error("[home] section failed", i, s.reason);
     return fallback;
   };
-  const featuredResult = pick(0, { success: false as const, data: null as { data: ProductWithRelations[]; total: number; page: number; pageSize: number; totalPages: number } | null });
-  const newResult = pick(1, { success: false as const, data: null as { data: ProductWithRelations[]; total: number; page: number; pageSize: number; totalPages: number } | null });
-  const bestsellerResult = pick(2, { success: false as const, data: null as { data: ProductWithRelations[]; total: number; page: number; pageSize: number; totalPages: number } | null });
-  const categoriesResult = pick(3, { success: false as const, data: null as Array<{ id: string; name: string; slug: string; parent_id: string | null; image_url?: string | null }> | null });
-  const brandsResult = pick(4, { success: false as const, data: null as Array<{ id: string; name: string; slug: string; logo_url?: string | null; name_fa?: string }> | null });
+  const featuredResult = pick(0, {
+    success: false as const,
+    data: null as {
+      data: ProductWithRelations[];
+      total: number;
+      page: number;
+      pageSize: number;
+      totalPages: number;
+    } | null,
+  });
+  const newResult = pick(1, {
+    success: false as const,
+    data: null as {
+      data: ProductWithRelations[];
+      total: number;
+      page: number;
+      pageSize: number;
+      totalPages: number;
+    } | null,
+  });
+  const bestsellerResult = pick(2, {
+    success: false as const,
+    data: null as {
+      data: ProductWithRelations[];
+      total: number;
+      page: number;
+      pageSize: number;
+      totalPages: number;
+    } | null,
+  });
+  const categoriesResult = pick(3, {
+    success: false as const,
+    data: null as Array<{
+      id: string;
+      name: string;
+      slug: string;
+      parent_id: string | null;
+      image_url?: string | null;
+    }> | null,
+  });
+  const brandsResult = pick(4, {
+    success: false as const,
+    data: null as Array<{
+      id: string;
+      name: string;
+      slug: string;
+      logo_url?: string | null;
+      name_fa?: string;
+    }> | null,
+  });
 
   const pageData = (r: { success?: boolean; data?: unknown }) => {
-    if (!r?.success || !r.data || typeof r.data !== "object") return [] as ProductWithRelations[];
+    if (!r?.success || !r.data || typeof r.data !== "object")
+      return [] as ProductWithRelations[];
     const inner = (r.data as { data?: unknown }).data;
     return Array.isArray(inner) ? (inner as ProductWithRelations[]) : [];
   };
-  const featured: ProductWithRelations[] = pageData(featuredResult as { success?: boolean; data?: unknown });
-  const newest: ProductWithRelations[] = pageData(newResult as { success?: boolean; data?: unknown });
+  const featured: ProductWithRelations[] = pageData(
+    featuredResult as { success?: boolean; data?: unknown },
+  );
+  const newest: ProductWithRelations[] = pageData(
+    newResult as { success?: boolean; data?: unknown },
+  );
   const categories =
     categoriesResult.success && categoriesResult.data
       ? categoriesResult.data
@@ -136,54 +210,20 @@ export default async function HomePage() {
 
           <HomeClothingRail />
 
-                    <CarouselLinks
-            title="برندها"
-            viewAllHref="/brands"
-            variant="brand"
-            items={
-              brands.length > 0
-                ? brands
-                    .filter((b) => {
-                      const s = String(b.slug || "").toLowerCase();
-                      const n = String(b.name || "").toLowerCase();
-                      return !(
-                        s.includes("tommy") ||
-                        s.includes("hilfiger") ||
-                        s.includes("تامی") ||
-                        n.includes("tommy") ||
-                        n.includes("hilfiger") ||
-                        n.includes("تامی") ||
-                        n.includes("هیلفیگر")
-                      );
-                    })
-                    .map((b) => {
-                    const slug = String(b.slug || "").toLowerCase();
-                    const name = String(b.name || "");
-                    const fromStatic = HOME_BRAND_SLIDES.find(
-                      (s) =>
-                        s.id === slug ||
-                        s.href.endsWith("/" + slug) ||
-                        s.label.toLowerCase() === name.toLowerCase(),
-                    );
-                    return {
-                      id: b.id,
-                      label: b.name,
-                      labelFa: (b as { name_fa?: string }).name_fa || b.name,
-                      href: `/${encodeURIComponent(b.slug)}`,
-                      imageUrl:
-                        (b as { logo_url?: string | null }).logo_url ||
-                        fromStatic?.imageUrl ||
-                        null,
-                    };
-                  })
-                : HOME_BRAND_SLIDES.map((s) => ({
-                    id: s.id,
-                    label: s.label,
-                    href: s.href,
-                    imageUrl: s.imageUrl,
-                  }))
-            }
-          />
+          {brands.length > 0 ? (
+            <CarouselLinks
+              title="برندها"
+              viewAllHref="/brands"
+              variant="brand"
+              items={brands.map((b) => ({
+                id: b.id,
+                label: b.name,
+                labelFa: (b as { name_fa?: string }).name_fa || b.name,
+                href: `/${encodeURIComponent(b.slug)}`,
+                imageUrl: (b as { logo_url?: string | null }).logo_url || null,
+              }))}
+            />
+          ) : null}
 
           {(() => {
             const HIDDEN = new Set(["متفرقه"]);
@@ -199,7 +239,8 @@ export default async function HomePage() {
                   id: cat.id,
                   label: cat.name,
                   href: "/" + encodeURIComponent(cat.slug),
-                  imageUrl: (cat as { image_url?: string | null }).image_url ?? null,
+                  imageUrl:
+                    (cat as { image_url?: string | null }).image_url ?? null,
                 }))}
               />
             ) : null;
@@ -265,7 +306,7 @@ export default async function HomePage() {
               </p>
             </section>
           )}
-<section className="grid gap-6 md:grid-cols-2">
+          <section className="grid gap-6 md:grid-cols-2">
             <NewsletterSmsBox />
             <OrderTrackBox />
           </section>

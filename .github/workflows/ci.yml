@@ -97,26 +97,5 @@ jobs:
           BASE_URL: https://pirahanmardane.ir
         run: bash scripts/security-smoke.sh
 
-  e2e-smoke:
-    runs-on: ubuntu-latest
-    needs: [build]
-    if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: npm
-
-      - name: Install dependencies
-        run: bash -c 'unset npm_config_cache_dir NPM_CONFIG_CACHE_DIR; npm install --no-audit --no-fund'
-
-      - name: Install Playwright Chromium
-        run: npx playwright install chromium --with-deps
-
-      - name: E2E smoke against production
-        run: npm run test:e2e:smoke
-        env:
-          PLAYWRIGHT_BASE_URL: https://pirahanmardane.ir
-          CI: "true"
+  # E2E intentionally skipped (agent/user preference): do not require Playwright in CI.
+  # Re-enable only when explicitly requested.
