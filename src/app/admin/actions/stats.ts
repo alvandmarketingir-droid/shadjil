@@ -1,9 +1,9 @@
 "use server";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 
 export async function adminDashboardStatsAction() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.reports");
   if (!gate.ok) {
     return {
       ok: false as const,
@@ -68,7 +68,7 @@ export async function adminDashboardStatsAction() {
 }
 
 export async function adminSalesReportAction(days = 30) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.reports");
   if (!gate.ok) {
     return { ok: false as const, error: gate.error, report: null };
   }
@@ -169,7 +169,7 @@ export async function adminExportOrdersCsvAction(days = 30): Promise<
   | { ok: true; rows: OrderCsvRow[]; days: number }
   | { ok: false; error: string; rows: OrderCsvRow[] }
 > {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.reports");
   if (!gate.ok) {
     return { ok: false, error: gate.error, rows: [] };
   }

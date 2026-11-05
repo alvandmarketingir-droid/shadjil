@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 
 function isSet(name: string): boolean {
   const v = process.env[name];
@@ -8,7 +8,7 @@ function isSet(name: string): boolean {
 }
 
 export async function adminSettingsStatusAction() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.settings");
   if (!gate.ok) return { ok: false as const, error: gate.error };
 
   return {
@@ -31,7 +31,7 @@ export async function adminChangePasswordAction(
   currentPassword: string,
   newPassword: string,
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.settings");
   if (!gate.ok) return { ok: false as const, error: gate.error };
 
   const cur = (currentPassword || "").trim();
@@ -84,7 +84,7 @@ const STORE_KEYS = [
 export type StoreSettingsMap = Record<(typeof STORE_KEYS)[number], string>;
 
 export async function adminGetStoreSettingsAction() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.settings");
   if (!gate.ok) {
     return { ok: false as const, error: gate.error, settings: null };
   }
@@ -124,7 +124,7 @@ export async function adminSaveStoreSettingsAction(input: {
   store_support_phone: string;
   store_support_email: string;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.settings");
   if (!gate.ok) return { ok: false as const, error: gate.error };
 
   const minRaw = String(input.free_shipping_min_amount || "").replace(/,/g, "");

@@ -1,5 +1,6 @@
 "use server";
 
+import { requirePermission } from "@/lib/admin/require-permission";
 import { requireAdmin } from "@/lib/admin/require-admin";
 
 function cleanIds(ids: string[]): string[] {
@@ -10,7 +11,7 @@ function cleanIds(ids: string[]): string[] {
 
 /** Archive = soft delete (deleted_at + status archived) */
 export async function adminArchiveProductsAction(ids: string[]) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const list = cleanIds(ids);
   if (!list.length) return { ok: false as const, error: "empty" as const };
@@ -77,7 +78,7 @@ export async function adminHardDeleteProductsAction(ids: string[]) {
 /* ───────── Categories ───────── */
 
 export async function adminArchiveCategoriesAction(ids: string[]) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const list = cleanIds(ids);
   if (!list.length) return { ok: false as const, error: "empty" as const };
@@ -178,7 +179,7 @@ export async function adminHardDeleteCategoriesAction(ids: string[]) {
 /* ───────── Brands ───────── */
 
 export async function adminArchiveBrandsAction(ids: string[]) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const list = cleanIds(ids);
   if (!list.length) return { ok: false as const, error: "empty" as const };
@@ -244,7 +245,7 @@ export async function adminHardDeleteBrandsAction(ids: string[]) {
 /* ───────── Product tags ───────── */
 
 export async function adminArchiveProductTagsAction(ids: string[]) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const list = cleanIds(ids);
   if (!list.length) return { ok: false as const, error: "empty" as const };
@@ -280,7 +281,7 @@ export async function adminHardDeleteProductTagsAction(ids: string[]) {
 /* ───────── Blog posts ───────── */
 
 export async function adminArchiveBlogPostsAction(ids: string[]) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const list = cleanIds(ids);
   if (!list.length) return { ok: false as const, error: "empty" as const };
@@ -316,7 +317,7 @@ export async function adminHardDeleteBlogPostsAction(ids: string[]) {
 /* ───────── Blog categories ───────── */
 
 export async function adminArchiveBlogCategoriesAction(ids: string[]) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const list = cleanIds(ids);
   if (!list.length) return { ok: false as const, error: "empty" as const };
@@ -352,7 +353,7 @@ export async function adminHardDeleteBlogCategoriesAction(ids: string[]) {
 /* ───────── Blog tags ───────── */
 
 export async function adminArchiveBlogTagsAction(ids: string[]) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const list = cleanIds(ids);
   if (!list.length) return { ok: false as const, error: "empty" as const };
@@ -388,7 +389,7 @@ export async function adminHardDeleteBlogTagsAction(ids: string[]) {
 /* ───────── Product attributes ───────── */
 
 export async function adminArchiveAttributesAction(ids: string[]) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const list = cleanIds(ids);
   if (!list.length) return { ok: false as const, error: "empty" as const };
@@ -559,7 +560,7 @@ export async function adminHardDeleteMediaAction(ids: string[]) {
 
 
 export async function adminArchiveReviewsAction(ids: string[]) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.reviews");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const list = cleanIds(ids);
   if (!list.length) return { ok: false as const, error: "empty" as const };
@@ -589,7 +590,7 @@ export async function adminHardDeleteReviewsAction(ids: string[]) {
 }
 
 export async function adminArchiveTicketsAction(ids: string[]) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const list = cleanIds(ids);
   if (!list.length) return { ok: false as const, error: "empty" as const };
@@ -650,7 +651,7 @@ export async function adminHardDeleteNotificationsAction(ids: string[]) {
 }
 
 export async function adminArchiveReturnsAction(ids: string[]) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.returns");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const list = cleanIds(ids);
   if (!list.length) return { ok: false as const, error: "empty" as const };
@@ -681,7 +682,7 @@ export async function adminHardDeleteReturnsAction(ids: string[]) {
 }
 
 export async function adminArchiveStockAlertsAction(ids: string[]) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const list = cleanIds(ids);
   if (!list.length) return { ok: false as const, error: "empty" as const };
@@ -713,7 +714,7 @@ export async function adminHardDeleteStockAlertsAction(ids: string[]) {
 /* ───────── Restore (بازگردانی از بایگانی) ───────── */
 
 export async function adminRestoreCategoriesAction(ids: string[]) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const list = cleanIds(ids);
   if (!list.length) return { ok: false as const, error: "empty" as const };
@@ -728,7 +729,7 @@ export async function adminRestoreCategoriesAction(ids: string[]) {
 }
 
 export async function adminRestoreBrandsAction(ids: string[]) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const list = cleanIds(ids);
   if (!list.length) return { ok: false as const, error: "empty" as const };
@@ -743,7 +744,7 @@ export async function adminRestoreBrandsAction(ids: string[]) {
 }
 
 export async function adminRestoreProductTagsAction(ids: string[]) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const list = cleanIds(ids);
   if (!list.length) return { ok: false as const, error: "empty" as const };
@@ -758,7 +759,7 @@ export async function adminRestoreProductTagsAction(ids: string[]) {
 }
 
 export async function adminRestoreBlogPostsAction(ids: string[]) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const list = cleanIds(ids);
   if (!list.length) return { ok: false as const, error: "empty" as const };
@@ -773,7 +774,7 @@ export async function adminRestoreBlogPostsAction(ids: string[]) {
 }
 
 export async function adminRestoreBlogCategoriesAction(ids: string[]) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const list = cleanIds(ids);
   if (!list.length) return { ok: false as const, error: "empty" as const };
@@ -788,7 +789,7 @@ export async function adminRestoreBlogCategoriesAction(ids: string[]) {
 }
 
 export async function adminRestoreBlogTagsAction(ids: string[]) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const list = cleanIds(ids);
   if (!list.length) return { ok: false as const, error: "empty" as const };

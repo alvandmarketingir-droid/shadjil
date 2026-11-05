@@ -4,7 +4,7 @@ import { emailShipped } from "@/lib/email/send";
 
 import { adminWriteLogAction } from "@/app/admin/actions/logs";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 import { OrderRepository } from "@/repositories/order.repository";
 import { createServiceClient } from "@/lib/supabase/service";
 import { PREDEFINED_NOTIFICATIONS } from "@/lib/notifications/templates";
@@ -21,7 +21,7 @@ export async function adminListOrdersAction(
   limit = 50,
   opts?: { status?: string; q?: string },
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.orders");
   if (!gate.ok) return { ok: false as const, error: gate.error, items: [] };
   try {
     const repo = new OrderRepository();
@@ -37,7 +37,7 @@ export async function adminUpdateOrderStatusAction(
   orderId: string,
   status: string,
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.orders");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const repo = new OrderRepository();
@@ -99,7 +99,7 @@ export async function adminUpdateOrderStatusAction(
 }
 
 export async function adminGetOrderAction(orderId: string) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.orders");
   if (!gate.ok) return { ok: false as const, error: gate.error, order: null };
   try {
     const repo = new OrderRepository();
@@ -114,7 +114,7 @@ export async function adminGetOrderAction(orderId: string) {
 
 /** حذف دائمی سفارش‌ها: آیتم‌ها + مرجوعی‌ها، در صورت نیاز بازگردانی موجودی، سپس خود سفارش */
 export async function adminHardDeleteOrdersAction(ids: string[]) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.orders");
   if (!gate.ok) return { ok: false as const, error: gate.error, deleted: 0, failed: 0 };
   const list = [...new Set((ids || []).map((x) => String(x || "").trim()).filter(Boolean))];
   if (!list.length) return { ok: false as const, error: "empty", deleted: 0, failed: 0 };
@@ -204,7 +204,7 @@ export async function adminUpdatePaymentStatusAction(
   orderId: string,
   paymentStatus: "pending" | "paid" | "failed" | "refunded",
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.orders");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const service = createServiceClient();
@@ -253,7 +253,7 @@ export async function adminSetOrderTrackingAction(
   orderId: string,
   trackingNumber: string,
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.orders");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const code = (trackingNumber || "").trim();
@@ -353,7 +353,7 @@ export async function adminAddOrderNoteAction(
   body: string,
   visibility: "customer" | "internal" = "internal",
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.orders");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const textBody = (body || "").trim();
   if (!textBody) return { ok: false as const, error: "empty" as const };
@@ -386,7 +386,7 @@ export async function adminAddOrderNoteAction(
 }
 
 export async function adminListOrderNotesAction(orderId: string) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.orders");
   if (!gate.ok) return { ok: false as const, error: gate.error, items: [] as const };
   try {
     const service = createServiceClient();
@@ -405,7 +405,7 @@ export async function adminListOrderNotesAction(orderId: string) {
 }
 
 export async function adminListFinancialAuditForOrderAction(orderId: string) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.orders");
   if (!gate.ok) return { ok: false as const, error: gate.error, items: [] as const };
   try {
     const service = createServiceClient();

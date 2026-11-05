@@ -1,4 +1,4 @@
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 import { formatJalaliDateTime } from "@/lib/dates/jalali";
 import { toPersianDigits } from "@/lib/numbers";
 import { ContactMessageActions } from "./actions-client";
@@ -7,7 +7,7 @@ import { ContactMessagesRealtimeRefresh } from "./realtime-refresh";
 export const dynamic = "force-dynamic";
 
 export default async function ContactMessagesAdminPage() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) {
     return (
       <div className="p-6 text-sm text-destructive" dir="rtl">

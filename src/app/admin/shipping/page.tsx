@@ -1,4 +1,4 @@
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 import { toPersianDigits } from "@/lib/numbers";
 import { ShippingActions } from "./actions-client";
 import { FreeShippingForm } from "./free-shipping-form";
@@ -7,7 +7,7 @@ import { ShippingZonesForm } from "./zones-form";
 export const dynamic = "force-dynamic";
 
 export default async function ShippingAdminPage() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.shipping");
   if (!gate.ok) {
     return (
       <div className="p-6 text-sm text-destructive" dir="rtl">

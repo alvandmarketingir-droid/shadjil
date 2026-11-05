@@ -1,4 +1,4 @@
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 import { formatJalaliDateTime } from "@/lib/dates/jalali";
 import { toPersianDigits } from "@/lib/numbers";
 import { ReviewActions } from "./actions-client";
@@ -7,7 +7,7 @@ import { ReviewsRealtimeRefresh } from "./realtime-refresh";
 export const dynamic = "force-dynamic";
 
 export default async function ReviewsAdminPage() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.reviews");
   if (!gate.ok) {
     return (
       <div className="p-6 text-sm text-destructive" dir="rtl">

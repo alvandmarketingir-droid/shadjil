@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import "./globals.css";
@@ -86,14 +87,16 @@ export const metadata: Metadata = {
       },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   return (
     <html lang="fa" dir="rtl" suppressHydrationWarning className="max-w-full">
       <head>
+        {nonce ? <meta property="csp-nonce" content={nonce} /> : null}
         <link rel="preconnect" href="https://media.pirahanmardane.ir" crossOrigin="" />
         <link rel="dns-prefetch" href="https://media.pirahanmardane.ir" />
         <link

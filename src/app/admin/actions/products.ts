@@ -7,7 +7,7 @@ import { recordProductPrice } from "@/lib/price-history";
 
 import { adminWriteLogAction } from "@/app/admin/actions/logs";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 import { normalizeProductSlug } from "@/lib/product-slug";
 import { productPathFromSlug, upsertUrlRedirect } from "@/lib/seo/redirects";
 
@@ -103,7 +103,7 @@ export async function adminListProductsAction(
   limit = 100,
   opts?: { q?: string; status?: string },
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error, items: [] };
   try {
     let query = gate.supabase
@@ -157,7 +157,7 @@ export async function adminSetProductFlagsAction(
     is_bestseller: boolean;
   }>,
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const body: Record<string, unknown> = { ...patch };
@@ -178,7 +178,7 @@ export async function adminSetProductFlagsAction(
 }
 
 export async function adminListCategoriesAction() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error, items: [] };
   try {
     const { data, error } = await gate.supabase
@@ -193,7 +193,7 @@ export async function adminListCategoriesAction() {
 }
 
 export async function adminListBrandsAction() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error, items: [] };
   try {
     const { data, error } = await gate.supabase
@@ -285,7 +285,7 @@ async function revalidateProductPaths(
 }
 
 export async function adminCreateProductAction(input: CreateProductInput) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
 
   const name = (input.name || "").trim();
@@ -419,7 +419,7 @@ export async function adminCreateProductAction(input: CreateProductInput) {
 
 
 export async function adminGetProductAction(id: string) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     // بدون image_url روی واریانت (ستون وجود ندارد) — لود جدا برای راهنما/زمان‌بندی
@@ -540,7 +540,7 @@ export async function adminUpdateProductAction(
   canonical_url?: string | null;
   },
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     // partial: فقط فیلدهای ارسال‌شده
@@ -802,7 +802,7 @@ export async function adminUpdateProductFlagsAction(
 
 /** حذف نرم — فقط deleted_at؛ از لیست ادمین و فروشگاه خارج می‌شود. */
 export async function adminSoftDeleteProductAction(id: string) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   if (!id?.trim()) return { ok: false as const, error: "invalid" as const };
   try {
@@ -831,7 +831,7 @@ export async function adminSoftDeleteProductAction(id: string) {
 /** همگام‌سازی وریانت‌ها — match با id یا size+color؛ بدون duplicate */
 /** بازگردانی از بایگانی */
 export async function adminRestoreProductsAction(ids: string[]) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const list = Array.from(new Set((ids || []).map((x) => String(x || "").trim()).filter(Boolean)));
   if (!list.length) return { ok: false as const, error: "empty" as const };
@@ -852,7 +852,7 @@ export async function adminSyncProductVariantsAction(
   productId: string,
   variants: AdminVariantInput[],
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   if (!productId) return { ok: false as const, error: "product_required" };
 
@@ -1143,7 +1143,7 @@ export async function adminAddProductGalleryImageAction(input: {
   url: string;
   alt_text?: string | null;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
 
   const productId = (input.productId || "").trim();
@@ -1191,7 +1191,7 @@ export async function adminCheckProductSlugAction(
   slug: string,
   excludeId?: string | null,
 ): Promise<{ ok: true; available: boolean } | { ok: false; error: string }> {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const s = (slug || "").trim();
   if (!s) return { ok: false as const, error: "slug_empty" };
@@ -1209,7 +1209,7 @@ export async function adminCheckProductSlugAction(
 }
 
 export async function adminListSizeGuidesAction() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const { data, error } = await gate.supabase
@@ -1232,7 +1232,7 @@ export async function adminQuickUpdateProductAction(
     brand_id: string | null;
   }>,
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const body: {
@@ -1268,7 +1268,7 @@ export async function adminQuickUpdateProductAction(
  * out=false → is_active=true (موجودی قبلی حفظ می‌شود)
  */
 export async function adminSetProductOutOfStockAction(id: string, out: boolean) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const { error } = await gate.supabase

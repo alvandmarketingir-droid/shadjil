@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { randomUUID } from "crypto";
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 import {
   processProductImageSizes,
   type ProductImageSizeName,
@@ -20,7 +20,7 @@ const SIZE_ORDER: ProductImageSizeName[] = [
 ];
 
 export async function adminUploadProductImageAction(formData: FormData) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.media");
   if (!gate.ok) return { ok: false as const, error: gate.error };
 
   const file = formData.get("file");
@@ -134,7 +134,7 @@ export async function adminDeleteProductImageAction(input: {
   url?: string | null;
   imageId?: string | null;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.media");
   if (!gate.ok) return { ok: false as const, error: gate.error };
 
   try {
@@ -191,7 +191,7 @@ export type MediaListItem = {
 };
 
 export async function adminListProductImagesAction(limit = 60) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.media");
   if (!gate.ok) return { ok: false as const, error: gate.error };
 
   const { data, error } = await gate.supabase
@@ -238,7 +238,7 @@ export async function adminUpdateProductImageMetaAction(input: {
   alt_text?: string | null;
   sort_order?: number;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.media");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const id = (input.id || "").trim();
   if (!id) return { ok: false as const, error: "bad_id" as const };
@@ -303,7 +303,7 @@ export async function adminRenameProductImageAction(input: {
   id: string;
   newBaseName: string;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.media");
   if (!gate.ok) return { ok: false as const, error: gate.error };
 
   const id = (input.id || "").trim();
@@ -397,7 +397,7 @@ export async function adminSetPrimaryProductImageAction(input: {
   url: string;
   imageId?: string | null;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.media");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const productId = (input.productId || "").trim();
   const url = (input.url || "").trim();
@@ -529,7 +529,7 @@ export async function adminRunOrphanMediaCleanupAction(input?: {
   minAgeHours?: number;
   maxDelete?: number;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.media");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const { runOrphanMediaCleanup } = await import("@/lib/media/orphan-cleanup");

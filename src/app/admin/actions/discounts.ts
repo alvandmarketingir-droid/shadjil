@@ -1,11 +1,11 @@
 "use server";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 
 
 
 export async function adminListDiscountsAction(limit = 50) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.discounts");
   if (!gate.ok) return { ok: false as const, error: gate.error, items: [] };
   try {
     const { data, error } = await gate.supabase
@@ -24,7 +24,7 @@ export async function adminListDiscountsAction(limit = 50) {
 }
 
 export async function adminSetDiscountActiveAction(id: string, isActive: boolean) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.discounts");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const { error } = await gate.supabase
@@ -61,7 +61,7 @@ export async function adminCreateDiscountAction(input: {
   product_ids?: string | null;
   category_ids?: string | null;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.discounts");
   if (!gate.ok) return { ok: false as const, error: gate.error };
 
   const code = (input.code || "").trim().toUpperCase();

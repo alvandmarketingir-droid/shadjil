@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 
 function slugify(input: string): string {
   return input
@@ -41,7 +41,7 @@ function isUniqueViolation(err: unknown): boolean {
 /* ─── Categories ─── */
 
 export async function adminListCategoriesAction() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error, items: [] };
   try {
     const { data, error } = await gate.supabase
@@ -81,7 +81,7 @@ export async function adminCreateCategoryAction(input: {
   is_cornerstone?: boolean;
   canonical_url?: string | null;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
 
   const name = (input.name || "").trim();
@@ -129,7 +129,7 @@ export async function adminUpdateCategoryAction(
     description?: string | null;
   },
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const body: Record<string, unknown> = {};
@@ -161,7 +161,7 @@ export async function adminUpdateCategoryAction(
 /* ─── Brands ─── */
 
 export async function adminListBrandsAction() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error, items: [] };
   try {
     const { data, error } = await gate.supabase
@@ -184,7 +184,7 @@ export async function adminCreateBrandAction(input: {
   description?: string | null;
   is_active?: boolean;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
 
   const name = (input.name || "").trim();
@@ -227,7 +227,7 @@ export async function adminUpdateBrandAction(
     description?: string | null;
   },
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const body: Record<string, unknown> = {};
@@ -255,7 +255,7 @@ export async function adminUpdateBrandAction(
 }
 
 export async function adminGetCategoryAction(id: string) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const { data, error } = await gate.supabase
@@ -275,7 +275,7 @@ export async function adminGetCategoryAction(id: string) {
 }
 
 export async function adminGetBrandAction(id: string) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const { data, error } = await gate.supabase

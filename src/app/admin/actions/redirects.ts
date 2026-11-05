@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 import {
   normalizeRedirectPath,
   upsertUrlRedirect,
@@ -22,7 +22,7 @@ export type UrlRedirectRow = {
 };
 
 export async function adminListRedirectsAction(limit = 200) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error, items: [] as UrlRedirectRow[] };
   try {
     const { data, error } = await gate.supabase
@@ -47,7 +47,7 @@ export async function adminUpsertRedirectAction(input: {
   note?: string;
   isActive?: boolean;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error };
 
   const from_path = normalizeRedirectPath(input.fromPath);
@@ -71,7 +71,7 @@ export async function adminUpsertRedirectAction(input: {
 }
 
 export async function adminToggleRedirectAction(id: string, isActive: boolean) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const { error } = await gate.supabase
@@ -88,7 +88,7 @@ export async function adminToggleRedirectAction(id: string, isActive: boolean) {
 }
 
 export async function adminDeleteRedirectAction(id: string) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const { error } = await gate.supabase.from("url_redirects").delete().eq("id", id);

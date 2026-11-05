@@ -80,23 +80,8 @@ const nextConfig: NextConfig = {
             key: "Strict-Transport-Security",
             value: "max-age=63072000; includeSubDomains; preload",
           },
-          {
-            key: "Content-Security-Policy",
-            value: [
-              "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-              "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: blob: https://media.pirahanmardane.ir https://*.supabase.co https://*.r2.dev https://placehold.co",
-              "font-src 'self' data:",
-              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://rest.payamak-panel.com",
-              "media-src 'self' https://media.pirahanmardane.ir",
-              "object-src 'none'",
-              "base-uri 'self'",
-              "form-action 'self'",
-              "frame-ancestors 'none'",
-              "upgrade-insecure-requests",
-            ].join("; "),
-          },
+          // CSP is set per-request in src/proxy.ts (nonce + strict-dynamic).
+          // Do not duplicate a static CSP here — browsers intersect multiple CSPs.
         ],
       },
     ];

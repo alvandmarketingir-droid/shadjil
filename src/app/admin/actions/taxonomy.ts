@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 
 function slugify(input: string): string {
   return input
@@ -15,7 +15,7 @@ function slugify(input: string): string {
 /* ── Categories ── */
 
 export async function adminListCategoriesAction() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error, items: [] };
   try {
     const { data, error } = await gate.supabase
@@ -42,7 +42,7 @@ export async function adminCreateCategoryAction(input: {
   sort_order?: number;
   is_active?: boolean;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const name = (input.name || "").trim();
   if (!name) return { ok: false as const, error: "name_required" };
@@ -81,7 +81,7 @@ export async function adminUpdateCategoryAction(
     is_active?: boolean;
   },
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const { error } = await gate.supabase.from("categories").update(patch).eq("id", id);
@@ -96,7 +96,7 @@ export async function adminUpdateCategoryAction(
 /* ── Brands ── */
 
 export async function adminListBrandsAction() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error, items: [] };
   try {
     const { data, error } = await gate.supabase
@@ -118,7 +118,7 @@ export async function adminCreateBrandAction(input: {
   description?: string;
   is_active?: boolean;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const name = (input.name || "").trim();
   if (!name) return { ok: false as const, error: "name_required" };
@@ -153,7 +153,7 @@ export async function adminUpdateBrandAction(
     is_active?: boolean;
   },
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const { error } = await gate.supabase.from("brands").update(patch).eq("id", id);

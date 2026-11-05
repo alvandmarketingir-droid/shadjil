@@ -1,10 +1,10 @@
 "use server";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 import { suggestAll, type SuggestInput } from "@/lib/seo/suggest";
 
 export async function adminSeoSuggestAction(input: SuggestInput) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error };
 
   const fallback = suggestAll(input);

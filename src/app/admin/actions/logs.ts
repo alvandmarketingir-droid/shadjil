@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 
 export type AdminLogRow = {
   id: string;
@@ -13,7 +13,7 @@ export type AdminLogRow = {
 };
 
 export async function adminListLogsAction(limit = 100) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.settings");
   if (!gate.ok) return { ok: false as const, error: gate.error, items: [] as AdminLogRow[] };
   try {
     const { data, error } = await gate.supabase
@@ -39,7 +39,7 @@ export async function adminWriteLogAction(input: {
   entity_id?: string;
   meta?: string;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.settings");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const { error } = await gate.supabase.from("admin_logs").insert({

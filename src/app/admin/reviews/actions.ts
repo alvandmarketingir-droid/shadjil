@@ -1,10 +1,10 @@
 "use server";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 import { revalidatePath } from "next/cache";
 
 export async function updateReviewApproval(id: string, isApproved: boolean) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.reviews");
   if (!gate.ok) return { error: gate.error };
 
   const supabase = gate.supabase;
@@ -48,7 +48,7 @@ export async function updateReviewApproval(id: string, isApproved: boolean) {
 }
 
 export async function updateReviewReply(id: string, adminReply: string) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.reviews");
   if (!gate.ok) return { error: gate.error };
 
   const { error } = await gate.supabase

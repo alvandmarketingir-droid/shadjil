@@ -1,9 +1,9 @@
 "use server";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 
 export async function updateContactMessageStatus(id: string, status: string) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { error: gate.error };
 
   const allowed = new Set(["new", "read", "replied", "archived"]);

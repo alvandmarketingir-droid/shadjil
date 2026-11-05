@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import {
@@ -106,7 +106,7 @@ export async function getTextPageContentAction(
 }
 
 export async function adminGetAllContentPagesAction() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error };
 
   try {
@@ -146,7 +146,7 @@ export async function adminGetAllContentPagesAction() {
 }
 
 export async function adminSaveFaqAction(items: FaqItem[]) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error };
 
   const cleaned = (items || [])
@@ -194,7 +194,7 @@ export async function adminSaveTextPageAction(
   slug: Exclude<ContentPageSlug, "faq">,
   content: TextPageContent,
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error };
 
   const key = CONTENT_KEYS[slug];

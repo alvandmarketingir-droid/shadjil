@@ -1,10 +1,10 @@
 "use server";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 import { isUpstashConfigured } from "@/lib/security/rate-limit";
 
 export async function adminHealthCheckAction() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.settings");
   if (!gate.ok) {
     return { ok: false as const, error: gate.error, health: null };
   }

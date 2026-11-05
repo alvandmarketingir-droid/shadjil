@@ -1,11 +1,11 @@
 "use server";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 
 export type SeoPageKey = "shop_plp" | "blog_plp";
 
 export async function adminGetSeoPageAction(page_key: SeoPageKey) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error, row: null };
   try {
     const { data, error } = await gate.supabase
@@ -37,7 +37,7 @@ export async function adminUpsertSeoPageAction(
     body_preview?: string | null;
   },
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const row = {

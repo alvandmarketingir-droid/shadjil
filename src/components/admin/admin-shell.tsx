@@ -27,48 +27,69 @@ import {
   FileSpreadsheet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { Permission, Role } from "@/lib/permissions";
 
-const NAV = [
+type NavItem = {
+  href: string;
+  label: string;
+  icon: typeof Home;
+  /** Permission required; omit = any admin.access session */
+  permission?: Permission;
+};
+
+const NAV: NavItem[] = [
   { href: "/admin/dashboard", label: "داشبورد", icon: Home },
-  { href: "/admin/orders", label: "سفارش‌ها", icon: ShoppingCart },
-  { href: "/admin/products", label: "محصولات", icon: Package },
-  { href: "/admin/categories", label: "دسته‌ها", icon: FolderTree },
-  { href: "/admin/brands", label: "برندها", icon: Package },
-  { href: "/admin/attributes", label: "مشخصات", icon: Tag },
-  { href: "/admin/tags", label: "برچسب‌ها", icon: Tag },
-  { href: "/admin/discounts", label: "تخفیف‌ها", icon: Tag },
-  { href: "/admin/flash-sale", label: "شگفت‌انگیز", icon: Percent },
-  { href: "/admin/users", label: "کاربران", icon: Users },
-  { href: "/admin/club", label: "باشگاه مشتریان", icon: Users },
-  { href: "/admin/media", label: "رسانه", icon: ImageIcon },
-  { href: "/admin/blog", label: "بلاگ", icon: FileText },
-  { href: "/admin/reviews", label: "نظرات", icon: MessageSquare },
-  { href: "/admin/tickets", label: "تیکت‌ها", icon: Ticket },
-  { href: "/admin/contact-messages", label: "پیام‌های تماس", icon: MessageSquare },
-  { href: "/admin/notifications", label: "اعلان‌ها", icon: Bell },
-  { href: "/admin/shipping", label: "ارسال", icon: Package },
-  { href: "/admin/returns", label: "مرجوعی", icon: Package },
-  { href: "/admin/stock-alerts", label: "لیست انتظار موجودی", icon: Bell },
-  { href: "/admin/reports", label: "گزارش فروش", icon: FileSpreadsheet },
-  { href: "/admin/analytics", label: "آمار", icon: BarChart3 },
-  { href: "/admin/health", label: "سلامت سیستم", icon: Activity },
-  { href: "/admin/seo", label: "سئو", icon: FileText },
-  { href: "/admin/seo/redirects", label: "ریدایرکت‌ها", icon: FileText },
-  { href: "/admin/logs", label: "لاگ‌ها", icon: FileText },
-  { href: "/admin/pages", label: "محتوای صفحات", icon: FileText },
-  { href: "/admin/settings", label: "تنظیمات", icon: Settings },
-  { href: "/admin/backup", label: "بک‌آپ", icon: Database },
+  { href: "/admin/orders", label: "سفارش‌ها", icon: ShoppingCart, permission: "admin.orders" },
+  { href: "/admin/products", label: "محصولات", icon: Package, permission: "admin.products" },
+  { href: "/admin/categories", label: "دسته‌ها", icon: FolderTree, permission: "admin.products" },
+  { href: "/admin/brands", label: "برندها", icon: Package, permission: "admin.products" },
+  { href: "/admin/attributes", label: "مشخصات", icon: Tag, permission: "admin.products" },
+  { href: "/admin/tags", label: "برچسب‌ها", icon: Tag, permission: "admin.products" },
+  { href: "/admin/discounts", label: "تخفیف‌ها", icon: Tag, permission: "admin.discounts" },
+  { href: "/admin/flash-sale", label: "شگفت‌انگیز", icon: Percent, permission: "admin.discounts" },
+  { href: "/admin/users", label: "کاربران", icon: Users, permission: "admin.users" },
+  { href: "/admin/club", label: "باشگاه مشتریان", icon: Users, permission: "admin.customers" },
+  { href: "/admin/media", label: "رسانه", icon: ImageIcon, permission: "admin.media" },
+  { href: "/admin/blog", label: "بلاگ", icon: FileText, permission: "admin.content" },
+  { href: "/admin/reviews", label: "نظرات", icon: MessageSquare, permission: "admin.reviews" },
+  { href: "/admin/tickets", label: "تیکت‌ها", icon: Ticket, permission: "admin.content" },
+  { href: "/admin/contact-messages", label: "پیام‌های تماس", icon: MessageSquare, permission: "admin.content" },
+  { href: "/admin/notifications", label: "اعلان‌ها", icon: Bell, permission: "admin.settings" },
+  { href: "/admin/shipping", label: "ارسال", icon: Package, permission: "admin.shipping" },
+  { href: "/admin/returns", label: "مرجوعی", icon: Package, permission: "admin.returns" },
+  { href: "/admin/stock-alerts", label: "لیست انتظار موجودی", icon: Bell, permission: "admin.products" },
+  { href: "/admin/reports", label: "گزارش فروش", icon: FileSpreadsheet, permission: "admin.reports" },
+  { href: "/admin/analytics", label: "آمار", icon: BarChart3, permission: "admin.reports" },
+  { href: "/admin/health", label: "سلامت سیستم", icon: Activity, permission: "admin.settings" },
+  { href: "/admin/seo", label: "سئو", icon: FileText, permission: "admin.content" },
+  { href: "/admin/seo/redirects", label: "ریدایرکت‌ها", icon: FileText, permission: "admin.content" },
+  { href: "/admin/logs", label: "لاگ‌ها", icon: FileText, permission: "admin.settings" },
+  { href: "/admin/pages", label: "محتوای صفحات", icon: FileText, permission: "admin.content" },
+  { href: "/admin/settings", label: "تنظیمات", icon: Settings, permission: "admin.settings" },
+  { href: "/admin/backup", label: "بک‌آپ", icon: Database, permission: "admin.settings" },
 ];
 
-export function AdminShell({ children }: { children: React.ReactNode }) {
+export function AdminShell({
+  children,
+  role,
+  permissions = [],
+}: {
+  children: React.ReactNode;
+  role?: Role;
+  permissions?: readonly Permission[] | Permission[];
+}) {
   const pathname = usePathname();
   const [open, setOpen] = useState(true);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const allowed = new Set(permissions);
+  const navItems = NAV.filter(
+    (item) => !item.permission || allowed.has(item.permission),
+  );
 
   function NavLinks({ compact = false }: { compact?: boolean }) {
     return (
       <>
-        {NAV.map((item) => {
+        {navItems.map((item) => {
           const active =
             pathname === item.href || pathname.startsWith(item.href + "/");
           const Icon = item.icon;

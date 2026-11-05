@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 
 
 type Role = "customer" | "admin" | "staff";
@@ -10,7 +10,7 @@ export async function adminListUsersAction(
   limit = 50,
   opts?: { q?: string; role?: string },
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.users");
   if (!gate.ok) return { ok: false as const, error: gate.error, items: [] };
   try {
     let query = gate.supabase
@@ -41,7 +41,7 @@ export async function adminListUsersAction(
 }
 
 export async function adminUpdateUserRoleAction(userId: string, role: Role) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.users");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   if (!["customer", "admin", "staff"].includes(role)) {
     return { ok: false as const, error: "bad_role" };
