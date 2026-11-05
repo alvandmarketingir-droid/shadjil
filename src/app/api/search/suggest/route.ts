@@ -4,6 +4,7 @@ import {
   expandTypoVariants,
   normalizeSearchQuery,
 } from "@/lib/search/normalize";
+import { isBlockedBrand } from "@/lib/brands/blocked";
 
 export const dynamic = "force-dynamic";
 
@@ -110,9 +111,13 @@ export async function GET(req: NextRequest) {
     for (const b of allBrands ?? []) {
       const name = String(b.name || "");
       const slug = String(b.slug || "");
+      if (isBlockedBrand({ name, slug })) continue;
       if (terms.some((t) => name.toLowerCase().includes(t.toLowerCase()))) {
         brandMap.set(slug, { name, slug });
       }
+    }
+    for (const [slug, b] of [...brandMap.entries()]) {
+      if (isBlockedBrand(b)) brandMap.delete(slug);
     }
 
     let posts: { title: string; slug: string }[] = [];
