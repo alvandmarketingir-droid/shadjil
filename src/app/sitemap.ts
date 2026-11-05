@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { createServiceClient } from "@/lib/supabase/service";
 import { isSiteIndexable, SITE_URL } from "@/lib/seo/indexing";
+import { isBlockedBrand } from "@/lib/brands/blocked";
 
 /**
  * زیرساخت sitemap آماده است.
@@ -81,13 +82,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     const { data: brands } = await supabase
       .from("brands")
-      .select("slug, updated_at")
+      .select("slug, name, updated_at")
       .eq("is_active", true)
       .limit(500);
 
     for (const b of brands ?? []) {
       const slug = (b as { slug?: string }).slug;
-      if (!slug) continue;
+      const name = (b as { name?: string }).name;
+      if (!slug || isBlockedBrand({ slug, name })) continue;
       entries.push({
         url: `${SITE_URL}/brands/${slug}`,
         lastModified: now,

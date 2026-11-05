@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { filterBlockedBrands } from "@/lib/brands/blocked";
 
 export const dynamic = "force-dynamic";
 
@@ -61,7 +62,9 @@ export async function GET() {
     return NextResponse.json(
       {
         categories: cats.data ?? [],
-        brands: brands.data ?? [],
+        brands: filterBlockedBrands(
+          (brands.data ?? []) as { name?: string; slug?: string }[],
+        ),
         colors: colors.data ?? [],
         sizes: sizes.data ?? [],
         attributes,

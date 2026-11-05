@@ -3,6 +3,7 @@ import type { Product, ProductVariant, ProductImage } from "@/types/database";
 import type { ProductFilterInput } from "@/lib/validation/product";
 import { normalizeProductSlug } from "@/lib/product-slug";
 import { expandTypoVariants, normalizeSearchQuery } from "@/lib/search/normalize";
+import { isBlockedBrand } from "@/lib/brands/blocked";
 
 export type ProductWithRelations = Product & {
   brand?: { id: string; name: string; slug: string } | null;
@@ -76,13 +77,18 @@ export class ProductRepository extends BaseRepository {
 
     // برند
     if (filters.brandSlug) {
-      const { data: brand } = await client
-        .from("brands")
-        .select("id")
-        .eq("slug", filters.brandSlug)
-        .eq("is_active", true)
-        .maybeSingle();
-      if (brand) query = query.eq("brand_id", brand.id);
+      if (isBlockedBrand({ slug: filters.brandSlug, name: filters.brandSlug })) {
+        // Blocked brand — force empty product set
+        query = query.eq("brand_id", "00000000-0000-0000-0000-000000000000");
+      } else {
+        const { data: brand } = await client
+          .from("brands")
+          .select("id")
+          .eq("slug", filters.brandSlug)
+          .eq("is_active", true)
+          .maybeSingle();
+        if (brand) query = query.eq("brand_id", brand.id);
+      }
     }
 
 

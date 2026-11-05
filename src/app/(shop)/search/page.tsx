@@ -8,6 +8,7 @@ import {
 } from "@/lib/search/normalize";
 import { EmptyBlock } from "@/components/ui/ui-state-blocks";
 import { TrackSearch } from "@/components/analytics/track-search";
+import { isBlockedBrand } from "@/lib/brands/blocked";
 
 export const dynamic = "force-dynamic";
 
@@ -120,8 +121,13 @@ export default async function SearchResultsPage({ searchParams }: Props) {
   const { data: allBrands } = await supabase.from("brands").select("name, slug").limit(80);
   for (const b of allBrands ?? []) {
     const name = String(b.name || "");
+    const slug = String(b.slug || "");
+    if (isBlockedBrand({ name, slug })) continue;
     if (terms.some((t) => name.toLowerCase().includes(t.toLowerCase())))
-      brandMap.set(String(b.slug), { name, slug: String(b.slug) });
+      brandMap.set(slug, { name, slug });
+  }
+  for (const [slug, b] of [...brandMap.entries()]) {
+    if (isBlockedBrand(b)) brandMap.delete(slug);
   }
 
   const categories = [...catMap.values()];

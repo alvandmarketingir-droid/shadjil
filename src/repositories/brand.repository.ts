@@ -1,5 +1,11 @@
 import { BaseRepository } from "./base.repository";
 import type { Brand } from "@/types/database";
+import { filterBlockedBrands, isBlockedBrand } from "@/lib/brands/blocked";
+
+type PublicBrand = Pick<
+  Brand,
+  "id" | "name" | "slug" | "logo_url" | "description" | "is_active"
+>;
 
 export class BrandRepository extends BaseRepository {
   async findAllActive() {
@@ -12,13 +18,12 @@ export class BrandRepository extends BaseRepository {
       .order("name", { ascending: true });
 
     if (error) throw error;
-    return (data ?? []) as Pick<
-      Brand,
-      "id" | "name" | "slug" | "logo_url" | "description" | "is_active"
-    >[];
+    return filterBlockedBrands((data ?? []) as PublicBrand[]);
   }
 
   async findBySlug(slug: string) {
+    if (isBlockedBrand({ slug, name: slug })) return null;
+
     const client = await this.getClient();
 
     const { data, error } = await client
@@ -33,9 +38,8 @@ export class BrandRepository extends BaseRepository {
       throw error;
     }
 
-    return data as Pick<
-      Brand,
-      "id" | "name" | "slug" | "logo_url" | "description" | "is_active"
-    >;
+    const brand = data as PublicBrand;
+    if (isBlockedBrand(brand)) return null;
+    return brand;
   }
 }
