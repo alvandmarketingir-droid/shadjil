@@ -1,6 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
-import { applySecurityHeaders } from "@/lib/security/headers";
+import {
+  applySecurityHeaders,
+  createCspNonce,
+  withNonceRequest,
+} from "@/lib/security/headers";
 import { REQUEST_ID_HEADER, resolveRequestId } from "@/lib/request-id";
 import { assertApiCsrf } from "@/lib/security/csrf-origin";
 
@@ -53,6 +57,8 @@ function requestIdFrom(request: NextRequest): string {
 
 async function sessionRewrite(request: NextRequest, dest: string) {
   const rid = requestIdFrom(request);
+  const nonce = createCspNonce();
+  const reqHeaders = withNonceRequest(request, nonce);
   const url = request.nextUrl.clone();
   const qIndex = dest.indexOf("?");
   if (qIndex >= 0) {
@@ -62,10 +68,10 @@ async function sessionRewrite(request: NextRequest, dest: string) {
   } else {
     url.pathname = dest;
   }
-  const sessionRes = await updateSession(request);
-  const rewrite = NextResponse.rewrite(url);
+  const sessionRes = await updateSession(request, reqHeaders);
+  const rewrite = NextResponse.rewrite(url, { request: { headers: reqHeaders } });
   sessionRes.cookies.getAll().forEach((c) => rewrite.cookies.set(c.name, c.value));
-  return applySecurityHeaders(rewrite, rid);
+  return applySecurityHeaders(rewrite, { requestId: rid, nonce });
 }
 
 async function supabaseExists(
@@ -167,14 +173,22 @@ export async function proxy(request: NextRequest) {
   if (pathname === "/admin" || pathname === "/admin/") {
     const url = request.nextUrl.clone();
     url.pathname = "/admin/dashboard";
-    return applySecurityHeaders(NextResponse.redirect(url), rid);
+    const nonce = createCspNonce();
+    return applySecurityHeaders(NextResponse.redirect(url), {
+      requestId: rid,
+      nonce,
+    });
   }
   if (pathname.startsWith("/admin") && !hasSupabaseAuthCookie(request)) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.search = "";
     url.searchParams.set("next", "/admin/dashboard");
-    return applySecurityHeaders(NextResponse.redirect(url), rid);
+    const nonce = createCspNonce();
+    return applySecurityHeaders(NextResponse.redirect(url), {
+      requestId: rid,
+      nonce,
+    });
   }
 
   // ریدایرکت formal از DB (۳۰۱ و ...)
@@ -213,7 +227,10 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  return applySecurityHeaders(await updateSession(request), requestIdFrom(request));
+  const nonce = createCspNonce();
+  const reqHeaders = withNonceRequest(request, nonce);
+  const sessionRes = await updateSession(request, reqHeaders);
+  return applySecurityHeaders(sessionRes, { requestId: rid, nonce });
 }
 
 export const config = {

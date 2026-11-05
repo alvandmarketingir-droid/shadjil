@@ -1,13 +1,13 @@
 "use server";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 import { assertNoLinkOrImage } from "@/lib/sanitize-user-text";
 import { writeFinancialAudit } from "@/lib/finance/audit";
 
 export async function adminListTicketsAction(opts?: {
   status?: "all" | "open" | "in_progress" | "closed";
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error, items: [] };
   try {
     let query = gate.supabase
@@ -30,7 +30,7 @@ export async function adminSetTicketStatusAction(
   id: string,
   status: "open" | "in_progress" | "closed",
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const { error } = await gate.supabase
@@ -45,7 +45,7 @@ export async function adminSetTicketStatusAction(
 }
 
 export async function adminReplyTicketAction(ticketId: string, bodyRaw: string) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const body = assertNoLinkOrImage(bodyRaw, "پاسخ");
   if (!body.ok) return { ok: false as const, error: body.error };
@@ -68,7 +68,7 @@ export async function adminReplyTicketAction(ticketId: string, bodyRaw: string) 
 }
 
 export async function adminListReturnsAction() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error, items: [] };
   try {
     const { data, error } = await gate.supabase
@@ -89,7 +89,7 @@ export async function adminSetReturnStatusAction(
   status: "pending" | "approved" | "rejected" | "received" | "refunded",
   adminNote?: string,
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const { data: prev } = await gate.supabase

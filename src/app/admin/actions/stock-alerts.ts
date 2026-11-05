@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 import { createServiceClient } from "@/lib/supabase/service";
 
 export type AdminStockAlertRow = {
@@ -22,7 +22,7 @@ export async function adminListStockAlertsAction(opts?: {
   status?: "all" | "pending" | "notified" | "cancelled";
   limit?: number;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) {
     return { ok: false as const, error: gate.error, items: [] as AdminStockAlertRow[] };
   }
@@ -88,7 +88,7 @@ export async function adminSetStockAlertStatusAction(
   id: string,
   status: "pending" | "notified" | "cancelled",
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   if (!id?.trim()) return { ok: false as const, error: "id_required" };
   try {

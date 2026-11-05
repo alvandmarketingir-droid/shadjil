@@ -1,11 +1,11 @@
 "use server";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 
 export async function adminListReviewsAction(opts?: {
   approved?: "all" | "yes" | "no";
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.reviews");
   if (!gate.ok) return { ok: false as const, error: gate.error, items: [] };
   try {
     let query = gate.supabase
@@ -29,7 +29,7 @@ export async function adminListReviewsAction(opts?: {
 }
 
 export async function adminSetReviewApprovedAction(id: string, is_approved: boolean) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.reviews");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const { data: row, error: fetchErr } = await gate.supabase
@@ -61,7 +61,7 @@ export async function adminSetReviewApprovedAction(id: string, is_approved: bool
 }
 
 export async function adminSetReviewReplyAction(id: string, reply: string) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.reviews");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const text = (reply ?? "").trim();

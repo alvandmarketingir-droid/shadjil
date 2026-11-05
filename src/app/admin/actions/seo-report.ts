@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 
 export type SeoReportRow = {
   type: string;
@@ -42,7 +42,7 @@ function scoreRow(r: {
 export async function adminSeoSiteReportAction(): Promise<
   { ok: true; report: SeoReportSummary } | { ok: false; error: string }
 > {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false, error: gate.error };
 
   const rows: SeoReportRow[] = [];

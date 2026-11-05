@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 import { revalidatePath } from "next/cache";
 
 export async function createShippingMethod(input: {
@@ -11,7 +11,7 @@ export async function createShippingMethod(input: {
   provider_code?: string;
   pricing_type?: string;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.shipping");
   if (!gate.ok) return { error: gate.error };
 
   const title = (input.title || "").trim();
@@ -45,7 +45,7 @@ export async function updateShippingMethod(
     api_config?: Record<string, unknown>;
   },
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.shipping");
   if (!gate.ok) return { error: gate.error };
 
   const patch: Record<string, unknown> = {
@@ -75,7 +75,7 @@ export async function updateShippingMethod(
 }
 
 export async function deleteShippingMethod(id: string) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.shipping");
   if (!gate.ok) return { error: gate.error };
 
   const { error } = await gate.supabase

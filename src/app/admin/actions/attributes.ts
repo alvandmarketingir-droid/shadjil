@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 
 export type AttrOption = { id: string; value: string; slug?: string; hex?: string | null };
 
@@ -14,7 +14,7 @@ export type AttrWithOptions = {
 };
 
 export async function adminListAttributesAction() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok)
     return { ok: false as const, error: gate.error, items: [] as AttrWithOptions[] };
   try {
@@ -70,7 +70,7 @@ export async function adminListAttributesAction() {
 }
 
 export async function adminGetProductAttributeValuesAction(productId: string) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok)
     return {
       ok: false as const,
@@ -119,7 +119,7 @@ export async function adminSyncProductAttributesAction(
   productId: string,
   values: AttrValueInput[],
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   if (!productId) return { ok: false as const, error: "product_required" };
   try {
@@ -202,7 +202,7 @@ export async function adminCreateAttributeAction(input: {
   name: string;
   slug?: string;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const name = (input.name || "").trim();
   if (!name) return { ok: false as const, error: "name_required" };
@@ -234,7 +234,7 @@ export async function adminCreateAttributeOptionAction(input: {
   slug?: string;
   hex?: string | null;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const value = (input.value || "").trim();
   if (!value || !input.attribute_id)
@@ -261,7 +261,7 @@ export async function adminCreateAttributeOptionAction(input: {
 }
 
 export async function adminDeleteAttributeOptionAction(id: string) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const { error } = await gate.supabase
@@ -281,7 +281,7 @@ export async function adminUpdateAttributeOptionAction(input: {
   value?: string;
   hex?: string | null;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   if (!input.id) return { ok: false as const, error: "validation" };
   const patch: Record<string, unknown> = {};

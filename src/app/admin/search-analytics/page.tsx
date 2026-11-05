@@ -1,10 +1,10 @@
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
 export default async function SearchAnalyticsPage() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.reports");
   if (!gate.ok) {
     return (
       <div className="p-6 text-sm text-destructive" dir="rtl">

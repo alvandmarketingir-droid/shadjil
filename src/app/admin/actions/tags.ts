@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 
 function slugify(input: string): string {
   return (
@@ -17,7 +17,7 @@ function slugify(input: string): string {
 /* ── product tags ── */
 
 export async function adminListProductTagsAction() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error, items: [] };
   try {
     const { data, error } = await gate.supabase
@@ -40,7 +40,7 @@ export async function adminCreateProductTagAction(input: {
   description?: string | null;
   is_active?: boolean;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const name = (input.name || "").trim();
   if (!name) return { ok: false as const, error: "name_required" };
@@ -69,7 +69,7 @@ export async function adminCreateProductTagAction(input: {
 }
 
 export async function adminToggleProductTagAction(id: string, is_active: boolean) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const { error } = await gate.supabase
@@ -95,7 +95,7 @@ export async function adminUpdateProductTagAction(
     description?: string | null;
   },
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const body: Record<string, unknown> = {};
@@ -128,7 +128,7 @@ export async function adminUpdateProductTagAction(
 }
 
 export async function adminDeleteProductTagAction(id: string) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     await gate.supabase.from("product_tag_map").delete().eq("tag_id", id);
@@ -144,7 +144,7 @@ export async function adminDeleteProductTagAction(id: string) {
 /* ── blog tags ── */
 
 export async function adminListBlogTagsAction() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error, items: [] };
   try {
     const { data, error } = await gate.supabase
@@ -163,7 +163,7 @@ export async function adminCreateBlogTagAction(input: {
   name: string;
   slug?: string;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const name = (input.name || "").trim();
   if (!name) return { ok: false as const, error: "name_required" };
@@ -183,7 +183,7 @@ export async function adminCreateBlogTagAction(input: {
 }
 
 export async function adminToggleBlogTagAction(id: string, is_active: boolean) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const { error } = await gate.supabase
@@ -199,7 +199,7 @@ export async function adminToggleBlogTagAction(id: string, is_active: boolean) {
 
 
 export async function adminGetProductTagAction(id: string) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.products");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const { data, error } = await gate.supabase

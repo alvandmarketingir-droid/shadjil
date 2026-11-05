@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 
 export type NewsletterRow = {
   id: string;
@@ -15,7 +15,7 @@ export async function adminListNewsletterAction(): Promise<{
   items: NewsletterRow[];
   error?: string;
 }> {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) {
     return { ok: false, items: [], error: gate.error };
   }
@@ -43,7 +43,7 @@ export async function adminUnsubscribeNewsletterAction(id: string): Promise<{
   ok: boolean;
   error?: string;
 }> {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false, error: gate.error };
   if (!id) return { ok: false, error: "validation" };
   try {
@@ -66,7 +66,7 @@ export async function adminResubscribeNewsletterAction(id: string): Promise<{
   ok: boolean;
   error?: string;
 }> {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false, error: gate.error };
   if (!id) return { ok: false, error: "validation" };
   try {

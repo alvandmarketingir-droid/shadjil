@@ -1,8 +1,20 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request });
+function nextWithOptionalHeaders(
+  request: NextRequest,
+  requestHeaders?: Headers,
+) {
+  return requestHeaders
+    ? NextResponse.next({ request: { headers: requestHeaders } })
+    : NextResponse.next({ request });
+}
+
+export async function updateSession(
+  request: NextRequest,
+  requestHeaders?: Headers,
+) {
+  let supabaseResponse = nextWithOptionalHeaders(request, requestHeaders);
 
   const hasAuthCookie = request.cookies
     .getAll()
@@ -28,7 +40,7 @@ export async function updateSession(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value),
           );
-          supabaseResponse = NextResponse.next({ request });
+          supabaseResponse = nextWithOptionalHeaders(request, requestHeaders);
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options),
           );

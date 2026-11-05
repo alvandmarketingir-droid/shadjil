@@ -1,7 +1,7 @@
 "use server";
 import { normalizeIranMobile, normalizePhone } from "@/lib/numbers";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 
 import { PREDEFINED_NOTIFICATIONS } from "@/lib/notifications/templates";
 
@@ -14,7 +14,7 @@ export async function adminSendNotificationAction(input: {
   customTitle?: string;
   customBody?: string;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.settings");
   if (!gate.ok) return gate;
 
   const customTitle = (input.customTitle || "").trim();
@@ -95,7 +95,7 @@ export async function adminSendNotificationAction(input: {
 }
 
 export async function adminListRecentNotificationsAction(limit = 40) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.settings");
   if (!gate.ok) return { ...gate, items: [] as any[] };
   const service = gate.supabase;
   const { data, error } = await service

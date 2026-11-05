@@ -137,7 +137,7 @@ export default function AdminBlogPage() {
       setItems([]);
       return;
     }
-    setItems((res.items as Post[]) ?? []);
+    setItems(((res.items as unknown) as Post[]) ?? []);
   }, []);
 
   useEffect(() => {

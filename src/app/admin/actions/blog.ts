@@ -2,7 +2,7 @@
 
 import { submitIndexNow, blogUrl } from "@/lib/seo/indexnow";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 
 function slugify(input: string): string {
   return (
@@ -19,7 +19,7 @@ function slugify(input: string): string {
 /* ── categories ── */
 
 export async function adminListBlogCategoriesAction() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error, items: [] };
   try {
     const { data, error } = await gate.supabase
@@ -40,7 +40,7 @@ export async function adminCreateBlogCategoryAction(input: {
   slug?: string;
   description?: string;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const name = (input.name || "").trim();
   if (!name) return { ok: false as const, error: "name_required" };
@@ -73,7 +73,7 @@ export async function adminToggleBlogCategoryAction(
   id: string,
   is_active: boolean,
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const { error } = await gate.supabase
@@ -90,7 +90,7 @@ export async function adminToggleBlogCategoryAction(
 /* ── posts ── */
 
 export async function adminListBlogPostsAction() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error, items: [] };
   try {
     const { data, error } = await gate.supabase
@@ -118,7 +118,7 @@ export async function adminCreateBlogPostAction(input: {
   status?: "draft" | "published" | "archived";
   tag_ids?: string[];
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const title = (input.title || "").trim();
   if (!title) return { ok: false as const, error: "title_required" };
@@ -177,7 +177,7 @@ export async function adminSetBlogPostStatusAction(
   id: string,
   status: "draft" | "published" | "archived",
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const patch: Record<string, unknown> = { status };
@@ -191,7 +191,7 @@ export async function adminSetBlogPostStatusAction(
 }
 
 export async function adminGetBlogPostAction(id: string) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error, post: null };
   try {
     const { data, error } = await gate.supabase
@@ -228,7 +228,7 @@ export async function adminUpdateBlogPostAction(
     tag_ids?: string[];
   },
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const title = (input.title || "").trim();
   if (!title) return { ok: false as const, error: "title_required" };
@@ -304,7 +304,7 @@ export async function adminUpdateBlogPostAction(
 /* ── tags ── */
 
 export async function adminListBlogTagsAction() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error, items: [] };
   try {
     const { data, error } = await gate.supabase
@@ -323,7 +323,7 @@ export async function adminCreateBlogTagAction(input: {
   name: string;
   slug?: string;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const name = (input.name || "").trim();
   if (!name) return { ok: false as const, error: "name_required" };

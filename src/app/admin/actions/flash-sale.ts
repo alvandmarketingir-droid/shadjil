@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 import { createClient } from "@/lib/supabase/server";
 
 const KEY_ENDS = "flash_sale_ends_at";
@@ -21,7 +21,7 @@ export async function getFlashSaleEndsAtAction() {
 }
 
 export async function adminGetFlashSaleSettingsAction() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.discounts");
   if (!gate.ok) return { ok: false as const, error: gate.error };
 
   const { data, error } = await gate.supabase
@@ -41,7 +41,7 @@ export async function adminGetFlashSaleSettingsAction() {
 }
 
 export async function adminSetFlashSaleEndsAtAction(endsAtIso: string | null) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.discounts");
   if (!gate.ok) return { ok: false as const, error: gate.error };
 
   const value =

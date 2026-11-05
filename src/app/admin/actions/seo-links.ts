@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 
 /** پیشنهاد لینک داخلی بر اساس کلیدواژه / نام */
 export async function adminSuggestInternalLinksAction(input: {
@@ -9,7 +9,7 @@ export async function adminSuggestInternalLinksAction(input: {
   excludeSlug?: string;
   limit?: number;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.content");
   if (!gate.ok) return { ok: false as const, error: gate.error, links: [] as { title: string; href: string; type: string }[] };
 
   const q = (input.keyphrase || input.pageName || "").trim();

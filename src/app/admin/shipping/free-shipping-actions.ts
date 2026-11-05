@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 import { createServiceClient } from "@/lib/supabase/service";
 import { revalidatePath } from "next/cache";
 
@@ -11,7 +11,7 @@ const KEYS = {
 } as const;
 
 export async function getFreeShippingSettingsAction() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.shipping");
   if (!gate.ok) return { ok: false as const, error: gate.error };
 
   try {
@@ -46,7 +46,7 @@ export async function saveFreeShippingSettingsAction(input: {
   minAmount: number;
   excludeCodes?: string;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.shipping");
   if (!gate.ok) return { ok: false as const, error: gate.error };
 
   const minAmount = Math.max(0, Math.floor(Number(input.minAmount) || 0));

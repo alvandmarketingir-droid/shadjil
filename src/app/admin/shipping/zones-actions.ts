@@ -1,11 +1,11 @@
 "use server";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 import { createServiceClient } from "@/lib/supabase/service";
 import { revalidatePath } from "next/cache";
 
 export async function listShippingZonesAdminAction() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.shipping");
   if (!gate.ok) return { ok: false as const, error: gate.error };
 
   const supabase = createServiceClient();
@@ -38,7 +38,7 @@ export async function listShippingZonesAdminAction() {
 }
 
 export async function saveMethodZonesAction(methodId: string, zoneIds: string[]) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.shipping");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   if (!methodId) return { ok: false as const, error: "missing" as const };
 
@@ -66,7 +66,7 @@ export async function createShippingZoneAction(input: {
   name: string;
   description?: string;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.shipping");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const name = (input.name || "").trim();
   if (!name) return { ok: false as const, error: "missing" as const };
@@ -86,7 +86,7 @@ export async function createShippingZoneAction(input: {
 }
 
 export async function addZoneProvinceAction(zoneId: string, province: string) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.shipping");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   const p = (province || "").trim();
   if (!zoneId || !p) return { ok: false as const, error: "missing" as const };
@@ -108,7 +108,7 @@ export async function addZoneProvinceAction(zoneId: string, province: string) {
 }
 
 export async function removeZoneLocationAction(locationId: string) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.shipping");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   if (!locationId) return { ok: false as const, error: "missing" as const };
 
@@ -123,7 +123,7 @@ export async function removeZoneLocationAction(locationId: string) {
 }
 
 export async function deleteShippingZoneAction(zoneId: string) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.shipping");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   if (!zoneId) return { ok: false as const, error: "missing" as const };
 
@@ -145,7 +145,7 @@ export async function saveMethodProvincesAction(
   methodId: string,
   provinces: string[],
 ) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.shipping");
   if (!gate.ok) return { ok: false as const, error: gate.error };
   if (!methodId) return { ok: false as const, error: "missing" as const };
 

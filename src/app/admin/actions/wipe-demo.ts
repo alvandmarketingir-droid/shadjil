@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 
 const DEMO_PRODUCT_SLUGS = [
   "classic-blue-dress-shirt",
@@ -22,7 +22,7 @@ const DEMO_BLOG_SLUGS = [
  * Does not touch profiles, shipping, or schema.
  */
 export async function adminWipeDemoContentAction() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.settings");
   if (!gate.ok) return { ok: false as const, error: gate.error };
 
   const sb = gate.supabase;

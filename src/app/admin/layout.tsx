@@ -1,13 +1,14 @@
 import { redirect } from "next/navigation";
 import { AdminShell } from "@/components/admin/admin-shell";
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
+import { permissionsFor } from "@/lib/permissions";
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.access");
 
   if (!gate.ok) {
     if (gate.error === "login_required") {
@@ -16,5 +17,12 @@ export default async function AdminLayout({
     redirect("/");
   }
 
-  return <AdminShell>{children}</AdminShell>;
+  return (
+    <AdminShell
+      role={gate.role}
+      permissions={[...permissionsFor(gate.role)]}
+    >
+      {children}
+    </AdminShell>
+  );
 }

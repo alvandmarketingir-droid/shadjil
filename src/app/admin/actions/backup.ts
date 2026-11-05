@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/admin/require-admin";
+import { requirePermission } from "@/lib/admin/require-permission";
 
 /** ترتیب restore: والد قبل از فرزند */
 const RESTORE_ORDER = [
@@ -46,7 +46,7 @@ async function fetchAll(
 }
 
 export async function adminBackupExportAction() {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.settings");
   if (!gate.ok) return { ok: false as const, error: gate.error };
 
   const tables: Record<string, Row[]> = {};
@@ -76,7 +76,7 @@ export async function adminBackupRestoreAction(payload: {
   version?: number;
   tables: Record<string, Row[]>;
 }) {
-  const gate = await requireAdmin();
+  const gate = await requirePermission("admin.settings");
   if (!gate.ok) return { ok: false as const, error: gate.error };
 
   if ((payload.confirm || "").trim() !== "RESTORE") {
