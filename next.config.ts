@@ -26,7 +26,8 @@ const nextConfig: NextConfig = {
       "date-fns-jalali",
       "framer-motion",
       "embla-carousel-react",
-      "lucide-react",
+      "@ark-ui/react",
+      "@number-flow/react",
     ],
   },
 
@@ -44,6 +45,12 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/fonts/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      {
+        source: "/brands/:path*",
         headers: [
           { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
         ],
@@ -67,7 +74,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: "X-DNS-Prefetch-Control",
-            value: "off",
+            value: "on",
           },
           {
             key: "Strict-Transport-Security",

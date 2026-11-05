@@ -98,6 +98,64 @@ export function IconFabric(props: IconProps) {
   );
 }
 
+
+/** کروات */
+export function IconTie(props: IconProps) {
+  return (
+    <svg {...svgProps(props)}>
+      <path d="M20 8 L24 12 L28 8 L30 10 L26 16 L28 40 L24 36 L20 40 L22 16 L18 10 Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <path d="M18 8 H30" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** پاپیون */
+export function IconBowTie(props: IconProps) {
+  return (
+    <svg {...svgProps(props)}>
+      <path d="M10 20 L22 24 L10 28 Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <path d="M38 20 L26 24 L38 28 Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <rect x="21" y="21" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  );
+}
+
+/** دکمه سردست */
+export function IconCufflink(props: IconProps) {
+  return (
+    <svg {...svgProps(props)}>
+      <circle cx="18" cy="24" r="7" stroke="currentColor" strokeWidth="2" />
+      <circle cx="30" cy="24" r="7" stroke="currentColor" strokeWidth="2" />
+      <circle cx="18" cy="24" r="2.5" fill="currentColor" />
+      <circle cx="30" cy="24" r="2.5" fill="currentColor" />
+      <path d="M25 24 H23" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** جین / دنیم */
+export function IconDenim(props: IconProps) {
+  return (
+    <svg {...svgProps(props)}>
+      <path d="M15 10 L24 15 L33 10 L38 15 L34 22 V40 H14 V22 L10 15 Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <path d="M18 22 L24 28 L30 22" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M16 32 H32" stroke="currentColor" strokeWidth="1.6" opacity="0.7" />
+      <path d="M16 36 H28" stroke="currentColor" strokeWidth="1.6" opacity="0.7" />
+    </svg>
+  );
+}
+
+/** اکسسوری */
+export function IconAccessory(props: IconProps) {
+  return (
+    <svg {...svgProps(props)}>
+      <circle cx="24" cy="24" r="12" stroke="currentColor" strokeWidth="2" />
+      <circle cx="24" cy="24" r="5" stroke="currentColor" strokeWidth="2" />
+      <path d="M24 12 V16 M24 32 V36 M12 24 H16 M32 24 H36" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function IconCategoryDefault(props: IconProps) {
   return (
     <svg {...svgProps(props)}>
@@ -111,9 +169,14 @@ export function IconCategoryDefault(props: IconProps) {
 const RULES: { test: (s: string) => boolean; Icon: (p: IconProps) => ReactElement }[] = [
   { test: (s) => /پارچه|fabric|کتان|پنبه|نخ|لینن|پشم/.test(s), Icon: IconFabric },
   { test: (s) => /فیت|fit|slim|regular|سایز/.test(s), Icon: IconFit },
+  { test: (s) => /پاپیون|bow[- ]?tie|پاپیون/.test(s), Icon: IconBowTie },
+  { test: (s) => /کروات|necktie|\btie\b|کراوات/.test(s), Icon: IconTie },
+  { test: (s) => /سردست|cufflink|دکمه/.test(s), Icon: IconCufflink },
+  { test: (s) => /جین|denim|jean/.test(s), Icon: IconDenim },
+  { test: (s) => /اکسسوری|accessory|کمربند|جوراب|شال/.test(s), Icon: IconAccessory },
   { test: (s) => /اسپرت|کار|sport|work|کارگری/.test(s), Icon: IconSportWork },
-  { test: (s) => /کژوال|casual|روزمره/.test(s), Icon: IconShirtCasual },
-  { test: (s) => /رسمی|formal|مجلسی/.test(s), Icon: IconShirtFormal },
+  { test: (s) => /کژوال|casual|روزمره|اکسفورد|oxford/.test(s), Icon: IconShirtCasual },
+  { test: (s) => /رسمی|formal|مجلسی|اداری|dress/.test(s), Icon: IconShirtFormal },
   { test: (s) => /پیراهن|shirt/.test(s), Icon: IconShirtFormal },
 ];
 

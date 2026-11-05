@@ -10,7 +10,9 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e:smoke": "npx playwright test e2e/smoke.spec.ts"
+    "analyze": "ANALYZE=true next build",
+    "test:e2e:smoke": "npx playwright test e2e/smoke.spec.ts",
+    "wipe:demo": "node --env-file=.env.local scripts/wipe-demo-content.mjs"
   },
   "dependencies": {
     "@ark-ui/react": "^5.39.2",

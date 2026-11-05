@@ -94,6 +94,8 @@ export default function RootLayout({
   return (
     <html lang="fa" dir="rtl" suppressHydrationWarning className="max-w-full">
       <head>
+        <link rel="preconnect" href="https://media.pirahanmardane.ir" crossOrigin="" />
+        <link rel="dns-prefetch" href="https://media.pirahanmardane.ir" />
         <link
           rel="preload"
           as="font"
@@ -105,6 +107,20 @@ export default function RootLayout({
           rel="preload"
           as="font"
           href="/fonts/iranyekan/IRANYekanX-Bold.woff2"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          as="font"
+          href="/fonts/iranyekan/IRANYekanX-Thin.woff2"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          as="font"
+          href="/fonts/iranyekan/IRANYekanX-Heavy.woff2"
           type="font/woff2"
           crossOrigin="anonymous"
         />

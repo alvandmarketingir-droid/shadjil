@@ -138,15 +138,25 @@ export function HeroScroll() {
       });
     (async () => {
       await loadOne(0);
+      // Low concurrency after first frame — avoids contending with LCP/fonts (same visuals).
+      const CONCURRENCY = 3;
       let next = 1;
-      await Promise.all(
-        Array.from({ length: 16 }, async () => {
-          while (next < FRAME_COUNT) {
-            const i = next++;
-            await loadOne(i);
-          }
-        }),
-      );
+      const workers = Array.from({ length: CONCURRENCY }, async () => {
+        while (!cancelled && next < FRAME_COUNT) {
+          const i = next++;
+          // Yield to idle when available so scroll/INP stay responsive.
+          await new Promise<void>((r) => {
+            if (typeof requestIdleCallback === "function") {
+              requestIdleCallback(() => r(), { timeout: 400 });
+            } else {
+              setTimeout(r, 0);
+            }
+          });
+          if (cancelled) return;
+          await loadOne(i);
+        }
+      });
+      await Promise.all(workers);
     })();
     return () => {
       cancelled = true;
