@@ -81,7 +81,7 @@ export function FreeShippingForm() {
           type="checkbox"
           checked={enabled}
           onChange={(e) => setEnabled(e.target.checked)}
-          className="size-4"
+          className="weight-4"
         />
         <span>فعال بودن ارسال رایگان</span>
       </label>

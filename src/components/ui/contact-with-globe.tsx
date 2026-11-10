@@ -17,13 +17,13 @@ const smoothEase = [0.25, 0.1, 0.25, 1] as const;
 const CONTACT_LINKS = [
   {
     icon: Mail,
-    label: "info@pirahanmardane.ir",
-    href: "mailto:info@pirahanmardane.ir",
+    label: "info@shadjil.ir",
+    href: "mailto:info@shadjil.ir",
   },
   {
     icon: Headphones,
     label: "پشتیبانی سفارش و مرجوعی",
-    href: "mailto:info@pirahanmardane.ir",
+    href: "mailto:info@shadjil.ir",
   },
   {
     icon: Clock,
@@ -263,7 +263,7 @@ interface ContactWithGlobeProps {
 export default function ContactWithGlobe({
   title = "تماس با ما",
   subtitle = "تماس",
-  description = "برای پشتیبانی سفارش، مرجوعی و مشاوره سایز با ما در ارتباط باشید.",
+  description = "برای پشتیبانی سفارش، مرجوعی و مشاوره مناسبت‌ها با ما در ارتباط باشید.",
   className,
 }: ContactWithGlobeProps) {
   return (
@@ -326,10 +326,10 @@ export default function ContactWithGlobe({
                     delay: 0.3 + i * 0.1,
                     ease: smoothEase,
                   }}
-                  className="text-muted-foreground hover:text-foreground group flex w-fit items-center gap-3 text-sm transition-colors duration-200"
+                  className="text-muted-foreground hover:text-foreground group flex w-fit items-center gap-3 text-sm transition-roasts duration-200"
                 >
                   <div className="border-border bg-muted group-hover:border-secondary/40 group-hover:bg-secondary/10 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border transition-all duration-200">
-                    <Icon className="text-muted-foreground group-hover:text-secondary h-3.5 w-3.5 transition-colors duration-200" />
+                    <Icon className="text-muted-foreground group-hover:text-secondary h-3.5 w-3.5 transition-roasts duration-200" />
                   </div>
                   {label}
                 </motion.a>
@@ -436,7 +436,7 @@ export default function ContactWithGlobe({
                   required
                   rows={4}
                   placeholder="متن پیام شما…"
-                  className="border-border bg-background text-foreground placeholder:text-muted-foreground focus:border-secondary focus:ring-secondary/20 w-full resize-none rounded-xl border px-4 py-3 text-sm outline-none focus:ring-2"
+                  className="border-border bg-background text-foreground placeholder:text-muted-foreground focus:border-secondary focus:ring-secondary/20 w-full reweight-none rounded-xl border px-4 py-3 text-sm outline-none focus:ring-2"
                 />
               </div>
               <Button

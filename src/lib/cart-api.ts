@@ -14,8 +14,8 @@ export async function cartAdd(input: {
   price: number;
   quantity?: number;
   image?: string;
-  size?: string;
-  color?: string;
+  weight?: string;
+  roast?: string;
 }): Promise<{ ok: boolean; error?: string }> {
   const qty = Math.max(1, Number(input.quantity) || 1);
   const store = useServerCartStore.getState();
@@ -27,8 +27,8 @@ export async function cartAdd(input: {
     price: input.price,
     quantity: qty,
     image: input.image,
-    size: input.size,
-    color: input.color,
+    weight: input.weight,
+    roast: input.roast,
   });
   try {
     const res = await addToCartAction(input.variantId, qty);

@@ -117,7 +117,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "media.pirahanmardane.ir",
+        hostname: "media.shadjil.ir",
       },
       {
         protocol: "https",

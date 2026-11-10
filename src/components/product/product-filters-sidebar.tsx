@@ -21,10 +21,10 @@ type Props = {
   featured?: boolean;
   minPrice?: number;
   maxPrice?: number;
-  colors?: { id: string; name: string; slug: string; hex?: string | null }[];
-  sizes?: { id: string; name: string; slug: string }[];
-  colorSlug?: string;
-  sizeSlug?: string;
+  roasts?: { id: string; name: string; slug: string; hex?: string | null }[];
+  weights?: { id: string; name: string; slug: string }[];
+  roastSlug?: string;
+  weightSlug?: string;
   forceVisible?: boolean;
 };
 
@@ -43,8 +43,8 @@ function buildHref(
     attrs?: Record<string, string>;
     minPrice?: number | null;
     maxPrice?: number | null;
-    color?: string | null;
-    size?: string | null;
+    roast?: string | null;
+    weight?: string | null;
   },
   base: Props
 ) {
@@ -52,21 +52,21 @@ function buildHref(
   if (base.brandSlug) params.set("brand", base.brandSlug);
   if (base.q) params.set("q", base.q);
 
-  const color =
-    (next as { color?: string | null }).color === null
+  const roast =
+    (next as { roast?: string | null }).roast === null
       ? undefined
-      : (next as { color?: string | null }).color !== undefined
-        ? (next as { color?: string | null }).color ?? undefined
-        : base.colorSlug;
-  if (color) params.set("color", color);
+      : (next as { roast?: string | null }).roast !== undefined
+        ? (next as { roast?: string | null }).roast ?? undefined
+        : base.roastSlug;
+  if (roast) params.set("roast", roast);
 
-  const size =
-    (next as { size?: string | null }).size === null
+  const weight =
+    (next as { weight?: string | null }).weight === null
       ? undefined
-      : (next as { size?: string | null }).size !== undefined
-        ? (next as { size?: string | null }).size ?? undefined
-        : base.sizeSlug;
-  if (size) params.set("size", size);
+      : (next as { weight?: string | null }).weight !== undefined
+        ? (next as { weight?: string | null }).weight ?? undefined
+        : base.weightSlug;
+  if (weight) params.set("weight", weight);
 
   const wantFeatured =
     next.sort === "featured"
@@ -136,7 +136,7 @@ function FilterLink({
         onNavigate(href);
       }}
       className={cn(
-        "flex items-center gap-2 rounded-md px-1.5 py-1.5 text-xs transition-colors",
+        "flex items-center gap-2 rounded-md px-1.5 py-1.5 text-xs transition-roasts",
         active
           ? "bg-primary/10 text-primary font-medium"
           : "text-foreground hover:bg-muted"
@@ -151,7 +151,7 @@ function CheckBox({ active }: { active: boolean }) {
   return (
     <span
       className={cn(
-        "flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors",
+        "flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-roasts",
         active
           ? "border-primary bg-primary text-primary-foreground"
           : "border-muted-foreground/40"
@@ -166,7 +166,7 @@ function RadioDot({ active }: { active: boolean }) {
   return (
     <span
       className={cn(
-        "flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors",
+        "flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-roasts",
         active ? "border-primary bg-primary" : "border-muted-foreground/40"
       )}
     >
@@ -290,7 +290,7 @@ export function ProductFiltersSidebar(props: Props) {
       >
         {categories.length > 0 ? (
           <div>
-            <p className="mb-2 text-xs font-medium">دسته‌بندی</p>
+            <p className="mb-2 text-xs font-medium">دسته‌بندی‌ها</p>
             <ul className="space-y-0.5">
               <li>
                 <FilterLink
@@ -327,7 +327,7 @@ export function ProductFiltersSidebar(props: Props) {
         ) : null}
 
         <div>
-          <p className="mb-2 text-xs font-medium">مرتب‌سازی</p>
+          <p className="mb-2 text-xs font-medium">مرتب‌سازی بر اساس</p>
           <ul className="space-y-0.5">
             {SORTS.map((s) => {
               const server =
@@ -353,7 +353,7 @@ export function ProductFiltersSidebar(props: Props) {
         </div>
 
         <div>
-          <p className="mb-2 text-xs font-medium">محدوده قیمت (تومان)</p>
+          <p className="mb-2 text-xs font-medium">بازه قیمت</p>
           <PriceRangeSlider06
             min={0}
             max={50_000_000}
@@ -372,16 +372,16 @@ export function ProductFiltersSidebar(props: Props) {
           />
         </div>
 
-        {/* —— رنگ —— */}
-        {(props.colors?.length ?? 0) > 0 ? (
+        {/* —— وضعیت محصول —— */}
+        {(props.roasts?.length ?? 0) > 0 ? (
           <div>
-            <p className="mb-2 text-xs font-medium">رنگ</p>
+            <p className="mb-2 text-xs font-medium">وضعیت محصول</p>
             <ul className="space-y-0.5">
-              {props.colors!.map((c) => {
-                const server = props.colorSlug === c.slug;
-                const key = `color:${c.slug}`;
+              {props.roasts!.map((c) => {
+                const server = props.roastSlug === c.slug;
+                const key = `roast:${c.slug}`;
                 const href = buildHref(
-                  { color: server ? null : c.slug },
+                  { roast: server ? null : c.slug },
                   props
                 );
                 return (
@@ -395,7 +395,7 @@ export function ProductFiltersSidebar(props: Props) {
                       {c.hex ? (
                         <span
                           className="h-3.5 w-3.5 shrink-0 rounded-full border border-black/10"
-                          style={{ backgroundColor: c.hex }}
+                          style={{ backgroundType: c.hex }}
                         />
                       ) : null}
                       <span className="leading-snug">{c.name}</span>
@@ -407,16 +407,16 @@ export function ProductFiltersSidebar(props: Props) {
           </div>
         ) : null}
 
-        {/* —— سایز —— */}
-        {(props.sizes?.length ?? 0) > 0 ? (
+        {/* —— مناسبت‌ها —— */}
+        {(props.weights?.length ?? 0) > 0 ? (
           <div>
-            <p className="mb-2 text-xs font-medium">سایز</p>
+            <p className="mb-2 text-xs font-medium">موجودی</p>
             <ul className="space-y-0.5">
-              {props.sizes!.map((s) => {
-                const server = props.sizeSlug === s.slug;
-                const key = `size:${s.slug}`;
+              {props.weights!.map((s) => {
+                const server = props.weightSlug === s.slug;
+                const key = `weight:${s.slug}`;
                 const href = buildHref(
-                  { size: server ? null : s.slug },
+                  { weight: server ? null : s.slug },
                   props
                 );
                 return (

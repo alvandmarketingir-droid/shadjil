@@ -11,5 +11,5 @@ Principles:
 3. User-facing text in Persian; technical detail in logs only
 
 Test:
-  curl -sI https://pirahanmardane.ir/api/health | grep -i x-request-id
-  curl -s https://pirahanmardane.ir/api/health
+  curl -sI https://shadjil.ir/api/health | grep -i x-request-id
+  curl -s https://shadjil.ir/api/health

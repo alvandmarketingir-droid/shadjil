@@ -8,7 +8,7 @@ export async function notifyStockAlertsForVariant(variantId: string): Promise<{
 
   const { data: variant } = await service
     .from("product_variants")
-    .select("id, stock_quantity, product_id, size, color_name, products(name, slug)")
+    .select("id, stock_quantity, product_id, weight, roast_name, products(name, slug)")
     .eq("id", variantId)
     .maybeSingle();
 
@@ -31,9 +31,9 @@ export async function notifyStockAlertsForVariant(variantId: string): Promise<{
   const p = Array.isArray(prod) ? prod[0] : prod;
   const titleName = p?.name ?? "محصول";
   const slug = p?.slug ?? "";
-  const size = (variant as { size?: string | null }).size ?? "";
-  const color = (variant as { color_name?: string | null }).color_name ?? "";
-  const label = [titleName, color, size].filter(Boolean).join(" · ");
+  const weight = (variant as { weight?: string | null }).weight ?? "";
+  const roast = (variant as { roast_name?: string | null }).roast_name ?? "";
+  const label = [titleName, roast, weight].filter(Boolean).join(" · ");
   const link = slug ? `/products/${slug}` : "/";
 
   let n = 0;

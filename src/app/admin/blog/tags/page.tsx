@@ -228,7 +228,7 @@ export default function AdminPage() {
             type="search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="جستجو نام یا اسلاگ…"
+            placeholder="جستجوی آجیل، خشکبار، خرما..."ی آجیل و خشکبار نام یا اسلاگ…"
             className="border-input bg-background h-10 min-w-[200px] flex-1 rounded-xl border px-3 text-sm"
           />
           <select

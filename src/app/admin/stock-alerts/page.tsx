@@ -201,7 +201,7 @@ export default function AdminStockAlertsPage() {
                     )}
                   </td>
                   <td className="text-muted-foreground p-3 text-xs">
-                    {[r.size, r.color_name].filter(Boolean).join(" / ") || r.variant_id.slice(0, 8)}
+                    {[r.weight, r.roast_name].filter(Boolean).join(" / ") || r.variant_id.slice(0, 8)}
                   </td>
                   <td className="p-3 tabular-nums text-xs">
                     {r.stock_quantity != null ? r.stock_quantity.toLocaleString("fa-IR") : "—"}

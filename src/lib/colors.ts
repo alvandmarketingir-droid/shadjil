@@ -1,4 +1,4 @@
-/** نام رنگ رایج فارسی/انگلیسی → hex */
+/** نام وضعیت محصول رایج فارسی/انگلیسی → hex */
 export function resolveColorHex(
   nameOrHex: string | null | undefined,
   explicitHex?: string | null,

@@ -26,7 +26,7 @@ export async function listActiveShippingMethodsAction(input?: {
       .order("sort_order", { ascending: true });
 
     if (error) throw error;
-    // هرگز api_config (کلید/توکن ارائه‌دهنده) را به کلاینت برنگردان
+    // هرگز api_config (کلید/توکن ارائه‌دهنده) را به کلاینت بوضعیت محصولردان
     const all = ((data ?? []) as ShippingMethodRow[]).map((m) => ({
       ...m,
       api_config: null,

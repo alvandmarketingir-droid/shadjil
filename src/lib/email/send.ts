@@ -1,6 +1,6 @@
 /**
  * ایمیل تراکنشی با Resend — fail-soft اگر کلید نباشد
- * env: RESEND_API_KEY, EMAIL_FROM (مثلاً فروشگاه <noreply@pirahanmardane.ir>)
+ * env: RESEND_API_KEY, EMAIL_FROM (مثلاً فروشگاه <noreply@shadjil.ir>)
  */
 export type EmailResult =
   | { ok: true; id?: string }
@@ -16,7 +16,7 @@ export async function sendTransactionalEmail(opts: {
   const from =
     process.env.EMAIL_FROM?.trim() ||
     process.env.RESEND_FROM?.trim() ||
-    "پیراهن مردانه <onboarding@resend.dev>";
+    "شادجیل <onboarding@resend.dev>";
 
   if (!apiKey) {
     console.warn("[email] skip: missing RESEND_API_KEY");
@@ -79,8 +79,8 @@ export async function emailOrderPlaced(opts: {
   const amt = escapeHtml(String(opts.amount ?? ""));
   return sendTransactionalEmail({
     to: opts.to,
-    subject: `سفارش ${oid} ثبت شد — پیراهن مردانه`,
-    html: `<p>${name} عزیز،</p><p>سفارش <strong>${oid}</strong> با موفقیت ثبت شد.${amt ? ` مبلغ: <strong>${amt}</strong> تومان.` : ""}</p><p><a href="https://pirahanmardane.ir/dashboard?tab=orders">پیگیری سفارش</a></p>`,
+    subject: `سفارش ${oid} ثبت شد — شادجیل`,
+    html: `<p>${name} عزیز،</p><p>سفارش <strong>${oid}</strong> با موفقیت ثبت شد.${amt ? ` مبلغ: <strong>${amt}</strong> تومان.` : ""}</p><p><a href="https://shadjil.ir/dashboard?tab=orders">پیگیری سفارش</a></p>`,
     text: `${name} عزیز، سفارش ${oid} ثبت شد.${amt ? ` مبلغ: ${amt} تومان.` : ""}`,
   });
 }
@@ -97,7 +97,7 @@ export async function emailPaymentSuccess(opts: {
   const amt = escapeHtml(String(opts.amount ?? ""));
   return sendTransactionalEmail({
     to: opts.to,
-    subject: `پرداخت سفارش ${oid} موفق — پیراهن مردانه`,
+    subject: `پرداخت سفارش ${oid} موفق — شادجیل`,
     html: `<p>${name} عزیز،</p><p>پرداخت سفارش <strong>${oid}</strong> با موفقیت انجام شد.${amt ? ` مبلغ: <strong>${amt}</strong> تومان.` : ""}</p>`,
     text: `${name} عزیز، پرداخت سفارش ${oid} موفق بود.${amt ? ` مبلغ: ${amt} تومان.` : ""}`,
   });
@@ -115,7 +115,7 @@ export async function emailShipped(opts: {
   const track = opts.tracking ? escapeHtml(String(opts.tracking)) : "";
   return sendTransactionalEmail({
     to: opts.to,
-    subject: `سفارش ${oid} ارسال شد — پیراهن مردانه`,
+    subject: `سفارش ${oid} ارسال شد — شادجیل`,
     html: `<p>${name} عزیز،</p><p>سفارش <strong>${oid}</strong> ارسال شد.${track ? ` کد رهگیری: <strong>${track}</strong>` : ""}</p>`,
     text: `${name} عزیز، سفارش ${oid} ارسال شد.${track ? ` کد رهگیری: ${track}` : ""}`,
   });

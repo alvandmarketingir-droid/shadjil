@@ -5,8 +5,8 @@ import { LegalView } from "@/components/content/legal-view";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "شرایط استفاده | پیراهن مردانه",
-  description: "شرایط و قوانین استفاده از فروشگاه پیراهن مردانه",
+  title: "شرایط استفاده | شادجیل",
+  description: "شرایط و قوانین استفاده از فروشگاه شادجیل",
 };
 
 export default async function TermsPage() {

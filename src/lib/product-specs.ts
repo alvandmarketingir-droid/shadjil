@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 
-const HIDE_ON_PDP = new Set(["size", "color", "سایز", "رنگ"]);
+const HIDE_ON_PDP = new Set(["weight", "roast", "موجودی", "وضعیت محصول"]);
 
 export async function getProductSpecRows(productId: string) {
   try {

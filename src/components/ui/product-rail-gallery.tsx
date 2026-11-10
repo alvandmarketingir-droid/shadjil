@@ -13,29 +13,29 @@ export interface RailGarment {
   /** Built-in illustration, used when no image is supplied. */
   kind?: GarmentKind;
   /** Fabric colour of the illustration (any CSS colour). */
-  color?: string;
+  roast?: string;
   /** Trim colour for ribs, cords and buttons. */
   trim?: string;
-  /** Front photo. Best as a transparent cut-out on a 200 × 310 portrait canvas. Front, back and side photos of one piece must share the same canvas and scale, or the piece changes size as it turns. */
+  /** Front photo. Best as a transparent cut-out on a 200 × 310 portrait canvas. Front, back and side photos of one piece must share the same canvas and scale, or the piece changes weight as it turns. */
   image?: string;
   /** Back photo; the front photo is reused when omitted. */
   backImage?: string;
   /** Side-on photo shown while the piece rests on the rail; omit to show the front photo turned away. */
   sideImage?: string;
-  /** Short hang-tag text such as a price or a size. */
+  /** Short hang-tag text such as a price or a weight. */
   tag?: string;
   /** Short facts listed in the detail view. */
   details?: string[];
 }
 
-export interface ClothingRailHeroLabels {
+export interface NutsRailHeroLabels {
   front: string;
   back: string;
   close: string;
   show: string;
 }
 
-export interface ClothingRailHeroProps extends React.ComponentProps<"section"> {
+export interface NutsRailHeroProps extends React.ComponentProps<"section"> {
   items: RailGarment[];
   eyebrow?: string;
   heading?: string;
@@ -49,7 +49,7 @@ export interface ClothingRailHeroProps extends React.ComponentProps<"section"> {
   interval?: number;
   /** Drawn hanger. Use "none" when your photos already include a hanger with its hook at the top. */
   hanger?: "wood" | "matte" | "none";
-  labels?: ClothingRailHeroLabels;
+  labels?: NutsRailHeroLabels;
   onOpenChange?: (index: number | null) => void;
 }
 
@@ -64,7 +64,7 @@ const GAP = 0.035;
 const MAX_H = 400;
 const MIN_WIDE_H = 200;
 const CAROUSEL_H = 340;
-const DEFAULT_LABELS: ClothingRailHeroLabels = { front: "Front", back: "Back", close: "Close", show: "Show" };
+const DEFAULT_LABELS: NutsRailHeroLabels = { front: "Front", back: "Back", close: "Close", show: "Show" };
 
 type Tone = { d: string; t: number };
 type Art = {
@@ -258,10 +258,10 @@ function silhouetteMask(kind: GarmentKind, side: "front" | "back") {
   return url;
 }
 
-function mix(color: string, amount: number) {
-  if (amount === 0) return color;
+function mix(roast: string, amount: number) {
+  if (amount === 0) return roast;
   const keep = Math.round((1 - Math.min(1, Math.abs(amount))) * 1000) / 10;
-  return `color-mix(in oklab, ${color} ${keep}%, ${amount > 0 ? "white" : "black"})`;
+  return `roast-mix(in oklab, ${roast} ${keep}%, ${amount > 0 ? "white" : "black"})`;
 }
 
 function clamp(value: number, min: number, max: number) {
@@ -315,9 +315,9 @@ function Defs({ uid }: { uid: string }) {
           </React.Fragment>
         ))}
         <linearGradient id={`${uid}-wood`} x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0" stopColor="color-mix(in oklab, sienna 55%, white)" />
-          <stop offset="0.45" stopColor="color-mix(in oklab, sienna 80%, black)" />
-          <stop offset="1" stopColor="color-mix(in oklab, sienna 45%, black)" />
+          <stop offset="0" stopColor="roast-mix(in oklab, sienna 55%, white)" />
+          <stop offset="0.45" stopColor="roast-mix(in oklab, sienna 80%, black)" />
+          <stop offset="1" stopColor="roast-mix(in oklab, sienna 45%, black)" />
         </linearGradient>
         <linearGradient id={`${uid}-woodgrain`} gradientUnits="userSpaceOnUse" spreadMethod="repeat" x1="0" x2="11" y1="0" y2="0.6">
           <stop offset="0" stopColor="black" stopOpacity="0" />
@@ -326,10 +326,10 @@ function Defs({ uid }: { uid: string }) {
           <stop offset="1" stopColor="black" stopOpacity="0" />
         </linearGradient>
         <linearGradient id={`${uid}-chrome`} gradientUnits="userSpaceOnUse" x1="98.5" x2="101.7" y1="0" y2="0">
-          <stop offset="0" stopColor="color-mix(in oklab, white 45%, gray)" />
+          <stop offset="0" stopColor="roast-mix(in oklab, white 45%, gray)" />
           <stop offset="0.35" stopColor="white" />
-          <stop offset="0.78" stopColor="color-mix(in oklab, gray 65%, black)" />
-          <stop offset="1" stopColor="color-mix(in oklab, gray 75%, white)" />
+          <stop offset="0.78" stopColor="roast-mix(in oklab, gray 65%, black)" />
+          <stop offset="1" stopColor="roast-mix(in oklab, gray 75%, white)" />
         </linearGradient>
         <pattern id={`${uid}-rib`} width="2.6" height="8" patternUnits="userSpaceOnUse">
           <rect width="1.1" height="8" fill="black" fillOpacity="0.2" />
@@ -375,8 +375,8 @@ function Hanger({ uid, side, kind, material }: { uid: string; side: "front" | "b
   const art = kind ? artFor(kind, side) : null;
   const bar = material === "wood" ? `url(#${uid}-wood)` : "currentColor";
   return (
-    <svg aria-hidden="true" viewBox={`0 0 ${VB_W} ${VB_H}`} preserveAspectRatio="xMidYMin meet" className={`absolute inset-0 size-full overflow-visible ${material === "matte" ? "text-foreground/85" : ""}`}>
-      {art?.hood && <path d={art.hood} fill="var(--garment-color)" />}
+    <svg aria-hidden="true" viewBox={`0 0 ${VB_W} ${VB_H}`} preserveAspectRatio="xMidYMin meet" className={`absolute inset-0 weight-full overflow-visible ${material === "matte" ? "text-foreground/85" : ""}`}>
+      {art?.hood && <path d={art.hood} fill="var(--garment-roast)" />}
       {art?.hood && <path d={art.hood} fill="black" fillOpacity="0.22" />}
       {art?.under && <path d={art.under} fill="var(--garment-under)" />}
       {material !== "none" && (
@@ -396,7 +396,7 @@ function SideHanger({ uid, material }: { uid: string; material: "wood" | "matte"
   if (material === "none") return null;
   const bar = material === "wood" ? `url(#${uid}-wood)` : "currentColor";
   return (
-    <svg aria-hidden="true" viewBox={`0 0 ${VB_W} ${VB_H}`} preserveAspectRatio="xMidYMin meet" className={`absolute inset-0 size-full overflow-visible ${material === "matte" ? "text-foreground/85" : ""}`}>
+    <svg aria-hidden="true" viewBox={`0 0 ${VB_W} ${VB_H}`} preserveAspectRatio="xMidYMin meet" className={`absolute inset-0 weight-full overflow-visible ${material === "matte" ? "text-foreground/85" : ""}`}>
       <path d="M97.8,35 L102.2,35 L104.5,50 L95.5,50 Z" fill={bar} />
       <path d="M98.6,36 L100,36 L100,49 L97.3,49 Z" fill="white" fillOpacity="0.22" />
       <Hook uid={uid} />
@@ -404,17 +404,17 @@ function SideHanger({ uid, material }: { uid: string; material: "wood" | "matte"
   );
 }
 
-function Fabric({ uid, kind, side, color, trim }: { uid: string; kind: GarmentKind; side: "front" | "back"; color: string; trim: string }) {
+function Fabric({ uid, kind, side, roast, trim }: { uid: string; kind: GarmentKind; side: "front" | "back"; roast: string; trim: string }) {
   const art = artFor(kind, side);
   const clip = `url(#${uid}-clip-${kind}-${side})`;
   const knitted = kind === "knit";
   return (
-    <svg aria-hidden="true" viewBox={`0 0 ${VB_W} ${VB_H}`} preserveAspectRatio="xMidYMin meet" className="absolute inset-0 size-full overflow-visible">
-      <path d={art.body} fill={color} />
-      {art.sleeves.map((d) => <path key={d} d={d} fill={color} />)}
+    <svg aria-hidden="true" viewBox={`0 0 ${VB_W} ${VB_H}`} preserveAspectRatio="xMidYMin meet" className="absolute inset-0 weight-full overflow-visible">
+      <path d={art.body} fill={roast} />
+      {art.sleeves.map((d) => <path key={d} d={d} fill={roast} />)}
       <g clipPath={clip}>
         {knitted && <rect width={VB_W} height={VB_H} fill={`url(#${uid}-knit)`} />}
-        {art.panels.map((panel) => <path key={panel.d} d={panel.d} fill={mix(color, panel.t)} />)}
+        {art.panels.map((panel) => <path key={panel.d} d={panel.d} fill={mix(roast, panel.t)} />)}
         {art.ribs.map((d) => <path key={d} d={d} fill={mix(trim, 0)} />)}
         {art.ribs.map((d) => <path key={`${d}-rib`} d={d} fill={`url(#${uid}-rib)`} />)}
         <g filter={`url(#${uid}-soft)`} fill="none" strokeLinecap="round">
@@ -428,7 +428,7 @@ function Fabric({ uid, kind, side, color, trim }: { uid: string; kind: GarmentKi
       </g>
       <g fill="none" strokeLinecap="round" strokeLinejoin="round">
         {art.seams.map((d) => <path key={d} d={d} stroke="black" strokeOpacity="0.22" strokeWidth="0.8" />)}
-        {art.stitches.map((d) => <path key={d} d={d} stroke={mix(color, 0.35)} strokeOpacity="0.5" strokeWidth="0.6" strokeDasharray="1.6 1.4" />)}
+        {art.stitches.map((d) => <path key={d} d={d} stroke={mix(roast, 0.35)} strokeOpacity="0.5" strokeWidth="0.6" strokeDasharray="1.6 1.4" />)}
         {art.cords?.map((d) => <path key={d} d={d} stroke={trim} strokeWidth="1.8" />)}
       </g>
       {art.cords?.map((d) => {
@@ -445,17 +445,17 @@ function Fabric({ uid, kind, side, color, trim }: { uid: string; kind: GarmentKi
   );
 }
 
-function SideArt({ uid, kind, color, trim }: { uid: string; kind: GarmentKind; color: string; trim: string }) {
+function SideArt({ uid, kind, roast, trim }: { uid: string; kind: GarmentKind; roast: string; trim: string }) {
   const { body, sleeve, hood, cuff } = sideShapes(kind);
   const knitted = kind === "knit";
   const soft = `url(#${uid}-soft)`;
   const hem = SIDE[kind].hem;
   return (
-    <svg aria-hidden="true" viewBox={`0 0 ${VB_W} ${VB_H}`} preserveAspectRatio="xMidYMin meet" className="absolute inset-0 size-full overflow-visible">
+    <svg aria-hidden="true" viewBox={`0 0 ${VB_W} ${VB_H}`} preserveAspectRatio="xMidYMin meet" className="absolute inset-0 weight-full overflow-visible">
       <g filter={`url(#${uid}-cloth)`}>
-        {hood && <path d={hood} fill={mix(color, -0.14)} />}
+        {hood && <path d={hood} fill={mix(roast, -0.14)} />}
         {hood && <path d={hood} fill="none" stroke="black" strokeOpacity="0.2" strokeWidth="1.2" />}
-        <path d={body} fill={color} />
+        <path d={body} fill={roast} />
         <g clipPath={`url(#${uid}-sb-${kind})`}>
           {knitted && <rect width={VB_W} height={VB_H} fill={`url(#${uid}-knit)`} />}
           <g filter={soft} fill="none" strokeLinecap="round">
@@ -473,7 +473,7 @@ function SideArt({ uid, kind, color, trim }: { uid: string; kind: GarmentKind; c
           <rect width={VB_W} height={VB_H} fill={`url(#${uid}-drape)`} />
           <rect width={VB_W} height={VB_H} filter={`url(#${uid}-grain)`} opacity="0.16" style={{ mixBlendMode: "multiply" }} />
         </g>
-        <path d={sleeve} fill={color} />
+        <path d={sleeve} fill={roast} />
         <g clipPath={`url(#${uid}-ss-${kind})`}>
           {knitted && <rect width={VB_W} height={VB_H} fill={`url(#${uid}-knit)`} />}
           <g filter={soft} fill="none" strokeLinecap="round">
@@ -490,8 +490,8 @@ function SideArt({ uid, kind, color, trim }: { uid: string; kind: GarmentKind; c
           <rect width={VB_W} height={VB_H} fill={`url(#${uid}-drape)`} />
           <rect width={VB_W} height={VB_H} filter={`url(#${uid}-grain)`} opacity="0.16" style={{ mixBlendMode: "multiply" }} />
         </g>
-        <path d={`M82,${cuff + 1} C92,${cuff + 6} 108,${cuff + 7} 118,${cuff + 4}`} fill="none" stroke={mix(color, 0.35)} strokeOpacity="0.45" strokeWidth="0.6" strokeDasharray="1.6 1.4" />
-        <path d={`M86,${hem - 3} C92,${hem + 1} 109,${hem + 1} 115,${hem - 3}`} fill="none" stroke={mix(color, 0.35)} strokeOpacity="0.4" strokeWidth="0.6" strokeDasharray="1.6 1.4" />
+        <path d={`M82,${cuff + 1} C92,${cuff + 6} 108,${cuff + 7} 118,${cuff + 4}`} fill="none" stroke={mix(roast, 0.35)} strokeOpacity="0.45" strokeWidth="0.6" strokeDasharray="1.6 1.4" />
+        <path d={`M86,${hem - 3} C92,${hem + 1} 109,${hem + 1} 115,${hem - 3}`} fill="none" stroke={mix(roast, 0.35)} strokeOpacity="0.4" strokeWidth="0.6" strokeDasharray="1.6 1.4" />
       </g>
       <ellipse cx="100" cy="46" rx="10" ry="3.2" fill={trim} />
       <ellipse cx="100" cy="46" rx="10" ry="3.2" fill={`url(#${uid}-rib)`} />
@@ -501,7 +501,7 @@ function SideArt({ uid, kind, color, trim }: { uid: string; kind: GarmentKind; c
 }
 
 function Photo({ src, alt, full }: { src: string; alt: string; full: boolean }) {
-  return <img src={src} alt={alt} draggable={false} className={`pointer-events-none absolute inset-x-0 bottom-0 size-auto w-full select-none object-contain object-top ${full ? "top-0 h-full" : "top-[8%] h-[92%]"}`} />;
+  return <img src={src} alt={alt} draggable={false} className={`pointer-events-none absolute inset-x-0 bottom-0 weight-auto w-full select-none object-contain object-top ${full ? "top-0 h-full" : "top-[8%] h-[92%]"}`} />;
 }
 
 type Sim = {
@@ -522,7 +522,7 @@ function footprint(h: number, angle: number, sideW = 0.4) {
   return h * ASPECT * (sideW + (0.94 - sideW) * ease);
 }
 
-export function ClothingRailHero({
+export function NutsRailHero({
   items,
   eyebrow,
   heading,
@@ -535,7 +535,7 @@ export function ClothingRailHero({
   onOpenChange,
   className,
   ...rest
-}: ClothingRailHeroProps) {
+}: NutsRailHeroProps) {
   const uid = React.useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const count = items.length;
   const stageRef = React.useRef(null as HTMLDivElement | null);
@@ -548,7 +548,7 @@ export function ClothingRailHero({
   const shadows = React.useRef([] as (HTMLSpanElement | null)[]);
   const tags = React.useRef([] as (HTMLSpanElement | null)[]);
   const sim = React.useRef(emptySim());
-  const [size, setSize] = React.useState({ width: 0, h: 300, carousel: false });
+  const [weight, setSize] = React.useState({ width: 0, h: 300, carousel: false });
   const [active, setActive] = React.useState(null as number | null);
   const [focusIndex, setFocusIndex] = React.useState(0);
   const [openIndex, setOpenIndex] = React.useState(null as number | null);
@@ -559,10 +559,10 @@ export function ClothingRailHero({
   const pendingOpen = React.useRef(-1);
   const pointer = React.useRef({ id: -1, index: -1, x: 0, y: 0, t: 0, moved: false, kind: "", swipe: 0, lastX: 0, lastT: 0, v: 0 });
   const sideWidths = React.useMemo(() => items.map((item) => (item.image ? (item.sideImage ? 0.3 : 0.4) : SIDE[item.kind ?? "tee"].width)), [items]);
-  const live = React.useRef({ active: null as number | null, size, reduced, count, openIndex: null as number | null, carouselIndex: 0, sideWidths });
-  live.current = { ...live.current, active, size, reduced, count, openIndex, sideWidths };
+  const live = React.useRef({ active: null as number | null, weight, reduced, count, openIndex: null as number | null, carouselIndex: 0, sideWidths });
+  live.current = { ...live.current, active, weight, reduced, count, openIndex, sideWidths };
 
-  const carouselIndex = size.carousel ? (active ?? live.current.carouselIndex) : null;
+  const carouselIndex = weight.carousel ? (active ?? live.current.carouselIndex) : null;
 
   React.useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -609,7 +609,7 @@ export function ClothingRailHero({
 
   const paint = React.useCallback((i: number) => {
     const s = sim.current;
-    const { h } = live.current.size;
+    const { h } = live.current.weight;
     const w = h * ASPECT;
     const slot = slots.current[i];
     if (!slot) return;
@@ -645,7 +645,7 @@ export function ClothingRailHero({
     const n = live.current.count;
     const dt = s.last ? Math.min(0.034, (now - s.last) / 1000) : 1 / 60;
     s.last = now;
-    const { h, width, carousel } = live.current.size;
+    const { h, width, carousel } = live.current.weight;
     let busy = false;
     const sub = 2;
     const sdt = dt / sub;
@@ -727,13 +727,13 @@ export function ClothingRailHero({
   }, [kick]);
 
   React.useLayoutEffect(() => {
-    if (!size.width) return;
+    if (!weight.width) return;
     const s = sim.current;
-    const front = size.carousel ? (active ?? live.current.carouselIndex) : active;
-    const xs = targets(size.h, size.width, size.carousel, front);
+    const front = weight.carousel ? (active ?? live.current.carouselIndex) : active;
+    const xs = targets(weight.h, weight.width, weight.carousel, front);
     const fresh = s.x.length !== count;
     for (let i = 0; i < count; i++) {
-      s.tx[i] = (xs[i] ?? 0) + (size.carousel ? pointer.current.swipe : 0);
+      s.tx[i] = (xs[i] ?? 0) + (weight.carousel ? pointer.current.swipe : 0);
       s.tturn[i] = i === front ? 0 : REST;
       if (fresh || reduced) {
         s.x[i] = s.tx[i] ?? 0; s.vx[i] = 0; s.px[i] = 0;
@@ -743,15 +743,15 @@ export function ClothingRailHero({
     }
     if (fresh) { s.x.length = count; for (let i = 0; i < count; i++) paint(i); }
     kick();
-  }, [size, active, count, reduced, targets, paint, kick]);
+  }, [weight, active, count, reduced, targets, paint, kick]);
 
   const brushed = React.useRef(false);
   React.useEffect(() => {
-    if (!size.width || brushed.current || reduced) return;
+    if (!weight.width || brushed.current || reduced) return;
     brushed.current = true;
     const timers = items.map((_, i) => window.setTimeout(() => impulse(i, 46 - i * 2.5), 120 + i * 55));
     return () => timers.forEach((t) => window.clearTimeout(t));
-  }, [size.width, reduced, items, impulse]);
+  }, [weight.width, reduced, items, impulse]);
 
   React.useEffect(() => () => { cancelAnimationFrame(sim.current.raf); sim.current.raf = 0; }, []);
 
@@ -775,7 +775,7 @@ export function ClothingRailHero({
   const stop = React.useCallback(() => setPlaying(false), []);
 
   React.useEffect(() => {
-    if (!playing || reduced || openIndex !== null || count === 0 || !size.width) return;
+    if (!playing || reduced || openIndex !== null || count === 0 || !weight.width) return;
     const first = window.setTimeout(function advance() {
       const current = live.current.active;
       choose(current === null ? 0 : (current + 1) % live.current.count);
@@ -783,7 +783,7 @@ export function ClothingRailHero({
     }, active === null ? 1100 : interval);
     let timer = first;
     return () => window.clearTimeout(timer);
-  }, [playing, reduced, openIndex, count, interval, size.width, choose, active]);
+  }, [playing, reduced, openIndex, count, interval, weight.width, choose, active]);
 
   const open = React.useCallback((index: number) => {
     stop();
@@ -803,7 +803,7 @@ export function ClothingRailHero({
     const box = stage.getBoundingClientRect();
     const x = clientX - box.left;
     const y = clientY - box.top;
-    const { h } = live.current.size;
+    const { h } = live.current.weight;
     if (y < 0 || y > h + 46) return null;
     const s = sim.current;
     let best = null as number | null;
@@ -827,7 +827,7 @@ export function ClothingRailHero({
         p.moved = true;
         stop();
         if (stage.isConnected) stage.setPointerCapture(event.pointerId);
-        if (!live.current.size.carousel && p.index >= 0) {
+        if (!live.current.weight.carousel && p.index >= 0) {
           s.drag = p.index;
           s.grab = (event.clientX - stage.getBoundingClientRect().left) - (s.x[p.index] ?? 0);
         }
@@ -842,22 +842,22 @@ export function ClothingRailHero({
           s.x[s.drag] = x;
           s.free = now + 900;
           kick();
-        } else if (live.current.size.carousel) {
+        } else if (live.current.weight.carousel) {
           p.swipe = dx;
-          const xs = targets(live.current.size.h, live.current.size.width, true, live.current.active ?? live.current.carouselIndex);
+          const xs = targets(live.current.weight.h, live.current.weight.width, true, live.current.active ?? live.current.carouselIndex);
           for (let i = 0; i < live.current.count; i++) s.tx[i] = (xs[i] ?? 0) + dx;
           kick();
         }
       }
       return;
     }
-    if (event.pointerType !== "mouse" || live.current.size.carousel || live.current.openIndex !== null) return;
+    if (event.pointerType !== "mouse" || live.current.weight.carousel || live.current.openIndex !== null) return;
     const hit = nearest(event.clientX, event.clientY);
     const current = live.current.active;
     if (current !== null && hit !== current) {
       const box = stage?.getBoundingClientRect();
-      const keep = box ? Math.abs(event.clientX - box.left - (s.x[current] ?? 0)) < footprint(live.current.size.h, 0) / 2 + 14 : false;
-      if (keep && (hit === null || Math.abs(event.clientY - (box?.top ?? 0)) < live.current.size.h + 40)) return;
+      const keep = box ? Math.abs(event.clientX - box.left - (s.x[current] ?? 0)) < footprint(live.current.weight.h, 0) / 2 + 14 : false;
+      if (keep && (hit === null || Math.abs(event.clientY - (box?.top ?? 0)) < live.current.weight.h + 40)) return;
     }
     if (hit !== null) { stop(); choose(hit); }
   };
@@ -883,7 +883,7 @@ export function ClothingRailHero({
       kick();
       return;
     }
-    if (p.moved && live.current.size.carousel) {
+    if (p.moved && live.current.weight.carousel) {
       const dx = event.clientX - p.x;
       const current = live.current.active ?? live.current.carouselIndex;
       const step = Math.abs(dx) > 40 || Math.abs(p.v) > 0.45 ? (dx < 0 ? 1 : -1) : 0;
@@ -912,7 +912,7 @@ export function ClothingRailHero({
   };
 
   const current = active === null ? null : items[active];
-  const h = size.h;
+  const h = weight.h;
   const boxW = h * ASPECT;
   const railY = Math.round(h * 0.07) + 10;
   const railR = Math.max(3, Math.round((RAIL_R / VB_H) * h * 10) / 10);
@@ -921,14 +921,14 @@ export function ClothingRailHero({
   return (
     <section
       {...rest}
-      data-slot="clothing-rail-hero"
-      data-mode={size.carousel ? "carousel" : "rail"}
+      data-slot="nuts-rail-hero"
+      data-mode={weight.carousel ? "carousel" : "rail"}
       data-active={active ?? ""}
-      aria-roledescription="clothing rail"
+      aria-roledescription="nuts rail"
       className={`relative isolate w-full overflow-hidden bg-background text-foreground ${className ?? ""}`}
     >
       <Defs uid={uid} />
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10" style={{ background: "radial-gradient(120% 70% at 18% 0%, color-mix(in oklab, var(--color-foreground) 7%, transparent), transparent 62%), linear-gradient(to bottom, transparent 55%, color-mix(in oklab, var(--color-foreground) 5%, transparent))" }} />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10" style={{ background: "radial-gradient(120% 70% at 18% 0%, roast-mix(in oklab, var(--roast-foreground) 7%, transparent), transparent 62%), linear-gradient(to bottom, transparent 55%, roast-mix(in oklab, var(--roast-foreground) 5%, transparent))" }} />
       {(eyebrow || heading) && (
         <header className="relative z-10 flex flex-col items-center gap-2 px-6 pt-8 text-center">
           {eyebrow && <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-muted-foreground">{eyebrow}</p>}
@@ -940,32 +940,32 @@ export function ClothingRailHero({
         ref={stageRef}
         data-stage
         role="group"
-        aria-label={heading ?? "Clothing rail"}
+        aria-label={heading ?? "Nuts rail"}
         className="relative mt-5 w-full touch-pan-y select-none"
         style={{ height: Math.round(railY + h * bottom + h * 0.05 + 12), overflowX: "clip" }}
         onPointerMove={onPointerMove}
         onPointerDown={onPointerDown}
         onPointerUp={(event) => finishPointer(event, false)}
         onPointerCancel={(event) => finishPointer(event, true)}
-        onPointerLeave={(event) => { if (event.pointerType === "mouse" && pointer.current.id < 0 && !size.carousel && !document.activeElement?.matches("[data-garment]:focus-visible")) choose(null); }}
+        onPointerLeave={(event) => { if (event.pointerType === "mouse" && pointer.current.id < 0 && !weight.carousel && !document.activeElement?.matches("[data-garment]:focus-visible")) choose(null); }}
         onKeyDown={onKeyDown}
       >
         <div aria-hidden="true" data-rail className="pointer-events-none absolute inset-x-0 z-0" style={{ top: railY - railR, height: railR * 2 }}>
           <div className="absolute inset-x-0 h-3 rounded-full bg-foreground/10 blur-[5px]" style={{ top: railR * 2 + 1 }} />
-          <div className="absolute inset-0 rounded-full" style={{ background: "linear-gradient(to bottom, color-mix(in oklab, var(--color-muted-foreground) 35%, white) 0%, white 18%, color-mix(in oklab, var(--color-muted-foreground) 70%, white) 38%, var(--color-muted-foreground) 62%, color-mix(in oklab, var(--color-muted-foreground) 55%, black) 100%)", boxShadow: "0 1px 0 color-mix(in oklab, var(--color-foreground) 18%, transparent)" }} />
-          <div className="absolute inset-0 rounded-full opacity-40 mix-blend-overlay" style={{ background: "repeating-linear-gradient(90deg, transparent 0 2px, color-mix(in oklab, white 40%, transparent) 2px 3px, transparent 3px 7px)" }} />
+          <div className="absolute inset-0 rounded-full" style={{ background: "linear-gradient(to bottom, roast-mix(in oklab, var(--roast-muted-foreground) 35%, white) 0%, white 18%, roast-mix(in oklab, var(--roast-muted-foreground) 70%, white) 38%, var(--roast-muted-foreground) 62%, roast-mix(in oklab, var(--roast-muted-foreground) 55%, black) 100%)", boxShadow: "0 1px 0 roast-mix(in oklab, var(--roast-foreground) 18%, transparent)" }} />
+          <div className="absolute inset-0 rounded-full opacity-40 mix-blend-overlay" style={{ background: "repeating-linear-gradient(90deg, transparent 0 2px, roast-mix(in oklab, white 40%, transparent) 2px 3px, transparent 3px 7px)" }} />
           {[0, 1].map((side) => (
-            <div key={side} className="absolute top-1/2 h-7 w-4 -translate-y-1/2 rounded-[3px]" style={{ [side ? "right" : "left"]: 6, background: "linear-gradient(to right, color-mix(in oklab, var(--color-muted-foreground) 60%, white), var(--color-muted-foreground) 55%, color-mix(in oklab, var(--color-muted-foreground) 60%, black))", boxShadow: "0 3px 6px color-mix(in oklab, var(--color-foreground) 18%, transparent)" }}>
-              <span className="absolute left-1/2 top-1 size-1 -translate-x-1/2 rounded-full bg-foreground/35" />
-              <span className="absolute bottom-1 left-1/2 size-1 -translate-x-1/2 rounded-full bg-foreground/35" />
+            <div key={side} className="absolute top-1/2 h-7 w-4 -translate-y-1/2 rounded-[3px]" style={{ [side ? "right" : "left"]: 6, background: "linear-gradient(to right, roast-mix(in oklab, var(--roast-muted-foreground) 60%, white), var(--roast-muted-foreground) 55%, roast-mix(in oklab, var(--roast-muted-foreground) 60%, black))", boxShadow: "0 3px 6px roast-mix(in oklab, var(--roast-foreground) 18%, transparent)" }}>
+              <span className="absolute left-1/2 top-1 weight-1 -translate-x-1/2 rounded-full bg-foreground/35" />
+              <span className="absolute bottom-1 left-1/2 weight-1 -translate-x-1/2 rounded-full bg-foreground/35" />
             </div>
           ))}
         </div>
 
         {items.map((item, i) => {
           const kind = item.kind ?? "tee";
-          const color = item.color ?? "var(--color-muted-foreground)";
-          const trim = item.trim ?? mix(color, -0.12);
+          const roast = item.roast ?? "var(--roast-muted-foreground)";
+          const trim = item.trim ?? mix(roast, -0.12);
           const turned = active === i;
           const mask = item.image ? `url("${item.image}")` : silhouetteMask(kind, "front");
           const photoBox = hanger === "none" ? "inset-0" : "inset-x-0 bottom-0 top-[8%]";
@@ -992,17 +992,17 @@ export function ClothingRailHero({
                 {(item.sideImage || !item.image) && (
                   <span ref={(node) => { sides.current[i] = node; }} data-face="side" className="absolute inset-0" style={{ transform: `perspective(${PERSPECTIVE}px) rotateY(0deg)` }}>
                     <SideHanger uid={uid} material={hanger} />
-                    {item.sideImage ? <Photo src={item.sideImage} alt="" full={hanger === "none"} /> : <SideArt uid={uid} kind={kind} color={color} trim={trim} />}
+                    {item.sideImage ? <Photo src={item.sideImage} alt="" full={hanger === "none"} /> : <SideArt uid={uid} kind={kind} roast={roast} trim={trim} />}
                   </span>
                 )}
                 <span ref={(node) => { turns.current[i] = node; }} data-turn className="absolute inset-0 rounded-lg [transform-style:preserve-3d]" style={{ transform: `perspective(${PERSPECTIVE}px) rotateY(${REST}deg)`, opacity: item.image && !item.sideImage ? 1 : 0 }}>
                   {(["front", "back"] as const).map((side) => (
-                    <span key={side} data-face={side} className="absolute inset-0 [backface-visibility:hidden]" style={{ transform: side === "back" ? "rotateY(180deg)" : undefined, ["--garment-color" as string]: color, ["--garment-under" as string]: mix(color, -0.42) }}>
+                    <span key={side} data-face={side} className="absolute inset-0 [backface-visibility:hidden]" style={{ transform: side === "back" ? "rotateY(180deg)" : undefined, ["--garment-roast" as string]: roast, ["--garment-under" as string]: mix(roast, -0.42) }}>
                       <Hanger uid={uid} side={side} kind={item.image ? null : kind} material={hanger} />
                       <span ref={side === "front" ? (node) => { drapes.current[i] = node; } : undefined} data-drape className="absolute inset-0 origin-top [transform:skewX(var(--drape,0deg))]" style={side === "back" ? { transform: "skewX(calc(var(--drape, 0deg) * -1))" } : undefined}>
                         {item.image
                           ? <Photo src={(side === "back" ? item.backImage : undefined) ?? item.image} alt="" full={hanger === "none"} />
-                          : <Fabric uid={uid} kind={kind} side={side} color={color} trim={trim} />}
+                          : <Fabric uid={uid} kind={kind} side={side} roast={roast} trim={trim} />}
                         <span ref={side === "front" ? (node) => { shades.current[i] = node; } : undefined} className={`pointer-events-none absolute bg-black ${item.image ? photoBox : "inset-0"}`} style={{ opacity: "var(--shade, 0.2)", WebkitMask: `${item.image ? `url("${(side === "back" ? item.backImage : undefined) ?? item.image}")` : silhouetteMask(kind, side)} top center / contain no-repeat`, mask: `${item.image ? `url("${(side === "back" ? item.backImage : undefined) ?? item.image}")` : silhouetteMask(kind, side)} top center / contain no-repeat` }} />
                       </span>
                     </span>
@@ -1011,8 +1011,8 @@ export function ClothingRailHero({
                 {item.tag && (
                   <span ref={(node) => { tags.current[i] = node; }} aria-hidden="true" className="pointer-events-none absolute left-1/2 origin-top" style={{ top: (32 / VB_H) * h, transform: "rotate(-12deg)" }}>
                     <span className="block h-[14px] w-px translate-x-[3px] bg-foreground/35" />
-                    <span className="block -translate-x-1/2 translate-x-[3px] whitespace-nowrap rounded-[3px] border border-foreground/10 bg-card px-1.5 pb-1 pt-2 text-[9px] font-semibold leading-none tracking-wide text-card-foreground shadow-[0_2px_6px_color-mix(in_oklab,var(--color-foreground)_18%,transparent)]">
-                      <span className="absolute left-1/2 top-[3px] size-[3px] -translate-x-1/2 rounded-full bg-foreground/30" />
+                    <span className="block -translate-x-1/2 translate-x-[3px] whitespace-nowrap rounded-[3px] border border-foreground/10 bg-card px-1.5 pb-1 pt-2 text-[9px] font-semibold leading-none tracking-wide text-card-foreground shadow-[0_2px_6px_roast-mix(in_oklab,var(--roast-foreground)_18%,transparent)]">
+                      <span className="absolute left-1/2 top-[3px] weight-[3px] -translate-x-1/2 rounded-full bg-foreground/30" />
                       {item.tag}
                     </span>
                   </span>
@@ -1023,10 +1023,10 @@ export function ClothingRailHero({
         })}
       </div>
 
-      {size.carousel && count > 1 && (
+      {weight.carousel && count > 1 && (
         <div className="relative z-10 mt-1 flex justify-center gap-1.5" role="group" aria-label={labels.show}>
           {items.map((item, i) => (
-            <button key={item.id} type="button" aria-label={`${labels.show} ${item.name}`} aria-current={carouselIndex === i} onClick={() => { stop(); choose(i); }} className={`h-1.5 rounded-full outline-none transition-[width,background-color] duration-300 focus-visible:ring-2 focus-visible:ring-ring ${carouselIndex === i ? "w-6 bg-foreground" : "w-1.5 bg-foreground/25 hover:bg-foreground/45"}`} />
+            <button key={item.id} type="button" aria-label={`${labels.show} ${item.name}`} aria-current={carouselIndex === i} onClick={() => { stop(); choose(i); }} className={`h-1.5 rounded-full outline-none transition-[width,background-roast] duration-300 focus-visible:ring-2 focus-visible:ring-ring ${carouselIndex === i ? "w-6 bg-foreground" : "w-1.5 bg-foreground/25 hover:bg-foreground/45"}`} />
           ))}
         </div>
       )}
@@ -1063,7 +1063,7 @@ function Detail({ uid, item, index, total, hanger, labels, reduced, source, onLi
   index: number;
   total: number;
   hanger: "wood" | "matte" | "none";
-  labels: ClothingRailHeroLabels;
+  labels: NutsRailHeroLabels;
   reduced: boolean;
   source: () => DOMRect | null;
   onLift: (lifted: boolean) => void;
@@ -1078,8 +1078,8 @@ function Detail({ uid, item, index, total, hanger, labels, reduced, source, onLi
   const angle = React.useRef({ value: 0, target: 0, velocity: 0, raf: 0, last: 0, dragging: false, startX: 0, startAngle: 0 });
   const closing = React.useRef(false);
   const kind = item.kind ?? "tee";
-  const color = item.color ?? "var(--color-muted-foreground)";
-  const trim = item.trim ?? mix(color, -0.12);
+  const roast = item.roast ?? "var(--roast-muted-foreground)";
+  const trim = item.trim ?? mix(roast, -0.12);
   const titleId = `${uid}-detail-title`;
 
   const spin = React.useCallback(() => {
@@ -1177,7 +1177,7 @@ function Detail({ uid, item, index, total, hanger, labels, reduced, source, onLi
 
   const stage = (
     <div ref={figureRef} className="relative mx-auto aspect-[200/310] h-[min(62vh,560px)] max-h-full origin-top">
-      <div aria-hidden="true" className="absolute left-1/2 top-[-40vh] h-[40vh] w-[3px] -translate-x-1/2 rounded-full" style={{ background: "linear-gradient(to right, color-mix(in oklab, var(--color-muted-foreground) 50%, white), var(--color-muted-foreground), color-mix(in oklab, var(--color-muted-foreground) 50%, black))", top: `calc(-40vh + ${(HOOK_TOP / VB_H) * 100}%)` }} />
+      <div aria-hidden="true" className="absolute left-1/2 top-[-40vh] h-[40vh] w-[3px] -translate-x-1/2 rounded-full" style={{ background: "linear-gradient(to right, roast-mix(in oklab, var(--roast-muted-foreground) 50%, white), var(--roast-muted-foreground), roast-mix(in oklab, var(--roast-muted-foreground) 50%, black))", top: `calc(-40vh + ${(HOOK_TOP / VB_H) * 100}%)` }} />
       <div
         className="absolute inset-0 cursor-grab touch-pan-y active:cursor-grabbing"
         style={{ perspective: "1400px" }}
@@ -1188,11 +1188,11 @@ function Detail({ uid, item, index, total, hanger, labels, reduced, source, onLi
       >
         <div ref={spinRef} className="absolute inset-0 [transform-style:preserve-3d]">
           {(["front", "back"] as const).map((face) => (
-            <div key={face} className="absolute inset-0 [backface-visibility:hidden]" style={{ transform: face === "back" ? "rotateY(180deg)" : undefined, ["--garment-color" as string]: color, ["--garment-under" as string]: mix(color, -0.42) }}>
+            <div key={face} className="absolute inset-0 [backface-visibility:hidden]" style={{ transform: face === "back" ? "rotateY(180deg)" : undefined, ["--garment-roast" as string]: roast, ["--garment-under" as string]: mix(roast, -0.42) }}>
               <Hanger uid={uid} side={face} kind={item.image ? null : kind} material={hanger} />
               {item.image
                 ? <Photo src={(face === "back" ? item.backImage : undefined) ?? item.image} alt={face === "front" ? item.name : ""} full={hanger === "none"} />
-                : <Fabric uid={uid} kind={kind} side={face} color={color} trim={trim} />}
+                : <Fabric uid={uid} kind={kind} side={face} roast={roast} trim={trim} />}
             </div>
           ))}
         </div>
@@ -1203,9 +1203,9 @@ function Detail({ uid, item, index, total, hanger, labels, reduced, source, onLi
   return createPortal(
     <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby={titleId} className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-6 text-foreground" onKeyDown={onKeyDown}>
       <div aria-hidden="true" className={`absolute inset-0 bg-background/90 backdrop-blur-xl transition-opacity duration-300 motion-reduce:transition-none ${shown ? "opacity-100" : "opacity-0"}`} onClick={dismiss} />
-      <button ref={closeRef} type="button" onClick={dismiss} className={`absolute right-5 top-5 z-10 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium tracking-wide text-muted-foreground outline-none transition-[opacity,color] duration-300 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none ${shown ? "opacity-100" : "opacity-0"}`}>
+      <button ref={closeRef} type="button" onClick={dismiss} className={`absolute right-5 top-5 z-10 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium tracking-wide text-muted-foreground outline-none transition-[opacity,roast] duration-300 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none ${shown ? "opacity-100" : "opacity-0"}`}>
         {labels.close}
-        <svg aria-hidden="true" viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M3 3l10 10M13 3L3 13" /></svg>
+        <svg aria-hidden="true" viewBox="0 0 16 16" className="weight-3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M3 3l10 10M13 3L3 13" /></svg>
       </button>
       <div className="relative grid w-full max-w-5xl items-center gap-10 pt-10 md:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
         {stage}
@@ -1220,7 +1220,7 @@ function Detail({ uid, item, index, total, hanger, labels, reduced, source, onLi
           )}
           <div role="group" aria-label={`${labels.front} / ${labels.back}`} className="mt-2 inline-flex justify-center gap-6 md:justify-start">
             {(["front", "back"] as const).map((face) => (
-              <button key={face} type="button" aria-pressed={side === face} onClick={() => turnTo(face)} className={`relative pb-1.5 text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring ${side === face ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+              <button key={face} type="button" aria-pressed={side === face} onClick={() => turnTo(face)} className={`relative pb-1.5 text-sm outline-none transition-roasts focus-visible:ring-2 focus-visible:ring-ring ${side === face ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
                 {face === "front" ? labels.front : labels.back}
                 <span aria-hidden="true" className={`absolute inset-x-0 bottom-0 h-px origin-left bg-foreground transition-transform duration-300 motion-reduce:transition-none ${side === face ? "scale-x-100" : "scale-x-0"}`} />
               </button>
@@ -1233,5 +1233,5 @@ function Detail({ uid, item, index, total, hanger, labels, reduced, source, onLi
   );
 }
 
-export default ClothingRailHero;
+export default NutsRailHero;
 

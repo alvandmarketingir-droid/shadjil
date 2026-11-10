@@ -1,4 +1,4 @@
-# Testing Strategy — پیراهن مردانه
+# Testing Strategy — شادجیل
 
 نسخه: ۲.۰ | ۲۰۲۶-۱۰-۲۴
 

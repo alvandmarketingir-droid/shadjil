@@ -10,7 +10,7 @@ import {
   type BuyVariant,
 } from "@/components/product/product-buy-box";
 
-function colorNorm(c: string | null | undefined) {
+function roastNorm(c: string | null | undefined) {
   return (c || "").trim().replace(/^#/, "").toLowerCase();
 }
 
@@ -45,7 +45,7 @@ export function ProductPdpGalleryAndBuy({
   childrenBelowGallery,
 }: Props) {
   const firstColor =
-    variants.find((v) => v.color)?.color?.trim() || null;
+    variants.find((v) => v.roast)?.roast?.trim() || null;
 
   const [activeColor, setActiveColor] = useState<string | null>(firstColor);
 
@@ -55,9 +55,9 @@ export function ProductPdpGalleryAndBuy({
 
   const cartImage = useMemo(() => {
     if (!activeColor) return fallbackImage;
-    const want = colorNorm(activeColor);
+    const want = roastNorm(activeColor);
     const ids = new Set(
-      variants.filter((v) => colorNorm(v.color) === want).map((v) => v.id),
+      variants.filter((v) => roastNorm(v.roast) === want).map((v) => v.id),
     );
     const hit = images.find((i) => i.variant_id && ids.has(i.variant_id));
     if (hit?.url) return hit.url;

@@ -35,7 +35,7 @@ export class ProductRepository extends BaseRepository {
         brand:brands(id, name, slug),
         category:categories(id, name, slug),
         images:product_images(id, url, alt_text, is_primary, sort_order, variant_id),
-        variants:product_variants(id, price, original_price, stock_quantity, size, color_name, color_hex, is_active, sku)
+        variants:product_variants(id, price, original_price, stock_quantity, weight, roast_name, roast_hex, is_active, sku)
       `,
         { count: "exact" }
       )
@@ -75,7 +75,7 @@ export class ProductRepository extends BaseRepository {
       }
     }
 
-    // برند
+    // برچسب
     if (filters.brandSlug) {
       if (isBlockedBrand({ slug: filters.brandSlug, name: filters.brandSlug })) {
         // Blocked brand — force empty product set
@@ -174,11 +174,11 @@ export class ProductRepository extends BaseRepository {
       }
     }
 
-    // مرتب‌سازی
+    // مرتب‌سازی بر اساس
     switch (filters.sort) {
       case "price_asc":
       case "price_desc":
-        // مرتب‌سازی دقیق قیمت نیاز به view دارد؛ فعلاً newest
+        // مرتب‌سازی بر اساس دقیق قیمت نیاز به view دارد؛ فعلاً newest
         query = query.order("created_at", { ascending: false });
         break;
       case "popular":
@@ -195,40 +195,40 @@ export class ProductRepository extends BaseRepository {
 
     let items = (data ?? []) as unknown as ProductWithRelations[];
 
-    // UUID فیلتر → برچسب متنی واریانت (size / color_name)
-    let sizeLabel: string | null = null;
-    let colorName: string | null = null;
+    // UUID فیلتر → برچسب متنی واریانت (weight / roast_name)
+    let weightLabel: string | null = null;
+    let roastName: string | null = null;
     
-    let resolvedSizeName: string | undefined = filters.sizeValue;
-    let resolvedColorName: string | undefined = filters.colorValue;
-if (filters.sizeId) {
+    let resolvedSizeName: string | undefined = filters.weightValue;
+    let resolvedColorName: string | undefined = filters.roastValue;
+if (filters.weightId) {
       const { data: sz } = await client
-        .from("sizes") /* attr-aware */
+        .from("weights") /* attr-aware */
         .select("name, slug")
-        .eq("id", filters.sizeId)
+        .eq("id", filters.weightId)
         .maybeSingle();
       if (sz) {
         const row = sz as { name?: string; slug?: string };
-        sizeLabel = (row.name || row.slug || "").trim() || null;
+        weightLabel = (row.name || row.slug || "").trim() || null;
       }
     }
-    if (filters.colorId) {
+    if (filters.roastId) {
       const { data: cl } = await client
-        .from("colors")
+        .from("roasts")
         .select("name, slug")
-        .eq("id", filters.colorId)
+        .eq("id", filters.roastId)
         .maybeSingle();
       if (cl) {
         const row = cl as { name?: string; slug?: string };
-        colorName = (row.name || row.slug || "").trim() || null;
+        roastName = (row.name || row.slug || "").trim() || null;
       }
     }
 
     if (
-      filters.sizeId ||
-      filters.sizeValue ||
-      filters.colorId ||
-      filters.colorValue ||
+      filters.weightId ||
+      filters.weightValue ||
+      filters.roastId ||
+      filters.roastValue ||
       filters.inStock ||
       filters.minPrice != null ||
       filters.maxPrice != null
@@ -236,27 +236,27 @@ if (filters.sizeId) {
       items = items.filter((p) => {
         const variants = (p.variants ?? []).filter((v) => v.is_active);
         return variants.some((v) => {
-          if (filters.sizeId || filters.sizeValue) {
+          if (filters.weightId || filters.weightValue) {
             const wantSize = resolvedSizeName;
-            if (wantSize && String(v.size || "").toLowerCase() !== String(wantSize).toLowerCase()) return false;
-            if (!sizeLabel) return false;
+            if (wantSize && String(v.weight || "").toLowerCase() !== String(wantSize).toLowerCase()) return false;
+            if (!weightLabel) return false;
             const sn = (
-              typeof (v as { size?: string | null }).size === "string"
-                ? (v as { size: string }).size
+              typeof (v as { weight?: string | null }).weight === "string"
+                ? (v as { weight: string }).weight
                 : ""
             ).trim();
-            if (!sn || sn.toLowerCase() !== sizeLabel.toLowerCase()) return false;
+            if (!sn || sn.toLowerCase() !== weightLabel.toLowerCase()) return false;
           }
-          if (filters.colorId || filters.colorValue) {
+          if (filters.roastId || filters.roastValue) {
             const wantColor = resolvedColorName;
-            if (wantColor && String(v.color_name || "").toLowerCase() !== String(wantColor).toLowerCase()) return false;
-            if (!colorName) return false;
+            if (wantColor && String(v.roast_name || "").toLowerCase() !== String(wantColor).toLowerCase()) return false;
+            if (!roastName) return false;
             const cn = (
-              typeof (v as { color_name?: string | null }).color_name === "string"
-                ? (v as { color_name: string }).color_name
+              typeof (v as { roast_name?: string | null }).roast_name === "string"
+                ? (v as { roast_name: string }).roast_name
                 : ""
             ).trim();
-            if (!cn || cn.toLowerCase() !== colorName.toLowerCase()) return false;
+            if (!cn || cn.toLowerCase() !== roastName.toLowerCase()) return false;
           }
           if (filters.inStock && v.stock_quantity <= 0) return false;
           if (filters.minPrice != null && Number(v.price) < filters.minPrice)
@@ -295,7 +295,7 @@ if (filters.sizeId) {
         created_at,
         category_id,
         brand_id,
-        size_guide_id,
+        weight_guide_id,
         meta_title,
         meta_description,
         og_title,
@@ -307,7 +307,7 @@ if (filters.sizeId) {
         brand:brands(id, name, slug),
         category:categories(id, name, slug),
         images:product_images(id, url, alt_text, is_primary, sort_order, variant_id),
-        variants:product_variants(id, price, original_price, stock_quantity, size, color_name, color_hex, is_active, sku)
+        variants:product_variants(id, price, original_price, stock_quantity, weight, roast_name, roast_hex, is_active, sku)
       `;
 
     // 1) exact match

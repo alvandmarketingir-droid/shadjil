@@ -127,7 +127,7 @@ export async function adminSeoSiteReportAction(): Promise<
       const robotsIndex = b.robots_index !== false;
       const base = { hasMetaTitle, hasMetaDesc, hasKeyphrase, robotsIndex };
       rows.push({
-        type: "برند",
+        type: "برچسب‌ها",
         id: b.id,
         title: b.name,
         slug: b.slug,

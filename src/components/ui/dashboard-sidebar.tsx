@@ -79,7 +79,7 @@ function NavRow({
       <div className="flex items-center gap-1.5">
         <item.icon
           className={cn(
-            "h-4 w-4 shrink-0 transition-colors",
+            "h-4 w-4 shrink-0 transition-roasts",
             active
               ? "text-foreground"
               : "text-muted-foreground/70 group-hover:text-foreground/70",
@@ -272,7 +272,7 @@ export function CustomerDashboardShell({
               <button
                 type="button"
                 onClick={() => setOpen((v) => !v)}
-                className="text-muted-foreground hover:bg-black/5 hover:text-foreground hidden rounded-md p-1.5 transition-colors lg:inline-flex dark:hover:bg-white/5"
+                className="text-muted-foreground hover:bg-black/5 hover:text-foreground hidden rounded-md p-1.5 transition-roasts lg:inline-flex dark:hover:bg-white/5"
                 aria-label="منو"
               >
                 {open ? (

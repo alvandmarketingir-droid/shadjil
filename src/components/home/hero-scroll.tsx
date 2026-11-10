@@ -7,11 +7,10 @@ import { ArrowFillButton } from "@/components/ui/arrow-fill-button";
 const FRAME_COUNT = 70;
 const SCROLL_VH = 320;
 
-/** بازه‌های متن (ایندکس فریم ۰-based، مطابق اسکراب فعلی) */
 const SLIDES = [
-  { start: 0, end: 23, text: "استایلی که فکر شده" },
-  { start: 24, end: 48, text: "انواع کیفیت و برند" },
-  { start: 48, end: 69, text: "پیراهن مردانه" },
+  { start: 0, end: 23, text: "تازه‌ترین آجیل و خشکبار" },
+  { start: 24, end: 48, text: "خرما و سوغات باکیفیت" },
+  { start: 48, end: 69, text: "شادجیل" },
 ] as const;
 
 const FADE_FRAMES = 2.5;
@@ -21,7 +20,6 @@ function frameSrc(i: number) {
   return `/hero/frames/frame-${String(i).padStart(3, "0")}.webp`;
 }
 
-/** opacity نرم داخل بازه [start, end] */
 function rangeOpacity(idx: number, start: number, end: number, fade = FADE_FRAMES) {
   if (idx < start - 0.001 || idx > end + 0.001) return 0;
   const fadeIn = Math.min(1, Math.max(0, (idx - start) / fade));
@@ -29,26 +27,25 @@ function rangeOpacity(idx: number, start: number, end: number, fade = FADE_FRAME
   return Math.min(fadeIn, fadeOut);
 }
 
-/** سایز دسکتاپ فقط — موبایل همان clamp والد */
 function TitleContent({ text }: { text: string }) {
-  if (text === "استایلی که فکر شده") {
+  if (text === "تازه‌ترین آجیل و خشکبار") {
     return (
       <>
-        <span className="text-[40px] text-white md:text-[55px] lg:text-[90px]">استایلی</span>{" "}
-        <span className="text-[20px] font-thin text-white md:text-[30px] lg:text-[40px]">که فکر شده</span>
+        <span className="text-[40px] text-white md:text-[55px] lg:text-[90px]">تازه‌ترین</span>{" "}
+        <span className="text-[20px] font-thin text-white md:text-[30px] lg:text-[40px]">آجیل و خشکبار</span>
       </>
     );
   }
-  if (text === "انواع کیفیت و برند") {
+  if (text === "خرما و سوغات باکیفیت") {
     return (
       <>
-        <span className="text-[20px] font-thin text-white md:text-[30px] lg:text-[40px]">انواع</span>{" "}
-        <span className="text-[40px] text-white md:text-[55px] lg:text-[90px]">کیفیت و برند</span>
+        <span className="text-[20px] font-thin text-white md:text-[30px] lg:text-[40px]">خرما و</span>{" "}
+        <span className="text-[40px] text-white md:text-[55px] lg:text-[90px]">سوغات باکیفیت</span>
       </>
     );
   }
-  if (text === "پیراهن مردانه") {
-    return <span className="text-[40px] text-white md:text-[55px] lg:text-[90px]">پیراهن مردانه</span>;
+  if (text === "شادجیل") {
+    return <span className="text-[40px] text-white md:text-[55px] lg:text-[90px]">شادجیل</span>;
   }
   return <>{text}</>;
 }
@@ -138,13 +135,11 @@ export function HeroScroll() {
       });
     (async () => {
       await loadOne(0);
-      // Low concurrency after first frame — avoids contending with LCP/fonts (same visuals).
       const CONCURRENCY = 3;
       let next = 1;
       const workers = Array.from({ length: CONCURRENCY }, async () => {
         while (!cancelled && next < FRAME_COUNT) {
           const i = next++;
-          // Yield to idle when available so scroll/INP stay responsive.
           await new Promise<void>((r) => {
             if (typeof requestIdleCallback === "function") {
               requestIdleCallback(() => r(), { timeout: 400 });
@@ -212,19 +207,18 @@ export function HeroScroll() {
       aria-label="هیرو"
       dir="rtl"
     >
-
-    <style>{`
-      @keyframes hero-scroll-bounce {
-        0%, 100% { transform: translateY(0); opacity: 0.85; }
-        50% { transform: translateY(8px); opacity: 1; }
-      }
-      .hero-scroll-hint {
-        animation: hero-scroll-bounce 1.6s ease-in-out infinite;
-      }
-      @media (prefers-reduced-motion: reduce) {
-        .hero-scroll-hint { animation: none; }
-      }
-    `}</style>
+      <style>{`
+        @keyframes hero-scroll-bounce {
+          0%, 100% { transform: translateY(0); opacity: 0.85; }
+          50% { transform: translateY(8px); opacity: 1; }
+        }
+        .hero-scroll-hint {
+          animation: hero-scroll-bounce 1.6s ease-in-out infinite;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hero-scroll-hint { animation: none; }
+        }
+      `}</style>
 
       <div
         ref={stageRef}
@@ -253,7 +247,6 @@ export function HeroScroll() {
           style={{ width: "100%", height: "100%" }}
         />
 
-        {/* overlay تیره فقط در دارک مود */}
         <div
           className="pointer-events-none absolute inset-0 z-[5] bg-transparent dark:bg-black/25"
           aria-hidden
@@ -266,7 +259,6 @@ export function HeroScroll() {
           }}
         />
 
-        {/* لایه متن اسکراب — وسط صفحه */}
         <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center px-6">
           <div className="relative flex w-full max-w-3xl flex-col items-center justify-center text-center">
             {SLIDES.map((slide, i) => {
@@ -291,7 +283,6 @@ export function HeroScroll() {
               );
             })}
 
-            {/* دکمه از فریم ۴۸ — زیر متن آخر */}
             <div
               className="pointer-events-auto mt-20 flex translate-y-[8px] justify-center sm:mt-24 sm:translate-y-[15px]"
               style={{
@@ -302,12 +293,9 @@ export function HeroScroll() {
             >
               <ArrowFillButton href="/products" btnText="خرید آنلاین" className="pointer-events-auto" />
             </div>
-
-
-
           </div>
         </div>
-        {/* نشانگر اسکرول — وسط استیج، سفید */}
+
         <div
           className="pointer-events-none absolute inset-0 z-30 flex flex-col items-center justify-center gap-2"
           style={{
@@ -323,7 +311,6 @@ export function HeroScroll() {
             <ChevronDown className="h-12 w-12 sm:h-16 sm:w-16 lg:h-[100px] lg:w-[100px]" strokeWidth={2.25} />
           </span>
         </div>
-
       </div>
     </section>
   );

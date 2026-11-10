@@ -10,7 +10,7 @@ export type ColorRow = {
 export class ColorRepository extends BaseRepository {
   async findAllActive(): Promise<ColorRow[]> {
     const { data, error } = await (await this.getClient())
-      .from("colors")
+      .from("roasts")
       .select("id, name, slug, hex_code, sort_order")
       .eq("is_active", true)
       .order("sort_order");
@@ -25,7 +25,7 @@ export class ColorRepository extends BaseRepository {
 
   async findBySlug(slug: string): Promise<ColorRow | null> {
     const { data, error } = await (await this.getClient())
-      .from("colors")
+      .from("roasts")
       .select("id, name, slug, hex_code")
       .eq("slug", slug)
       .maybeSingle();

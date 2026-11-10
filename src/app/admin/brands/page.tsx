@@ -180,7 +180,7 @@ export default function AdminPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold text-primary">
-              {showArchived ? "بایگانی برندها" : "برندها"}
+              {showArchived ? "بایگانی برچسبها" : "برچسبها"}
             </h1>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -188,7 +188,7 @@ export default function AdminPage() {
               href="/admin/brands/new"
               className="bg-primary text-primary-foreground rounded-xl px-4 py-2 text-sm font-medium"
             >
-              برند جدید
+              برچسب جدید
             </Link>
 <button
               type="button"
@@ -224,7 +224,7 @@ export default function AdminPage() {
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="نام برند جدید"
+            placeholder="نام برچسب جدید"
             className="border-input bg-background h-10 min-w-[12rem] flex-1 rounded-xl border px-3 text-sm"
             required
           />
@@ -242,7 +242,7 @@ export default function AdminPage() {
             type="search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="جستجو نام یا اسلاگ…"
+            placeholder="جستجوی آجیل، خشکبار، خرما..."ی آجیل و خشکبار نام یا اسلاگ…"
             className="border-input bg-background h-10 min-w-[200px] flex-1 rounded-xl border px-3 text-sm"
           />
           <select
@@ -278,7 +278,7 @@ export default function AdminPage() {
           <div className="flex justify-center py-16"><LumaSpin /></div>
         ) : visible.length === 0 ? (
           <div className="border-border rounded-2xl border py-16 text-center">
-            <p className="text-muted-foreground text-sm">برندی یافت نشد.</p>
+            <p className="text-muted-foreground text-sm">برچسبی یافت نشد.</p>
           </div>
         ) : (
           <div className="table-scroll border-border overflow-x-auto rounded-2xl border">

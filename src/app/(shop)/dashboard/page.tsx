@@ -194,7 +194,7 @@ export default function BuyerDashboardPage() {
     shipping_city?: string | null;
     tracking_number?: string | null;
     created_at?: string;
-    items?: { id: string; title: string; size_name?: string | null; quantity: number }[];
+    items?: { id: string; title: string; weight_name?: string | null; quantity: number }[];
   } | null>(null);
   const [trackError, setTrackError] = useState<string | null>(null);
 
@@ -484,8 +484,8 @@ useEffect(() => {
           prev.filter((x) => x.variantId !== line.variantId)
         );
         removeFromCart(line.productId, {
-          color: line.color,
-          size: line.size,
+          roast: line.roast,
+          weight: line.weight,
         });
         window.dispatchEvent(new CustomEvent("pm:cart-changed"));
       }
@@ -668,7 +668,7 @@ useEffect(() => {
                       {(o.order_items ?? []).map((it: any) => (
                         <li key={it.id}>
                           {it.title}
-                          {it.size_name ? ` · ${it.size_name}` : ""}
+                          {it.weight_name ? ` · ${it.weight_name}` : ""}
                           {it.quantity > 1 ? ` × ${it.quantity}` : ""}
                         </li>
                       ))}
@@ -1638,7 +1638,7 @@ useEffect(() => {
                   value={
                     [
                       "کالا با توضیحات مطابقت ندارد",
-                      "سایز نامناسب است",
+                      "مناسبت‌ها نامناسب است",
                       "کالا آسیب دیده رسیده",
                       "انصراف از خرید",
                       "سایر",
@@ -1658,7 +1658,7 @@ useEffect(() => {
                   <option value="کالا با توضیحات مطابقت ندارد">
                     کالا با توضیحات مطابقت ندارد
                   </option>
-                  <option value="سایز نامناسب است">سایز نامناسب است</option>
+                  <option value="مناسبت‌ها نامناسب است">مناسبت‌ها نامناسب است</option>
                   <option value="کالا آسیب دیده رسیده">کالا آسیب دیده رسیده</option>
                   <option value="انصراف از خرید">انصراف از خرید</option>
                   <option value="سایر">سایر (توضیح بنویسید)</option>
@@ -1779,26 +1779,26 @@ useEffect(() => {
                         <div className="min-w-0 text-right">
                           <p className="truncate font-medium">{line.title}</p>
                           <div className="text-muted-foreground mt-1 flex flex-wrap items-center gap-2 text-xs">
-                            {line.colorHex || line.color ? (
+                            {line.roastHex || line.roast ? (
                               <span
                                 className="border-border inline-block h-4 w-4 rounded-full border"
                                 style={{
                                   backgroundColor:
-                                    line.colorHex ||
-                                    (line.color?.startsWith("#")
-                                      ? line.color
+                                    line.roastHex ||
+                                    (line.roast?.startsWith("#")
+                                      ? line.roast
                                       : undefined),
                                 }}
-                                title={line.color || ""}
+                                title={line.roast || ""}
                               />
                             ) : null}
-                            {line.size ? (
+                            {line.weight ? (
                               <span className="border-border rounded-md border px-1.5 py-0.5 text-[11px] font-medium text-foreground">
-                                {line.size}
+                                {line.weight}
                               </span>
                             ) : null}
-                            {line.color && !line.color.startsWith("#") ? (
-                              <span>{line.color}</span>
+                            {line.roast && !line.roast.startsWith("#") ? (
+                              <span>{line.roast}</span>
                             ) : null}
                           </div>
                           <p className="text-xs">
@@ -1882,7 +1882,7 @@ useEffect(() => {
             ) : (
               <ul className="space-y-3">
                 {cart.map((p) => {
-                  const key = `${p.id}|${p.color ?? ""}|${p.size ?? ""}`;
+                  const key = `${p.id}|${p.roast ?? ""}|${p.weight ?? ""}`;
                   return (
                     <li
                       key={key}
@@ -1902,7 +1902,7 @@ useEffect(() => {
                         <div className="min-w-0 text-right">
                           <p className="truncate font-medium">{p.title}</p>
                           <p className="text-muted-foreground text-xs">
-                            {[p.size, p.color].filter(Boolean).join(" · ")}
+                            {[p.weight, p.roast].filter(Boolean).join(" · ")}
                             {(p.quantity ?? 1) > 1
                               ? ` × ${p.quantity}`
                               : ""}
@@ -1917,8 +1917,8 @@ useEffect(() => {
                         className="text-destructive text-xs"
                         onClick={() =>
                           removeFromCart(p.id, {
-                            color: p.color,
-                            size: p.size,
+                            roast: p.roast,
+                            weight: p.weight,
                           })
                         }
                       >

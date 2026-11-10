@@ -201,7 +201,7 @@ export function ShippingZonesForm() {
                     >
                       <input
                         type="checkbox"
-                        className="size-4 shrink-0"
+                        className="weight-4 shrink-0"
                         checked={checked}
                         onChange={() => toggle(m.id, p)}
                       />

@@ -1,4 +1,4 @@
-# امنیت پیراهن مردانه
+# امنیت شادجیل
 
 ## انجام‌شده در کد (کامل)
 
@@ -16,7 +16,7 @@
 ## کارهای دستی (یک‌بار — حتماً انجام بده)
 
 1. در **Supabase → SQL Editor** محتوای فایل `supabase/migrations/030_rls_hardening.sql` را اجرا کنید.
-2. در **Supabase → Authentication → URL Configuration** دامنه `https://pirahanmardane.ir` را مجاز کنید.
+2. در **Supabase → Authentication → URL Configuration** دامنه `https://shadjil.ir` را مجاز کنید.
 3. متغیرهای زیر را فقط در **Vercel → Settings → Environment Variables** (server-side) بگذارید:
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `UPSTASH_REDIS_REST_URL`
@@ -38,9 +38,9 @@
 
 ```bash
 # Health
-curl -s https://pirahanmardane.ir/api/health | jq
+curl -s https://shadjil.ir/api/health | jq
 
 # Rate limit contact (باید بعد از چند درخواست 429 بدهد)
-curl -X POST https://pirahanmardane.ir/api/contact \\
+curl -X POST https://shadjil.ir/api/contact \\
   -H "Content-Type: application/json" \\
   -d '{"name":"test","email":"a@b.com","message":"hi"}'

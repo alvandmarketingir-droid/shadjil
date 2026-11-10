@@ -160,12 +160,12 @@ export function ArrowFillButton({
         className={cn(
           "pointer-events-none absolute top-1/2 right-1.5 z-[3] inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center overflow-hidden rounded-full bg-[var(--btn-fill-bg)] text-[var(--btn-arrow)] sm:right-2 sm:h-9 sm:w-9",
           isReady &&
-            "transition-colors duration-[450ms] ease-[cubic-bezier(0.785,0.135,0.15,0.86)] group-hover:bg-[var(--btn-fill-bg-hover)] group-hover:text-[var(--btn-arrow-hover)] group-data-[pressed=true]:bg-[var(--btn-fill-bg-hover)] group-data-[pressed=true]:text-[var(--btn-arrow-hover)]",
+            "transition-roasts duration-[450ms] ease-[cubic-bezier(0.785,0.135,0.15,0.86)] group-hover:bg-[var(--btn-fill-bg-hover)] group-hover:text-[var(--btn-arrow-hover)] group-data-[pressed=true]:bg-[var(--btn-fill-bg-hover)] group-data-[pressed=true]:text-[var(--btn-arrow-hover)]",
         )}
       >
         <ArrowLeft
           className={cn(
-            "absolute top-1/2 left-1/2 size-4 scale-0 translate-x-[170%] -translate-y-1/2 text-current",
+            "absolute top-1/2 left-1/2 weight-4 scale-0 translate-x-[170%] -translate-y-1/2 text-current",
             isReady &&
               "transition-transform duration-[450ms] ease-[cubic-bezier(0.785,0.135,0.15,0.86)] group-hover:-translate-x-1/2 group-hover:scale-100 group-data-[pressed=true]:-translate-x-1/2 group-data-[pressed=true]:scale-100",
           )}
@@ -173,7 +173,7 @@ export function ArrowFillButton({
         />
         <ArrowLeft
           className={cn(
-            "absolute top-1/2 left-1/2 size-4 -translate-x-1/2 -translate-y-1/2 text-current",
+            "absolute top-1/2 left-1/2 weight-4 -translate-x-1/2 -translate-y-1/2 text-current",
             isReady &&
               "transition-transform duration-[450ms] ease-[cubic-bezier(0.785,0.135,0.15,0.86)] group-hover:-translate-x-[170%] group-hover:scale-0 group-data-[pressed=true]:-translate-x-[170%] group-data-[pressed=true]:scale-0",
           )}

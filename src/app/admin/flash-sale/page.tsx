@@ -188,7 +188,7 @@ export default function AdminFlashSalePage() {
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="جستجو..."
+              placeholder="جستجوی آجیل، خشکبار، خرما..."ی آجیل و خشکبار..."
               className="border-input bg-background h-9 w-full max-w-xs rounded-xl border px-3 text-sm"
             />
           </div>
@@ -208,7 +208,7 @@ export default function AdminFlashSalePage() {
                   <tr>
                     <th className="p-3 font-medium">شگفت‌انگیز</th>
                     <th className="p-3 font-medium">نام</th>
-                    <th className="p-3 font-medium">دسته / برند</th>
+                    <th className="p-3 font-medium">دسته / برچسب</th>
                     <th className="p-3 font-medium">وضعیت</th>
                   </tr>
                 </thead>

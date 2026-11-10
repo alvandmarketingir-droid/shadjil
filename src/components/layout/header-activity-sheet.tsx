@@ -89,7 +89,7 @@ export function HeaderActivitySheet({ open, onOpenChange, items = [] }: Props) {
                     <a
                       key={item.id}
                       href={item.href ?? "#"}
-                      className="hover:bg-primary hover:text-primary-foreground block rounded-lg border p-3 text-sm transition-colors"
+                      className="hover:bg-primary hover:text-primary-foreground block rounded-lg border p-3 text-sm transition-roasts"
                     >
                       {item.title}
                     </a>

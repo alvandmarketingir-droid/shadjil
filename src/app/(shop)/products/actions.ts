@@ -21,8 +21,8 @@ export async function loadProductsPage(input: {
   sort?: "newest" | "price_asc" | "price_desc" | "popular";
   featured?: boolean;
   attrs?: Record<string, string>;
-  colorId?: string;
-  sizeId?: string;
+  roastId?: string;
+  weightId?: string;
   minPrice?: number;
   maxPrice?: number;
 }): Promise<LoadProductsResult> {
@@ -38,8 +38,8 @@ export async function loadProductsPage(input: {
     sort: input.sort ?? "newest",
     featured: input.featured,
     attrs: input.attrs,
-    colorId: input.colorId,
-    sizeId: input.sizeId,
+    roastId: input.roastId,
+    weightId: input.weightId,
     minPrice: input.minPrice,
     maxPrice: input.maxPrice,
   });

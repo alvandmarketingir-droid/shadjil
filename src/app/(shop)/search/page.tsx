@@ -143,7 +143,7 @@ export default async function SearchResultsPage({ searchParams }: Props) {
         <p className="text-muted-foreground text-sm">
           {products.length} محصول
           {categories.length ? ` · ${categories.length} دسته` : ""}
-          {brands.length ? ` · ${brands.length} برند` : ""}
+          {brands.length ? ` · ${brands.length} برچسب` : ""}
         </p>
       </header>
 
@@ -184,7 +184,7 @@ export default async function SearchResultsPage({ searchParams }: Props) {
                         alt={p.name}
                         fill
                         className="object-cover transition group-hover:scale-[1.02]"
-                        sizes="(max-width:768px) 50vw, 25vw"
+                        weights="(max-width:768px) 50vw, 25vw"
                       />
                     ) : (
                       <div className="text-muted-foreground flex h-full items-center justify-center text-xs">
@@ -231,7 +231,7 @@ export default async function SearchResultsPage({ searchParams }: Props) {
 
       {brands.length > 0 ? (
         <section>
-          <h2 className="mb-3 text-lg font-semibold text-primary">برندها</h2>
+          <h2 className="mb-3 text-lg font-semibold text-primary">برچسبها</h2>
           <div className="flex flex-wrap gap-2">
             {brands.map((b) => (
               <Link

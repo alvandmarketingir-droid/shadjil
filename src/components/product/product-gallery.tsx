@@ -7,7 +7,7 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { X, ChevronRight, ChevronLeft } from "lucide-react";
 import { ProductWishCompareStack } from "@/components/product/product-wish-compare";
-import { colorNorm, colorKey } from "@/lib/variant-availability";
+import { roastNorm, roastKey } from "@/lib/variant-availability";
 
 export type GalleryImage = {
   url: string;
@@ -16,12 +16,12 @@ export type GalleryImage = {
   variant_id?: string | null;
 };
 
-type VariantLite = { id: string; color?: string | null };
+type VariantLite = { id: string; roast?: string | null };
 
 /**
  * استاندارد فروشگاه‌های بزرگ:
- * - تامب‌نیل = تصاویر گالری محصول (ثابت، وابسته به رنگ نیست)
- * - تصویر بزرگ = عکس واریانت رنگ فعال، وگرنه تامب انتخاب‌شده / اول گالری
+ * - تامب‌نیل = تصاویر گالری محصول (ثابت، وابسته به وضعیت محصول نیست)
+ * - تصویر بزرگ = عکس واریانت وضعیت محصول فعال، وگرنه تامب انتخاب‌شده / اول گالری
  * - لایت‌باکس = ورق زدن بین تصاویر گالری با فلش چپ/راست
  */
 export function ProductGallery({
@@ -52,19 +52,19 @@ export function ProductGallery({
     });
   }, [images]);
 
-  // --- عکس واریانت رنگ فعال (فقط برای تصویر بزرگ) ---
+  // --- عکس واریانت وضعیت محصول فعال (فقط برای تصویر بزرگ) ---
   const variantMain = useMemo(() => {
     if (!activeColor) return null;
-    const want = colorNorm(activeColor);
-    const key = colorKey(activeColor);
+    const want = roastNorm(activeColor);
+    const key = roastKey(activeColor);
     const all = images.filter((i) => i.url);
 
     if (variants.length) {
       const ids = new Set(
         variants
           .filter((v) => {
-            if (!v.color) return false;
-            return colorNorm(v.color) === want || colorKey(v.color) === key;
+            if (!v.roast) return false;
+            return roastNorm(v.roast) === want || roastKey(v.roast) === key;
           })
           .map((v) => v.id),
       );
@@ -74,7 +74,7 @@ export function ProductGallery({
       if (byVar) return byVar;
     }
 
-    // fallback: url شامل نام رنگ
+    // fallback: url شامل نام وضعیت محصول
     return (
       all.find((img) => {
         if (!img.variant_id) return false;
@@ -95,7 +95,7 @@ export function ProductGallery({
   // کاربر خودش تامب زده → اولویت با تامب، نه واریانت
   const [preferThumb, setPreferThumb] = useState(false);
 
-  // با عوض شدن رنگ: دوباره عکس واریانت اولویت دارد
+  // با عوض شدن وضعیت محصول: دوباره عکس واریانت اولویت دارد
   useEffect(() => {
     setPreferThumb(false);
   }, [activeColor]);
@@ -178,7 +178,7 @@ export function ProductGallery({
                 ? { transformOrigin: `${zoomPos.x}% ${zoomPos.y}%` }
                 : undefined
             }
-            sizes="(max-width: 1024px) 100vw, 50vw"
+            weights="(max-width: 1024px) 100vw, 50vw"
             priority
           />
           <span className="bg-background/80 text-muted-foreground pointer-events-none absolute bottom-3 left-3 rounded-lg px-2 py-1 text-[11px] backdrop-blur-sm max-lg:hidden">
@@ -200,7 +200,7 @@ export function ProductGallery({
         ) : null}
       </div>
 
-      {/* تامب‌نیل‌ها — همیشه گالری، ثابت با تغییر رنگ */}
+      {/* تامب‌نیل‌ها — همیشه گالری، ثابت با تغییر وضعیت محصول */}
       {thumbs.length > 1 ? (
         <div className="flex gap-2 overflow-x-auto pb-1">
           {thumbs.map((img, i) => (
@@ -223,7 +223,7 @@ export function ProductGallery({
                 alt={ensureAlt(null, { pageName: productName })}
                 fill
                 className="object-cover p-0"
-                sizes="56px"
+                weights="56px"
               />
             </button>
           ))}

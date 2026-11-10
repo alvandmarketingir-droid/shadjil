@@ -6,8 +6,8 @@ import ContactWithGlobe from "@/components/ui/contact-with-globe";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "تماس با ما | پیراهن مردانه",
-  description: "راه‌های ارتباط با فروشگاه تخصصی پیراهن مردانه",
+  title: "تماس با ما | شادجیل",
+  description: "راه‌های ارتباط با فروشگاه تخصصی شادجیل",
 };
 
 export default async function ContactPage() {
@@ -47,7 +47,7 @@ export default async function ContactPage() {
       <ContactWithGlobe
         subtitle="تماس"
         title="تماس با ما"
-        description="برای پشتیبانی سفارش، مرجوعی و مشاوره سایز از راه‌های زیر با ما در ارتباط باشید."
+        description="برای پشتیبانی سفارش، مرجوعی و مشاوره مناسبت‌ها از راه‌های زیر با ما در ارتباط باشید."
       />
     </>
   );

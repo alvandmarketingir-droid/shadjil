@@ -326,7 +326,7 @@ export default function AdminProductsPage() {
             type="search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="جستجو نام یا اسلاگ…"
+            placeholder="جستجوی آجیل، خشکبار، خرما..."ی آجیل و خشکبار نام یا اسلاگ…"
             className="border-input bg-background h-10 min-w-[200px] flex-1 rounded-xl border px-3 text-sm"
           />
           <select
@@ -378,7 +378,7 @@ export default function AdminProductsPage() {
                   <th className="p-2 font-medium">تصویر</th>
                   <th className="p-2 font-medium">نام</th>
                   <th className="p-2 font-medium">دسته</th>
-                  <th className="p-2 font-medium">برند</th>
+                  <th className="p-2 font-medium">برچسب‌ها</th>
                   <th className="p-2 font-medium">وضعیت</th>
                   <th className="p-2 font-medium">ناموجود</th>
                   <th className="p-2 font-medium">شگفت</th>
@@ -513,7 +513,7 @@ export default function AdminProductsPage() {
                           }}
                           className="border-input bg-background h-8 max-w-[140px] rounded-lg border px-1 text-xs"
                         >
-                          <option value="">— برند —</option>
+                          <option value="">— برچسب —</option>
                           {brands.map((b) => (
                             <option key={b.id} value={b.id}>
                               {b.name}

@@ -6,8 +6,8 @@ export type CreateOrderInput = {
     variantId: string;
     productId: string;
     title: string;
-    sizeName?: string;
-    colorName?: string;
+    weightName?: string;
+    roastName?: string;
     unitPrice: number;
     quantity: number;
   }[];
@@ -174,8 +174,8 @@ export class OrderRepository extends BaseRepository {
       variant_id: i.variantId,
       product_id: i.productId,
       title: i.title,
-      size_name: i.sizeName ?? null,
-      color_name: i.colorName ?? null,
+      weight_name: i.weightName ?? null,
+      roast_name: i.roastName ?? null,
       unit_price: i.unitPrice,
       quantity: i.quantity,
       line_total: i.unitPrice * i.quantity,
@@ -227,7 +227,7 @@ export class OrderRepository extends BaseRepository {
         tracking_number,
         shipped_at,
         created_at,
-        order_items(id, title, size_name, color_name, unit_price, quantity, line_total)
+        order_items(id, title, weight_name, roast_name, unit_price, quantity, line_total)
       `
       )
       .eq("user_id", userId)
@@ -256,7 +256,7 @@ export class OrderRepository extends BaseRepository {
         shipped_at,
         note,
         created_at,
-        order_items(id, title, size_name, color_name, unit_price, quantity, line_total, variant_id)
+        order_items(id, title, weight_name, roast_name, unit_price, quantity, line_total, variant_id)
       `
       )
       .eq("id", orderId)
@@ -284,7 +284,7 @@ export class OrderRepository extends BaseRepository {
     const { data, error } = await service
       .from("orders")
       .select(
-        "id, status, payment_status, total_amount, shipping_city, tracking_number, shipped_at, created_at, order_items(id, title, size_name, color_name, quantity, line_total)"
+        "id, status, payment_status, total_amount, shipping_city, tracking_number, shipped_at, created_at, order_items(id, title, weight_name, roast_name, quantity, line_total)"
       )
       .eq("id", id)
       .maybeSingle();
@@ -420,7 +420,7 @@ export class OrderRepository extends BaseRepository {
         shipping_postal,
         note,
         created_at,
-        order_items(id, title, size_name, color_name, unit_price, quantity, line_total, variant_id)
+        order_items(id, title, weight_name, roast_name, unit_price, quantity, line_total, variant_id)
       `
       )
       .eq("id", orderId)

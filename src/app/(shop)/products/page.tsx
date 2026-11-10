@@ -19,7 +19,7 @@ export const revalidate = 60;
 export async function generateMetadata(): Promise<Metadata> {
   return metadataFromSeoPage("shop_plp", {
     title: "محصولات",
-    description: "لیست محصولات فروشگاه تخصصی پیراهن مردانه",
+    description: "لیست محصولات فروشگاه تخصصی شادجیل",
   });
 }
 
@@ -57,30 +57,30 @@ export default async function ProductsPage({
       ? Number(params.maxPrice)
       : undefined;
 
-  const colorSlug =
-    typeof params.color === "string" && params.color ? params.color : undefined;
-  const sizeSlug =
-    typeof params.size === "string" && params.size ? params.size : undefined;
+  const roastSlug =
+    typeof params.roast === "string" && params.roast ? params.roast : undefined;
+  const weightSlug =
+    typeof params.weight === "string" && params.weight ? params.weight : undefined;
 
   const FACET_KEYS = [
-    "fabric",
-    "pattern",
-    "season",
-    "collar",
-    "collar-type",
-    "sleeve",
-    "sleeve-type",
-    "button-type",
-    "fit",
-    "thickness",
-    "closure",
-    "pocket",
-    "occasion",
+    "weight",
+    "type",
     "origin",
-    "tie-width",
-    "tie-length",
-    "bow-tie-type",
-    "cufflink-material",
+    "packaging",
+    "grade",
+    "roast",
+    "salted",
+    "raw",
+    "weight-pack",
+    "quality",
+    "organic",
+    "gift",
+    "usage",
+    "origin",
+    "weight-250",
+    "weight-500",
+    "weight-1kg",
+    "premium",
   ] as const;
 
   const attrs: Record<string, string> = {};
@@ -96,30 +96,30 @@ export default async function ProductsPage({
   const facets = allFacets.filter((f) => allowed.has(f.slug));
 
   
-  // منبع اصلی: attribute options (size/color) — fallback: جداول sizes/colors
-  const colorAttr = allFacets.find((f) => f.slug === "color");
-  const sizeAttr = allFacets.find((f) => f.slug === "size");
+  // منبع اصلی: attribute options (weight/roast) — fallback: جداول weights/roasts
+  const roastAttr = allFacets.find((f) => f.slug === "roast");
+  const weightAttr = allFacets.find((f) => f.slug === "weight");
   type Chip = { id: string; name: string; slug: string; hex?: string | null };
-  let colors: Chip[] = (colorAttr?.options ?? []).map((o) => ({
+  let roasts: Chip[] = (roastAttr?.options ?? []).map((o) => ({
     id: o.id,
     name: o.value,
     slug: o.slug || o.value,
     hex: (o as { hex?: string | null }).hex ?? null,
   }));
-  let sizes: Chip[] = (sizeAttr?.options ?? []).map((o) => ({
+  let weights: Chip[] = (weightAttr?.options ?? []).map((o) => ({
     id: o.id,
     name: o.value,
     slug: o.slug || o.value,
   }));
-  const colorRepo = new ColorRepository();
-  const sizeRepo = new SizeRepository();
-  if (!colors.length || !sizes.length) {
+  const roastRepo = new ColorRepository();
+  const weightRepo = new SizeRepository();
+  if (!roasts.length || !weights.length) {
     const [legacyColors, legacySizes] = await Promise.all([
-      colorRepo.findAllActive().catch(() => [] as Awaited<ReturnType<ColorRepository["findAllActive"]>>),
-      sizeRepo.findAllActive().catch(() => [] as Awaited<ReturnType<SizeRepository["findAllActive"]>>),
+      roastRepo.findAllActive().catch(() => [] as Awaited<ReturnType<ColorRepository["findAllActive"]>>),
+      weightRepo.findAllActive().catch(() => [] as Awaited<ReturnType<SizeRepository["findAllActive"]>>),
     ]);
-    if (!colors.length) {
-      colors = legacyColors.map((c) => ({
+    if (!roasts.length) {
+      roasts = legacyColors.map((c) => ({
         id: c.id,
         name: c.name,
         slug: c.slug,
@@ -129,28 +129,28 @@ export default async function ProductsPage({
           null,
       }));
     }
-    if (!sizes.length) {
-      sizes = legacySizes.map((s) => ({ id: s.id, name: s.name, slug: s.slug }));
+    if (!weights.length) {
+      weights = legacySizes.map((s) => ({ id: s.id, name: s.name, slug: s.slug }));
     }
   }
-  const colorOpt = colorSlug
-    ? colors.find((c) => c.slug === colorSlug || c.name === colorSlug)
+  const roastOpt = roastSlug
+    ? roasts.find((c) => c.slug === roastSlug || c.name === roastSlug)
     : undefined;
-  const sizeOpt = sizeSlug
-    ? sizes.find((s) => s.slug === sizeSlug || s.name === sizeSlug)
+  const weightOpt = weightSlug
+    ? weights.find((s) => s.slug === weightSlug || s.name === weightSlug)
     : undefined;
-  const colorValue = colorOpt?.name;
-  const sizeValue = sizeOpt?.name;
-  let colorId: string | undefined;
-  let sizeId: string | undefined;
+  const roastValue = roastOpt?.name;
+  const weightValue = weightOpt?.name;
+  let roastId: string | undefined;
+  let weightId: string | undefined;
   // فقط fallback legacy id وقتی از جدول قدیمی آمده
-  if (colorSlug && !colorAttr) {
-    const c = await colorRepo.findBySlug(colorSlug).catch(() => null);
-    colorId = c?.id;
+  if (roastSlug && !roastAttr) {
+    const c = await roastRepo.findBySlug(roastSlug).catch(() => null);
+    roastId = c?.id;
   }
-  if (sizeSlug && !sizeAttr) {
-    const s = await sizeRepo.findBySlug(sizeSlug).catch(() => null);
-    sizeId = s?.id;
+  if (weightSlug && !weightAttr) {
+    const s = await weightRepo.findBySlug(weightSlug).catch(() => null);
+    weightId = s?.id;
   }
 
   const result = await service.getPublishedProducts({
@@ -163,10 +163,10 @@ export default async function ProductsPage({
     featured,
     attrs: Object.keys(attrs).length ? attrs : undefined,
     minPrice: minPrice && !Number.isNaN(minPrice) ? minPrice : undefined,
-    colorId,
-    sizeId,
-    sizeValue,
-    colorValue,
+    roastId,
+    weightId,
+    weightValue,
+    roastValue,
     maxPrice: maxPrice && !Number.isNaN(maxPrice) ? maxPrice : undefined,
   });
 
@@ -200,10 +200,10 @@ export default async function ProductsPage({
         </p>
       </div>
 <ProductFiltersMobile
-          colors={colors}
-          sizes={sizes}
-          colorSlug={colorSlug}
-          sizeSlug={sizeSlug}
+          roasts={roasts}
+          weights={weights}
+          roastSlug={roastSlug}
+          weightSlug={weightSlug}
         facets={facets}
         current={attrs}
         categories={categories}
@@ -219,10 +219,10 @@ export default async function ProductsPage({
       <div className="flex flex-col gap-8 lg:flex-row">
         <Suspense fallback={<aside className="border-border bg-card hidden w-64 shrink-0 rounded-xl border p-4 lg:block" />}>
         <ProductFiltersSidebar
-          colors={colors}
-          sizes={sizes}
-          colorSlug={colorSlug}
-          sizeSlug={sizeSlug}
+          roasts={roasts}
+          weights={weights}
+          roastSlug={roastSlug}
+          weightSlug={weightSlug}
           facets={facets}
           current={attrs}
           categories={categories}
@@ -237,8 +237,8 @@ export default async function ProductsPage({
         </Suspense>
         <div className="min-w-0 flex-1">
           <ProductInfiniteList
-            colorId={colorId}
-            sizeId={sizeId}
+            roastId={roastId}
+            weightId={weightId}
             initialProducts={products}
             initialPage={page}
             initialHasMore={page < totalPages}

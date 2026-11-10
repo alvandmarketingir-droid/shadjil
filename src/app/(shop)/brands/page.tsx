@@ -7,8 +7,8 @@ import { EmptyBlock } from "@/components/ui/ui-state-blocks";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "برندها",
-  description: "همه برندهای فروشگاه تخصصی پیراهن مردانه",
+  title: "برچسبها",
+  description: "همه برچسبهای فروشگاه تخصصی شادجیل",
 };
 
 export default async function BrandsIndexPage() {
@@ -22,17 +22,17 @@ export default async function BrandsIndexPage() {
       <main className="w-full max-w-none mx-auto px-4 py-8 md:py-12">
         <div className="mb-8">
           <h1 className="text-2xl md:text-3xl font-iranyekan-heavy text-primary">
-            برندها
+            برچسبها
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            انتخاب برند برای مشاهده محصولات
+            انتخاب برچسب برای مشاهده محصولات
           </p>
         </div>
 
         {brands.length === 0 ? (
           <EmptyBlock
-            title="برندی ثبت نشده"
-            description="به‌زودی برندها اینجا نمایش داده می‌شوند."
+            title="برچسبی ثبت نشده"
+            description="به‌زودی برچسبها اینجا نمایش داده می‌شوند."
           />
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-4">
@@ -40,7 +40,7 @@ export default async function BrandsIndexPage() {
               <Link
                 key={b.id}
                 href={`/brands/${b.slug}`}
-                className="bg-card hover:border-foreground/20 flex h-24 items-center justify-center rounded-2xl border px-3 text-center text-sm font-medium transition-colors hover:bg-muted/40"
+                className="bg-card hover:border-foreground/20 flex h-24 items-center justify-center rounded-2xl border px-3 text-center text-sm font-medium transition-roasts hover:bg-muted/40"
               >
                 {b.name}
               </Link>

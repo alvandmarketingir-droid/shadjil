@@ -5,7 +5,7 @@ type PriceProps = {
   amount: number | string | null | undefined;
   className?: string;
   /** sm | md | lg | pdp (≈۲×) */
-  size?: "sm" | "md" | "lg" | "pdp";
+  weight?: "sm" | "md" | "lg" | "pdp";
   bare?: boolean;
   strike?: boolean;
 };
@@ -20,7 +20,7 @@ function formatAmount(amount: number | string | null | undefined): string {
   return toPersianDigits(Math.round(n).toLocaleString("en-US"));
 }
 
-const sizeClass = {
+const weightClass = {
   sm: "text-sm",
   md: "text-base",
   lg: "text-lg",
@@ -38,7 +38,7 @@ const tomanSize = {
 export function Price({
   amount,
   className,
-  size = "md",
+  weight = "md",
   bare = false,
   strike = false,
 }: PriceProps) {
@@ -46,7 +46,7 @@ export function Price({
     <span
       className={cn(
         "inline-flex items-baseline gap-1",
-        sizeClass[size],
+        weightClass[weight],
         strike && "line-through opacity-60",
         className,
       )}
@@ -59,7 +59,7 @@ export function Price({
         <span
           className={cn(
             "font-thin text-secondary dark:!text-white",
-            tomanSize[size],
+            tomanSize[weight],
           )}
         >
           تومان

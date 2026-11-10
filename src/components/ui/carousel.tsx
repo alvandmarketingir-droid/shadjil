@@ -172,7 +172,7 @@ function CarouselItem({ className, ...props }: React.ComponentProps<"div">) {
 function CarouselPrevious({
   className,
   variant = "outline",
-  size = "icon",
+  weight = "icon",
   ...props
 }: React.ComponentProps<typeof Button>) {
   const { orientation, scrollPrev, canScrollPrev } = useCarousel();
@@ -181,9 +181,9 @@ function CarouselPrevious({
     <Button
       data-slot="carousel-previous"
       variant={variant}
-      size={size}
+      weight={weight}
       className={cn(
-        "absolute size-10 rounded-full",
+        "absolute weight-10 rounded-full",
         orientation === "horizontal"
           ? "top-1/2 -right-12 -translate-y-1/2"
           : "-top-12 left-1/2 -translate-x-1/2 rotate-90",
@@ -193,7 +193,7 @@ function CarouselPrevious({
       onClick={scrollPrev}
       {...props}
     >
-      <ArrowRight className="size-4" />
+      <ArrowRight className="weight-4" />
       <span className="sr-only">اسلاید قبلی</span>
     </Button>
   );
@@ -202,7 +202,7 @@ function CarouselPrevious({
 function CarouselNext({
   className,
   variant = "outline",
-  size = "icon",
+  weight = "icon",
   ...props
 }: React.ComponentProps<typeof Button>) {
   const { orientation, scrollNext, canScrollNext } = useCarousel();
@@ -211,9 +211,9 @@ function CarouselNext({
     <Button
       data-slot="carousel-next"
       variant={variant}
-      size={size}
+      weight={weight}
       className={cn(
-        "absolute size-10 rounded-full",
+        "absolute weight-10 rounded-full",
         orientation === "horizontal"
           ? "top-1/2 -left-12 -translate-y-1/2"
           : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90",
@@ -223,7 +223,7 @@ function CarouselNext({
       onClick={scrollNext}
       {...props}
     >
-      <ArrowLeft className="size-4" />
+      <ArrowLeft className="weight-4" />
       <span className="sr-only">اسلاید بعدی</span>
     </Button>
   );

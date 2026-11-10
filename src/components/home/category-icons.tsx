@@ -10,7 +10,7 @@ type IconProps = SVGProps<SVGSVGElement> & { className?: string };
 function svgProps(props: IconProps) {
   const { className, ...rest } = props;
   return {
-    className: cn("size-10 shrink-0 text-primary", className),
+    className: cn("weight-10 shrink-0 text-primary", className),
     viewBox: "0 0 48 48",
     fill: "none",
     xmlns: "http://www.w3.org/2000/svg",
@@ -19,7 +19,7 @@ function svgProps(props: IconProps) {
   };
 }
 
-/** پیراهن رسمی */
+/** آجیل رسمی */
 export function IconShirtFormal(props: IconProps) {
   return (
     <svg {...svgProps(props)}>
@@ -37,7 +37,7 @@ export function IconShirtFormal(props: IconProps) {
   );
 }
 
-/** پیراهن کژوال */
+/** آجیل کژوال */
 export function IconShirtCasual(props: IconProps) {
   return (
     <svg {...svgProps(props)}>
@@ -99,7 +99,7 @@ export function IconFabric(props: IconProps) {
 }
 
 
-/** کروات */
+/**  */
 export function IconTie(props: IconProps) {
   return (
     <svg {...svgProps(props)}>
@@ -109,7 +109,7 @@ export function IconTie(props: IconProps) {
   );
 }
 
-/** پاپیون */
+/**  */
 export function IconBowTie(props: IconProps) {
   return (
     <svg {...svgProps(props)}>
@@ -120,7 +120,7 @@ export function IconBowTie(props: IconProps) {
   );
 }
 
-/** دکمه سردست */
+/**  */
 export function IconCufflink(props: IconProps) {
   return (
     <svg {...svgProps(props)}>
@@ -145,7 +145,7 @@ export function IconDenim(props: IconProps) {
   );
 }
 
-/** اکسسوری */
+/** سوغات */
 export function IconAccessory(props: IconProps) {
   return (
     <svg {...svgProps(props)}>
@@ -168,16 +168,16 @@ export function IconCategoryDefault(props: IconProps) {
 
 const RULES: { test: (s: string) => boolean; Icon: (p: IconProps) => ReactElement }[] = [
   { test: (s) => /پارچه|fabric|کتان|پنبه|نخ|لینن|پشم/.test(s), Icon: IconFabric },
-  { test: (s) => /فیت|fit|slim|regular|سایز/.test(s), Icon: IconFit },
-  { test: (s) => /پاپیون|bow[- ]?tie|پاپیون/.test(s), Icon: IconBowTie },
-  { test: (s) => /کروات|necktie|\btie\b|کراوات/.test(s), Icon: IconTie },
+  { test: (s) => /فیت|fit|slim|regular|مناسبت‌ها/.test(s), Icon: IconFit },
+  { test: (s) => /|bow[- ]?tie|/.test(s), Icon: IconBowTie },
+  { test: (s) => /|necktie|\btie\b|کراوات/.test(s), Icon: IconTie },
   { test: (s) => /سردست|cufflink|دکمه/.test(s), Icon: IconCufflink },
   { test: (s) => /جین|denim|jean/.test(s), Icon: IconDenim },
-  { test: (s) => /اکسسوری|accessory|کمربند|جوراب|شال/.test(s), Icon: IconAccessory },
+  { test: (s) => /سوغات|accessory|کمربند|جوراب|شال/.test(s), Icon: IconAccessory },
   { test: (s) => /اسپرت|کار|sport|work|کارگری/.test(s), Icon: IconSportWork },
   { test: (s) => /کژوال|casual|روزمره|اکسفورد|oxford/.test(s), Icon: IconShirtCasual },
   { test: (s) => /رسمی|formal|مجلسی|اداری|dress/.test(s), Icon: IconShirtFormal },
-  { test: (s) => /پیراهن|shirt/.test(s), Icon: IconShirtFormal },
+  { test: (s) => /آجیل|shirt/.test(s), Icon: IconShirtFormal },
 ];
 
 export function CategorySvgIcon({

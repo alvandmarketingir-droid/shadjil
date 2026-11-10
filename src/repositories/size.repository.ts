@@ -9,7 +9,7 @@ export type SizeRow = {
 export class SizeRepository extends BaseRepository {
   async findAllActive(): Promise<SizeRow[]> {
     const { data, error } = await (await this.getClient())
-      .from("sizes")
+      .from("weights")
       .select("id, name, slug, sort_order")
       .eq("is_active", true)
       .order("sort_order");
@@ -19,7 +19,7 @@ export class SizeRepository extends BaseRepository {
 
   async findBySlug(slug: string): Promise<SizeRow | null> {
     const { data, error } = await (await this.getClient())
-      .from("sizes")
+      .from("weights")
       .select("id, name, slug")
       .eq("slug", slug)
       .maybeSingle();

@@ -393,7 +393,7 @@ export default function AdminOrderDetailPage() {
                   <td className="p-3">
                     {it.title}
                     <span className="text-muted-foreground block text-xs">
-                      {[it.size_name, it.color_name].filter(Boolean).join(" / ")}
+                      {[it.weight_name, it.roast_name].filter(Boolean).join(" / ")}
                     </span>
                   </td>
                   <td className="p-3">{it.quantity}</td>

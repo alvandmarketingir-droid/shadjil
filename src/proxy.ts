@@ -23,7 +23,7 @@ const PERSIAN_ROUTES: Record<string, string> = {
   "/حریم-خصوصی": "/privacy",
   "/ارسال": "/shipping",
   "/مرجوعی": "/returns",
-  "/راهنمای-سایز": "/size-guide",
+  "/راهنمای-مناسبت‌ها": "/weight-guide",
   "/پیگیری-سفارش": "/track",
   "/پیگیری": "/track",
 };
@@ -31,7 +31,7 @@ const PERSIAN_ROUTES: Record<string, string> = {
 const RESERVED = new Set([
   "", "admin", "api", "login", "register", "dashboard", "cart", "checkout",
   "products", "brands", "blog", "contact", "about", "faq", "terms", "privacy",
-  "shipping", "returns", "size-guide", "track", "categories", "tag", "wishlist",
+  "shipping", "returns", "weight-guide", "track", "categories", "tag", "wishlist",
   "compare", "recently-viewed", "_next", "favicon.ico", "robots.txt",
   "sitemap.xml", "llms.txt", "ورود", "ثبت-نام", "علاقه-مندی-ها", "مقایسه",
   "سبد-خرید", "محصولات",
@@ -217,7 +217,7 @@ export async function proxy(request: NextRequest) {
   if (parts.length === 1) {
     const seg = decodeSeg(parts[0]);
     if (!RESERVED.has(seg) && !RESERVED.has(seg.toLowerCase()) && !seg.includes(".")) {
-      // برند اول — URL نوار همان /لاکوست می‌ماند
+      // برچسب اول — URL نوار همان /لاکوست می‌ماند
       if (await supabaseExists("brands", seg)) {
         return sessionRewrite(request, "/brands/" + seg);
       }

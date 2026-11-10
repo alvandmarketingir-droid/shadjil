@@ -1,11 +1,11 @@
-const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://pirahanmardane.ir").replace(/\/$/, "");
+const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://shadjil.ir").replace(/\/$/, "");
 
 export function organizationSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
     "@id": `${SITE}/#organization`,
-    name: "پیراهن مردانه",
+    name: "شادجیل",
     url: SITE,
     logo: {
       "@type": "ImageObject",
@@ -21,7 +21,7 @@ export function websiteSchema() {
     "@type": "WebSite",
     "@id": `${SITE}/#website`,
     url: SITE,
-    name: "پیراهن مردانه",
+    name: "شادجیل",
     inLanguage: "fa-IR",
     publisher: { "@id": `${SITE}/#organization` },
     potentialAction: {
@@ -111,11 +111,11 @@ export function articleSchema(input: {
     dateModified: input.dateModified || input.datePublished || undefined,
     author: {
       "@type": "Person",
-      name: input.authorName || "پیراهن مردانه",
+      name: input.authorName || "شادجیل",
     },
     publisher: {
       "@type": "Organization",
-      name: "پیراهن مردانه",
+      name: "شادجیل",
       logo: {
         "@type": "ImageObject",
         url: `${SITE}/icon.png`,
@@ -134,7 +134,7 @@ export function collectionPageSchema(input: {
   description?: string | null;
   url: string;
 }) {
-  const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://pirahanmardane.ir").replace(/\/$/, "");
+  const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://shadjil.ir").replace(/\/$/, "");
   const url = input.url.startsWith("http") ? input.url : `${SITE}${input.url.startsWith("/") ? "" : "/"}${input.url}`;
   return {
     "@context": "https://schema.org",
@@ -152,7 +152,7 @@ export function brandPageSchema(input: {
   slug: string;
   logo?: string | null;
 }) {
-  const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://pirahanmardane.ir").replace(/\/$/, "");
+  const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://shadjil.ir").replace(/\/$/, "");
   return {
     "@context": "https://schema.org",
     "@type": "Brand",

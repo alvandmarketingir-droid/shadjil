@@ -44,7 +44,7 @@ export function ProductWishCompareStack({
       <Button
         type="button"
         variant="secondary"
-        size="icon"
+        weight="icon"
         className={cn(btnCls, isWishlisted && "text-rose-500")}
         onClick={async (e) => {
           e.preventDefault();
@@ -86,7 +86,7 @@ export function ProductWishCompareStack({
       <Button
         type="button"
         variant="secondary"
-        size="icon"
+        weight="icon"
         className={cn(btnCls, isCompared && "text-primary")}
         onClick={(e) => {
           e.preventDefault();
@@ -134,7 +134,7 @@ export function ProductWishCompareInline({
       <Button
         type="button"
         variant="secondary"
-        size="icon"
+        weight="icon"
         className={cn(btnCls, "h-11 w-11", isWishlisted && "text-rose-500")}
         onClick={async (e) => {
           e.preventDefault();
@@ -173,7 +173,7 @@ export function ProductWishCompareInline({
       <Button
         type="button"
         variant="secondary"
-        size="icon"
+        weight="icon"
         className={cn(btnCls, "h-11 w-11", isCompared && "text-primary")}
         onClick={(e) => {
           e.preventDefault();

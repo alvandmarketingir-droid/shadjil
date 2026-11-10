@@ -55,49 +55,49 @@ export function ProductCard({ product }: Props) {
     discount = Math.round(((originalPrice - price) / originalPrice) * 100);
   }
 
-  const sizes = [
+  const weights = [
     ...new Set(
       variants
         .map((v) => {
           const x = v as {
-            size?: string | { name?: string | null } | null;
+            weight?: string | { name?: string | null } | null;
           };
-          if (typeof x.size === "string" && x.size) return x.size;
-          if (x.size && typeof x.size === "object" && x.size.name) return x.size.name;
+          if (typeof x.weight === "string" && x.weight) return x.weight;
+          if (x.weight && typeof x.weight === "object" && x.weight.name) return x.weight.name;
           return null;
         })
         .filter((s): s is string => Boolean(s))
     ),
   ];
 
-  // لیست یکتای رنگ: hex واقعی برای سواچ
-  const colorEntries: { name: string; hex: string }[] = [];
+  // لیست یکتای وضعیت محصول: hex واقعی برای سواچ
+  const roastEntries: { name: string; hex: string }[] = [];
   {
     const seen = new Set<string>();
     for (const v of variants) {
       const x = v as {
-        color_hex?: string | null;
-        color?: string | { name?: string | null; hex?: string | null; hex_code?: string | null } | null;
-        color_name?: string | null;
+        roast_hex?: string | null;
+        roast?: string | { name?: string | null; hex?: string | null; hex_code?: string | null } | null;
+        roast_name?: string | null;
       };
       const name =
-        (x.color_name || "").trim() ||
-        (typeof x.color === "string" ? x.color : x.color?.name || "") ||
+        (x.roast_name || "").trim() ||
+        (typeof x.roast === "string" ? x.roast : x.roast?.name || "") ||
         "";
       const hex = resolveColorHex(
-        name || x.color_hex,
-        x.color_hex ||
-          (x.color && typeof x.color === "object"
-            ? x.color.hex_code || x.color.hex
+        name || x.roast_hex,
+        x.roast_hex ||
+          (x.roast && typeof x.roast === "object"
+            ? x.roast.hex_code || x.roast.hex
             : null),
       );
       const key = name || hex;
       if (!key || seen.has(key)) continue;
       seen.add(key);
-      colorEntries.push({ name: name || hex, hex });
+      roastEntries.push({ name: name || hex, hex });
     }
   }
-  const colors = colorEntries.map((c) => c.hex);
+  const roasts = roastEntries.map((c) => c.hex);
 
   
   const categoryName =
@@ -139,33 +139,33 @@ export function ProductCard({ product }: Props) {
       price: number;
       stock_quantity?: number;
       stock?: number;
-      size?: string | { name?: string | null } | null;
-      color?: string | { name?: string | null; hex_code?: string | null; hex?: string | null } | null;
-      color_name?: string | null;
-      color_hex?: string | null;
+      weight?: string | { name?: string | null } | null;
+      roast?: string | { name?: string | null; hex_code?: string | null; hex?: string | null } | null;
+      roast_name?: string | null;
+      roast_hex?: string | null;
     };
-    const sizeName =
-      typeof x.size === "string"
-        ? x.size
-        : x.size && typeof x.size === "object"
-          ? x.size.name ?? null
+    const weightName =
+      typeof x.weight === "string"
+        ? x.weight
+        : x.weight && typeof x.weight === "object"
+          ? x.weight.name ?? null
           : null;
     const name =
-      (x.color_name || "").trim() ||
-      (typeof x.color === "string" ? x.color : x.color?.name || "") ||
+      (x.roast_name || "").trim() ||
+      (typeof x.roast === "string" ? x.roast : x.roast?.name || "") ||
       "";
-    const colorVal = resolveColorHex(
-      name || x.color_hex,
-      x.color_hex ||
-        (x.color && typeof x.color === "object"
-          ? x.color.hex_code || x.color.hex
+    const roastVal = resolveColorHex(
+      name || x.roast_hex,
+      x.roast_hex ||
+        (x.roast && typeof x.roast === "object"
+          ? x.roast.hex_code || x.roast.hex
           : null),
     );
     return {
       id: x.id,
       price: Number(x.price),
-      size: sizeName,
-      color: colorVal,
+      weight: weightName,
+      roast: roastVal,
       stock: Number(x.stock_quantity ?? x.stock ?? 0),
     };
   });
@@ -189,8 +189,8 @@ export function ProductCard({ product }: Props) {
         rating={typeof product.average_rating === 'number' ? product.average_rating : 0}
         reviewCount={typeof product.review_count === 'number' ? product.review_count : 0}
         images={images}
-        colors={colors}
-        sizes={sizes}
+        roasts={roasts}
+        weights={weights}
         variantOptions={variantOptions}
         isNew={Boolean(product.is_new)}
         isBestSeller={Boolean(product.is_bestseller)}

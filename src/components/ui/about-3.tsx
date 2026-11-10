@@ -23,18 +23,18 @@ interface About3Props {
 }
 
 const defaultAchievements = [
-  { label: "تمرکز تخصصی", value: "پیراهن" },
-  { label: "راهنمای سایز", value: "شفاف" },
+  { label: "تمرکز تخصصی", value: "آجیل" },
+  { label: "راهنمای مناسبت‌ها بسته‌بندی", value: "شفاف" },
   { label: "مرجوعی آسان", value: "آسوده" },
   { label: "پشتیبانی", value: "واقعی" },
 ];
 
 export function About3({
   title = "درباره ما",
-  description = "پیراهن مردانه؛ فروشگاه تخصصی پیراهن، کروات، پاپیون و اکسسوری — با تمرکز روی کیفیت دوخت، فیت دقیق و تجربه خرید مطمئن.",
+  description = "شادجیل؛ فروشگاه تخصصی آجیل، ،  و سوغات — با تمرکز روی کیفیت دوخت، فیت دقیق و تجربه خرید مطمئن.",
   mainImage = {
     src: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=1200&q=80",
-    alt: "پیراهن مردانه",
+    alt: "شادجیل",
   },
   secondaryImage = {
     src: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=800&q=80",
@@ -45,14 +45,14 @@ export function About3({
     alt: "لوگو",
     title: "اندازه درست، استایل درست",
     description:
-      "از راهنمای سایز شفاف تا تعویض آسان — هدف ما اعتماد به فیت قبل از خرید است.",
+      "از راهنمای مناسبت‌ها بسته‌بندی شفاف تا تعویض آسان — هدف ما اعتماد به فیت قبل از خرید است.",
     buttonText: "مشاهده محصولات",
     buttonUrl: "/products",
   },
   companiesTitle = "تمرکز ما",
   companies = [],
   achievementsTitle = "آنچه برای خریدار مهم است",
-  achievementsDescription = "کیفیت دوخت، راهنمای سایز شفاف، ارسال مطمئن و پشتیبانی واقعی.",
+  achievementsDescription = "کیفیت دوخت، راهنمای مناسبت‌ها بسته‌بندی شفاف، ارسال مطمئن و پشتیبانی واقعی.",
   achievements = defaultAchievements,
 }: About3Props = {}) {
   return (
@@ -123,7 +123,7 @@ export function About3({
           <div className="py-16 text-center">
             <p className="text-muted-foreground text-sm">{companiesTitle}</p>
             <p className="text-secondary mt-2 text-lg font-medium">
-              پیراهن · کروات · پاپیون · دکمه سردست
+              آجیل ·  ·  · 
             </p>
           </div>
         )}

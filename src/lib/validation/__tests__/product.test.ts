@@ -26,7 +26,7 @@ describe("productFilterSchema", () => {
 describe("productCreateSchema", () => {
   it("requires name and valid slug", () => {
     const result = productCreateSchema.safeParse({
-      name: "پیراهن رسمی سفید",
+      name: "آجیل رسمی سفید",
       slug: "dress-shirt-white",
       categoryId: "a1000001-0000-4000-8000-000000000011",
     });

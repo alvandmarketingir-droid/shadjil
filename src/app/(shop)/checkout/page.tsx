@@ -200,7 +200,7 @@ export default function CheckoutPage() {
         return;
       }
 
-      // وزن واقعی واریانت‌ها؛ اگر نبود هر قلم ۴۰۰ گرم
+      // مناسبت‌ها واقعی واریانت‌ها؛ اگر نبود هر قلم ۴۰۰ گرم
       const weightGrams = Math.max(
         100,
         items.reduce((sum, it) => {
@@ -661,7 +661,7 @@ export default function CheckoutPage() {
               <>
                 <h2 className="font-semibold text-primary">۱. تأیید آیتم‌های سبد</h2>
                 <p className="text-muted-foreground text-xs">
-                  تعداد، رنگ و سایز انتخاب‌شده را بررسی کنید.
+                  تعداد، وضعیت محصول و مناسبت‌ها انتخاب‌شده را بررسی کنید.
                 </p>
                 <ul className="space-y-3">
                   {items.map((it) => (
@@ -676,28 +676,28 @@ export default function CheckoutPage() {
                             alt={it.title}
                             fill
                             className="object-cover"
-                            sizes="64px"
+                            weights="64px"
                           />
                         ) : null}
                       </div>
                       <div className="min-w-0 flex-1 text-sm">
                         <p className="font-medium text-primary">{it.title}</p>
                         <div className="text-muted-foreground mt-1 flex flex-wrap gap-2 text-xs">
-                          {it.size ? (
+                          {it.weight ? (
                             <span className="bg-muted rounded-md px-2 py-0.5">
-                              سایز: {it.size}
+                              مناسبت‌ها: {it.weight}
                             </span>
                           ) : null}
-                          {it.color || it.colorHex ? (
+                          {it.roast || it.roastHex ? (
                             <span className="bg-muted inline-flex items-center gap-1 rounded-md px-2 py-0.5">
-                              رنگ:
-                              {it.colorHex ? (
+                              وضعیت محصول:
+                              {it.roastHex ? (
                                 <span
                                   className="inline-block h-3 w-3 rounded-full border"
-                                  style={{ background: it.colorHex }}
+                                  style={{ background: it.roastHex }}
                                 />
                               ) : null}
-                              {it.color || it.colorHex}
+                              {it.roast || it.roastHex}
                             </span>
                           ) : null}
                           <span className="bg-muted rounded-md px-2 py-0.5">
@@ -707,7 +707,7 @@ export default function CheckoutPage() {
                         <p className="mt-1 font-medium">
                           <Price
                             amount={Number(it.price) * Number(it.quantity)}
-                            size="sm"
+                            weight="sm"
                           />
                         </p>
                       </div>
@@ -751,7 +751,7 @@ export default function CheckoutPage() {
                         if (def) applyAddress(def);
                         setAddressMode("default");
                       }}
-                      className={`rounded-xl border p-3 text-sm font-medium transition-colors ${
+                      className={`rounded-xl border p-3 text-sm font-medium transition-roasts ${
                         addressMode === "default"
                           ? "border-primary bg-primary/10 text-primary"
                           : "border-border hover:bg-muted/50"
@@ -772,7 +772,7 @@ export default function CheckoutPage() {
                           note: "",
                         }));
                       }}
-                      className={`rounded-xl border p-3 text-sm font-medium transition-colors ${
+                      className={`rounded-xl border p-3 text-sm font-medium transition-roasts ${
                         addressMode === "new"
                           ? "border-primary bg-primary/10 text-primary"
                           : "border-border hover:bg-muted/50"
@@ -965,12 +965,12 @@ export default function CheckoutPage() {
                               ? "رایگان"
                               : "توافقی"
                           ) : (
-                            <Price amount={shipFee} size="sm" />
+                            <Price amount={shipFee} weight="sm" />
                           )
                         ) : opt.fee === 0 ? (
                           "توافقی"
                         ) : (
-                          <Price amount={opt.fee} size="sm" />
+                          <Price amount={opt.fee} weight="sm" />
                         )}
                       </span>
                     </button>
@@ -1088,7 +1088,7 @@ export default function CheckoutPage() {
                   ) : null}
                   {discountPreview ? (
                     <p className="text-sm text-emerald-700 dark:text-emerald-400">
-                      <Price amount={discountPreview.discountAmount} size="sm" />{" "}
+                      <Price amount={discountPreview.discountAmount} weight="sm" />{" "}
                       تخفیف اعمال شد
                     </p>
                   ) : null}
@@ -1108,7 +1108,7 @@ export default function CheckoutPage() {
                     {shipOptions.find((s) => s.id === shipMethod)?.title}
                   </p>
                   <p className="font-bold">
-                    قابل پرداخت: <Price amount={payable} size="md" />
+                    قابل پرداخت: <Price amount={payable} weight="md" />
                   </p>
                 </div>
 
@@ -1182,7 +1182,7 @@ export default function CheckoutPage() {
                       شناسه سفارش: {doneOrder.id}
                     </p>
                     <p>
-                      مبلغ: <Price amount={doneOrder.total} size="md" />
+                      مبلغ: <Price amount={doneOrder.total} weight="md" />
                     </p>
                   </div>
                 ) : null}
@@ -1231,7 +1231,7 @@ export default function CheckoutPage() {
                   <span className="min-w-0">
                     <span className="block truncate">{it.title}</span>
                     <span className="text-muted-foreground text-xs">
-                      {[it.size, it.color, `×${it.quantity}`]
+                      {[it.weight, it.roast, `×${it.quantity}`]
                         .filter(Boolean)
                         .join(" · ")}
                     </span>
@@ -1239,7 +1239,7 @@ export default function CheckoutPage() {
                   <span className="shrink-0">
                     <Price
                       amount={Number(it.price) * Number(it.quantity)}
-                      size="sm"
+                      weight="sm"
                     />
                   </span>
                 </li>
@@ -1248,14 +1248,14 @@ export default function CheckoutPage() {
             <div className="border-border mt-4 space-y-1 border-t pt-4 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">جمع کالا</span>
-                <Price amount={subtotal} size="sm" />
+                <Price amount={subtotal} weight="sm" />
               </div>
               {discountPreview ? (
                 <div className="flex justify-between text-emerald-700 dark:text-emerald-400">
                   <span>تخفیف</span>
                   <span>
                     −
-                    <Price amount={discountPreview.discountAmount} size="sm" />
+                    <Price amount={discountPreview.discountAmount} weight="sm" />
                   </span>
                 </div>
               ) : null}
@@ -1268,12 +1268,12 @@ export default function CheckoutPage() {
                       : "توافقی"}
                   </span>
                 ) : (
-                  <Price amount={shipFee} size="sm" />
+                  <Price amount={shipFee} weight="sm" />
                 )}
               </div>
               <div className="flex justify-between text-base font-bold">
                 <span>قابل پرداخت</span>
-                <Price amount={payable} size="md" />
+                <Price amount={payable} weight="md" />
               </div>
             </div>
           </aside>

@@ -17,10 +17,10 @@ type Chip = { id: string; name: string; slug: string; hex?: string | null };
 type Props = {
   facets: AttributeWithOptions[];
   current: Record<string, string>;
-  colors?: Chip[];
-  sizes?: Chip[];
-  colorSlug?: string;
-  sizeSlug?: string;
+  roasts?: Chip[];
+  weights?: Chip[];
+  roastSlug?: string;
+  weightSlug?: string;
   categories?: { name: string; slug: string }[];
   categorySlug?: string;
   brandSlug?: string;
@@ -43,7 +43,7 @@ export function ProductFiltersMobile(props: Props) {
         {/* بدون asChild و بدون Button تو در تو */}
         <SheetTrigger
           className={cn(
-            "border-input bg-background hover:bg-muted inline-flex h-8 items-center justify-center gap-2 rounded-md border px-3 text-sm font-medium transition-colors"
+            "border-input bg-background hover:bg-muted inline-flex h-8 items-center justify-center gap-2 rounded-md border px-3 text-sm font-medium transition-roasts"
           )}
         >
           <SlidersHorizontal className="h-4 w-4" />

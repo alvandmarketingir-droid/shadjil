@@ -75,10 +75,10 @@ const LABELS: Record<CatalogKind, { titleNew: string; titleEdit: string; listHre
     nameLabel: "نام دسته",
   },
   brand: {
-    titleNew: "برند جدید",
-    titleEdit: "ویرایش برند",
+    titleNew: "برچسب جدید",
+    titleEdit: "ویرایش برچسب",
     listHref: "/admin/brands",
-    nameLabel: "نام برند",
+    nameLabel: "نام برچسب",
   },
   tag: {
     titleNew: "برچسب جدید",

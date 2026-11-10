@@ -72,8 +72,8 @@ export default function OrderWaybillLabelPage() {
       <div className="border-border space-y-4 rounded-2xl border-2 border-dashed p-6 print:border-black">
         <div className="flex flex-wrap items-start justify-between gap-3 border-b pb-3">
           <div>
-            <h1 className="text-xl font-bold">برچسب ارسال — پیراهن مردانه</h1>
-            <p className="text-muted-foreground text-xs">pirahanmardane.ir</p>
+            <h1 className="text-xl font-bold">برچسب ارسال — شادجیل</h1>
+            <p className="text-muted-foreground text-xs">shadjil.ir</p>
           </div>
           <div className="text-left font-mono text-xs" dir="ltr">
             <div>Order: {order.id}</div>
@@ -149,8 +149,8 @@ export default function OrderWaybillLabelPage() {
               <li key={it.id} className="flex justify-between gap-2 border-b border-dashed py-1">
                 <span>
                   {it.title}
-                  {it.size_name ? ` · ${it.size_name}` : ""}
-                  {it.color_name ? ` · ${it.color_name}` : ""}
+                  {it.weight_name ? ` · ${it.weight_name}` : ""}
+                  {it.roast_name ? ` · ${it.roast_name}` : ""}
                 </span>
                 <span className="shrink-0">
                   × {toPersianDigits(String(it.quantity || 1))}

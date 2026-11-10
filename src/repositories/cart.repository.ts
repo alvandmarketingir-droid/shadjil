@@ -147,9 +147,9 @@ export class CartRepository {
           id,
           price,
           product_id,
-          size,
-          color_name,
-          color_hex,
+          weight,
+          roast_name,
+          roast_hex,
           weight_grams,
           products(id, name, slug, product_images(url, is_primary, sort_order, variant_id))
         )

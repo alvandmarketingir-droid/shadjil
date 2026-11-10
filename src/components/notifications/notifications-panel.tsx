@@ -40,7 +40,7 @@ export function NotificationsPanel({ onNavigate }: { onNavigate?: () => void }) 
                 <button
                   type="button"
                   className={cn(
-                    "w-full rounded-xl border p-3 text-right transition-colors",
+                    "w-full rounded-xl border p-3 text-right transition-roasts",
                     n.read_at
                       ? "border-transparent opacity-70 hover:bg-muted/50"
                       : "border-border bg-primary/5 hover:bg-primary/10",

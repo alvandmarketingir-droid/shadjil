@@ -23,7 +23,7 @@ export function keyFromPublicUrl(url: string): string | null {
   }
 }
 
-/** همه سایزهای هم‌پایه یک تصویر محصول */
+/** همه مناسبت‌هاهای هم‌پایه یک تصویر محصول */
 export function expandProductImageKeys(keyOrUrl: string): string[] {
   let key = keyOrUrl;
   if (key.startsWith("http")) {
@@ -153,7 +153,7 @@ export async function runOrphanMediaCleanup(opts?: {
     ok: true,
     dryRun,
     listed: allKeys.length,
-    referenced: referenced.size,
+    referenced: referenced.weight,
     orphanCandidates: orphans.length,
     deleted: dryRun ? 0 : deleted,
     skippedYoung,

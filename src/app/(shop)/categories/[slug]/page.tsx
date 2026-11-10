@@ -38,24 +38,24 @@ function decodeSlug(raw: string): string {
 }
 
 const FACET_KEYS = [
-  "fabric",
-  "pattern",
-  "season",
-  "collar",
-  "collar-type",
-  "sleeve",
-  "sleeve-type",
-  "button-type",
-  "fit",
-  "thickness",
-  "closure",
-  "pocket",
-  "occasion",
+  "weight",
+  "nut-type",
   "origin",
-  "tie-width",
-  "tie-length",
-  "bow-tie-type",
-  "cufflink-material",
+  "packaging",
+  "grade",
+  "roast-type",
+  "salted",
+  "raw",
+  "pack-weight",
+  "quality",
+  "organic",
+  "gift-box",
+  "usage",
+  "origin",
+  "weight-250",
+  "weight-500",
+  "weight-1kg",
+  "premium",
 ] as const;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -63,7 +63,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const categoryService = new CategoryService();
   const result = await categoryService.getBySlug(slug);
   if (!result.success || !result.data) {
-    return { title: "دسته‌بندی" };
+    return { title: "دسته‌بندی‌ها" };
   }
   const d = result.data as {
     name: string;
@@ -118,9 +118,9 @@ export default async function CategoryListingPage({
     typeof sp.minPrice === "string" && sp.minPrice ? Number(sp.minPrice) : undefined;
   const maxPrice =
     typeof sp.maxPrice === "string" && sp.maxPrice ? Number(sp.maxPrice) : undefined;
-  const colorSlug =
-    typeof sp.color === "string" && sp.color ? sp.color : undefined;
-  const sizeSlug = typeof sp.size === "string" && sp.size ? sp.size : undefined;
+  const roastSlug =
+    typeof sp.roast === "string" && sp.roast ? sp.roast : undefined;
+  const weightSlug = typeof sp.weight === "string" && sp.weight ? sp.weight : undefined;
 
   const attrs: Record<string, string> = {};
   for (const key of FACET_KEYS) {
@@ -134,29 +134,29 @@ export default async function CategoryListingPage({
   const allowed = new Set(facetSlugsForCategory(slug));
   const facets = allFacets.filter((f) => allowed.has(f.slug));
 
-  const colorAttr = allFacets.find((f) => f.slug === "color");
-  const sizeAttr = allFacets.find((f) => f.slug === "size");
+  const roastAttr = allFacets.find((f) => f.slug === "roast");
+  const weightAttr = allFacets.find((f) => f.slug === "weight");
   type Chip = { id: string; name: string; slug: string; hex?: string | null };
-  let colors: Chip[] = (colorAttr?.options ?? []).map((o) => ({
+  let roasts: Chip[] = (roastAttr?.options ?? []).map((o) => ({
     id: o.id,
     name: o.value,
     slug: o.slug || o.value,
     hex: (o as { hex?: string | null }).hex ?? null,
   }));
-  let sizes: Chip[] = (sizeAttr?.options ?? []).map((o) => ({
+  let weights: Chip[] = (weightAttr?.options ?? []).map((o) => ({
     id: o.id,
     name: o.value,
     slug: o.slug || o.value,
   }));
-  const colorRepo = new ColorRepository();
-  const sizeRepo = new SizeRepository();
-  if (!colors.length || !sizes.length) {
+  const roastRepo = new ColorRepository();
+  const weightRepo = new SizeRepository();
+  if (!roasts.length || !weights.length) {
     const [legacyColors, legacySizes] = await Promise.all([
-      colorRepo.findAllActive().catch(() => [] as Awaited<ReturnType<ColorRepository["findAllActive"]>>),
-      sizeRepo.findAllActive().catch(() => [] as Awaited<ReturnType<SizeRepository["findAllActive"]>>),
+      roastRepo.findAllActive().catch(() => [] as Awaited<ReturnType<ColorRepository["findAllActive"]>>),
+      weightRepo.findAllActive().catch(() => [] as Awaited<ReturnType<SizeRepository["findAllActive"]>>),
     ]);
-    if (!colors.length) {
-      colors = legacyColors.map((c) => ({
+    if (!roasts.length) {
+      roasts = legacyColors.map((c) => ({
         id: c.id,
         name: c.name,
         slug: c.slug,
@@ -166,27 +166,27 @@ export default async function CategoryListingPage({
           null,
       }));
     }
-    if (!sizes.length) {
-      sizes = legacySizes.map((s) => ({ id: s.id, name: s.name, slug: s.slug }));
+    if (!weights.length) {
+      weights = legacySizes.map((s) => ({ id: s.id, name: s.name, slug: s.slug }));
     }
   }
-  const colorOpt = colorSlug
-    ? colors.find((c) => c.slug === colorSlug || c.name === colorSlug)
+  const roastOpt = roastSlug
+    ? roasts.find((c) => c.slug === roastSlug || c.name === roastSlug)
     : undefined;
-  const sizeOpt = sizeSlug
-    ? sizes.find((s) => s.slug === sizeSlug || s.name === sizeSlug)
+  const weightOpt = weightSlug
+    ? weights.find((s) => s.slug === weightSlug || s.name === weightSlug)
     : undefined;
-  const colorValue = colorOpt?.name;
-  const sizeValue = sizeOpt?.name;
-  let colorId: string | undefined;
-  let sizeId: string | undefined;
-  if (colorSlug && !colorAttr) {
-    const c = await colorRepo.findBySlug(colorSlug).catch(() => null);
-    colorId = c?.id;
+  const roastValue = roastOpt?.name;
+  const weightValue = weightOpt?.name;
+  let roastId: string | undefined;
+  let weightId: string | undefined;
+  if (roastSlug && !roastAttr) {
+    const c = await roastRepo.findBySlug(roastSlug).catch(() => null);
+    roastId = c?.id;
   }
-  if (sizeSlug && !sizeAttr) {
-    const s = await sizeRepo.findBySlug(sizeSlug).catch(() => null);
-    sizeId = s?.id;
+  if (weightSlug && !weightAttr) {
+    const s = await weightRepo.findBySlug(weightSlug).catch(() => null);
+    weightId = s?.id;
   }
 
   const result = await productService.getPublishedProducts({
@@ -200,10 +200,10 @@ export default async function CategoryListingPage({
     attrs: Object.keys(attrs).length ? attrs : undefined,
     minPrice: minPrice && !Number.isNaN(minPrice) ? minPrice : undefined,
     maxPrice: maxPrice && !Number.isNaN(maxPrice) ? maxPrice : undefined,
-    colorId,
-    sizeId,
-    sizeValue,
-    colorValue,
+    roastId,
+    weightId,
+    weightValue,
+    roastValue,
   });
 
   if (!result.success || !result.data) {
@@ -218,7 +218,7 @@ export default async function CategoryListingPage({
   }
 
   const { data: products, total, page, totalPages } = result.data;
-  const siteBase = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://pirahanmardane.ir").replace(
+  const siteBase = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://shadjil.ir").replace(
     /\/$/,
     "",
   );
@@ -250,10 +250,10 @@ export default async function CategoryListingPage({
       </div>
 
       <ProductFiltersMobile
-        colors={colors}
-        sizes={sizes}
-        colorSlug={colorSlug}
-        sizeSlug={sizeSlug}
+        roasts={roasts}
+        weights={weights}
+        roastSlug={roastSlug}
+        weightSlug={weightSlug}
         facets={facets}
         current={attrs}
         categories={categories}
@@ -273,10 +273,10 @@ export default async function CategoryListingPage({
           }
         >
           <ProductFiltersSidebar
-            colors={colors}
-            sizes={sizes}
-            colorSlug={colorSlug}
-            sizeSlug={sizeSlug}
+            roasts={roasts}
+            weights={weights}
+            roastSlug={roastSlug}
+            weightSlug={weightSlug}
             facets={facets}
             current={attrs}
             categories={categories}
@@ -291,8 +291,8 @@ export default async function CategoryListingPage({
         </Suspense>
         <div className="min-w-0 flex-1">
           <ProductInfiniteList
-            colorId={colorId}
-            sizeId={sizeId}
+            roastId={roastId}
+            weightId={weightId}
             initialProducts={products}
             initialPage={page}
             initialHasMore={page < totalPages}

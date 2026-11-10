@@ -87,7 +87,7 @@ export function ShopActivityDrawer({
             <ul className="space-y-3">
               {items.map((p) => (
                 <div
-                  key={(p as { key?: string }).key ?? `${(p as { id?: string; productId?: string }).id ?? (p as { productId?: string }).productId}|${p.color ?? ""}|${p.size ?? ""}`}
+                  key={(p as { key?: string }).key ?? `${(p as { id?: string; productId?: string }).id ?? (p as { productId?: string }).productId}|${p.roast ?? ""}|${p.weight ?? ""}`}
                   className="flex gap-3 rounded-xl border border-border/60 bg-background p-3"
                 >
                   {p.image ? (
@@ -110,7 +110,7 @@ export function ShopActivityDrawer({
                     {tab === "cart" && typeof p.price === "number" ? (
                       <div className="mt-0.5 space-y-0.5 text-xs">
                         <p className="text-muted-foreground">
-                          <Price amount={p.price} size="sm" />
+                          <Price amount={p.price} weight="sm" />
                           {(p.quantity ?? 1) > 1
                             ? " × " + (p.quantity ?? 1)
                             : ""}
@@ -128,69 +128,69 @@ export function ShopActivityDrawer({
                       <div className="mt-2 space-y-2">
                         {(() => {
                           const line = p as {
-                            colors?: string[];
-                            sizes?: string[];
-                            colorHex?: string;
-                            color?: string;
-                            size?: string;
+                            roasts?: string[];
+                            weights?: string[];
+                            roastHex?: string;
+                            roast?: string;
+                            weight?: string;
                             variantId?: string;
                             productId?: string;
                             id?: string;
                             quantity?: number;
                             source?: string;
                             variantOptions?: {
-                              color?: string;
-                              colorHex?: string;
-                              size?: string;
+                              roast?: string;
+                              roastHex?: string;
+                              weight?: string;
                               stock: number;
                             }[];
                           };
                           const opts = line.variantOptions ?? [];
                           const likes = opts.map((o, i) => ({
                             id: String(i),
-                            size: o.size || null,
-                            color: o.colorHex || o.color || null,
+                            weight: o.weight || null,
+                            roast: o.roastHex || o.roast || null,
                             stock: o.stock,
                           }));
-                          const colors: string[] = [];
+                          const roasts: string[] = [];
                           for (const o of opts) {
-                            const k = (o.colorHex || o.color || "").trim();
+                            const k = (o.roastHex || o.roast || "").trim();
                             if (
                               k &&
-                              !colors.some(
+                              !roasts.some(
                                 (x) =>
                                   x.replace(/^#/, "").toLowerCase() ===
                                   k.replace(/^#/, "").toLowerCase(),
                               )
                             ) {
-                              colors.push(k);
+                              roasts.push(k);
                             }
                           }
-                          if (!colors.length && (line.colorHex || line.color)) {
-                            colors.push(line.colorHex || line.color!);
+                          if (!roasts.length && (line.roastHex || line.roast)) {
+                            roasts.push(line.roastHex || line.roast!);
                           }
-                          const sizes = [
+                          const weights = [
                             ...new Set(
                               opts
-                                .map((o) => (o.size || "").trim())
+                                .map((o) => (o.weight || "").trim())
                                 .filter(Boolean),
                             ),
                           ];
-                          if (!sizes.length && line.size) sizes.push(line.size);
-                          const currentColor = line.colorHex || line.color || null;
-                          const currentSize = line.size || null;
+                          if (!weights.length && line.weight) weights.push(line.weight);
+                          const currentColor = line.roastHex || line.roast || null;
+                          const currentSize = line.weight || null;
 
                           async function swap(patch: {
-                            size?: string;
-                            colorKey?: string;
+                            weight?: string;
+                            roastKey?: string;
                           }) {
                             const nextColor =
-                              patch.colorKey !== undefined
-                                ? patch.colorKey
+                              patch.roastKey !== undefined
+                                ? patch.roastKey
                                 : currentColor;
                             const nextSize =
-                              patch.size !== undefined
-                                ? patch.size
+                              patch.weight !== undefined
+                                ? patch.weight
                                 : currentSize;
                             if (
                               isLoggedIn &&
@@ -200,8 +200,8 @@ export function ShopActivityDrawer({
                               const res = await swapCartVariantAction({
                                 oldVariantId: line.variantId,
                                 productId: line.productId || line.id!,
-                                colorHex: nextColor,
-                                size: nextSize,
+                                roastHex: nextColor,
+                                weight: nextSize,
                                 quantity: line.quantity ?? 1,
                               });
                               if (!res.ok) {
@@ -217,21 +217,21 @@ export function ShopActivityDrawer({
                             } else {
                               const pid = line.productId || line.id;
                               if (!pid) return;
-                              const key = `${pid}|${p.color ?? ""}|${p.size ?? ""}`;
+                              const key = `${pid}|${p.roast ?? ""}|${p.weight ?? ""}`;
                               updateCartItem(key, {
-                                size: nextSize || undefined,
-                                color: nextColor || undefined,
+                                weight: nextSize || undefined,
+                                roast: nextColor || undefined,
                               });
                             }
                           }
 
-                          if (!colors.length && !sizes.length) return null;
+                          if (!roasts.length && !weights.length) return null;
 
                           return (
                             <div className="mt-1.5 space-y-1.5">
-                              {colors.length > 0 ? (
+                              {roasts.length > 0 ? (
                                 <div className="flex flex-wrap items-center justify-end gap-1.5">
-                                  {colors.map((c) => {
+                                  {roasts.map((c) => {
                                     const hex = resolveColorHex(c) || c;
                                     const active = sameColor(c, currentColor);
                                     const ok = colorAvailable(
@@ -247,10 +247,10 @@ export function ShopActivityDrawer({
                                         title={
                                           ok
                                             ? c
-                                            : "این رنگ با سایز فعلی تعریف نشده"
+                                            : "این وضعیت محصول با مناسبت‌ها فعلی تعریف نشده"
                                         }
                                         onClick={() =>
-                                          ok && void swap({ colorKey: c })
+                                          ok && void swap({ roastKey: c })
                                         }
                                         className={`h-5 w-5 rounded-full border-2 ${
                                           active
@@ -263,9 +263,9 @@ export function ShopActivityDrawer({
                                   })}
                                 </div>
                               ) : null}
-                              {sizes.length > 0 ? (
+                              {weights.length > 0 ? (
                                 <div className="flex flex-wrap items-center justify-end gap-1">
-                                  {sizes.map((sz) => {
+                                  {weights.map((sz) => {
                                     const active =
                                       (sz || "").toUpperCase() ===
                                       (currentSize || "").toUpperCase();
@@ -282,10 +282,10 @@ export function ShopActivityDrawer({
                                         title={
                                           ok
                                             ? sz
-                                            : `سایز ${sz} برای این رنگ تعریف نشده`
+                                            : `مناسبت‌ها ${sz} برای این وضعیت محصول تعریف نشده`
                                         }
                                         onClick={() =>
-                                          ok && void swap({ size: sz })
+                                          ok && void swap({ weight: sz })
                                         }
                                         className={`h-7 min-w-[1.75rem] rounded-md border px-1.5 text-[11px] font-medium ${
                                           active && ok
@@ -386,7 +386,7 @@ export function ShopActivityDrawer({
           <div className="border-border flex items-center justify-between border-t px-4 py-3">
             <span className="text-sm font-medium">جمع کل</span>
             <span className="text-sm font-bold">
-              <Price amount={cartTotal} size="md" />
+              <Price amount={cartTotal} weight="md" />
             </span>
           </div>
         ) : null}

@@ -1,6 +1,6 @@
 # چک‌لیست رسمی: Staging → QA → Backup → Smoke → Monitor
 
-سایت: https://pirahanmardane.ir
+سایت: https://shadjil.ir
 علامت: [x] پاس | [ ] باز | [N/A] رد/غیرکاربردی
 
 ## 1) Staging

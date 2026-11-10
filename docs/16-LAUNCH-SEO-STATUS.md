@@ -22,7 +22,7 @@
 ## برای روز لانچ عمومی (دستی مالک)
 1. در Vercel: `NEXT_PUBLIC_ALLOW_INDEX=true`
 2. Redeploy
-3. Search Console: دامنه + ارسال sitemap `https://pirahanmardane.ir/sitemap.xml`
+3. Search Console: دامنه + ارسال sitemap `https://shadjil.ir/sitemap.xml`
 4. بررسی `robots.txt` و یک صفحه محصول در Rich Results Test
 
 ## خارج از محدوده این فاز

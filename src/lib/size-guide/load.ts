@@ -6,7 +6,7 @@ export type SizeGuideView = {
   name: string;
   description: string | null;
   rows: {
-    size_label: string;
+    weight_label: string;
     chest_cm: number | null;
     waist_cm: number | null;
     shoulder_cm: number | null;
@@ -21,27 +21,27 @@ async function loadGuideById(
   guideId: string,
 ): Promise<SizeGuideView | null> {
   const { data: guide, error } = await supabase
-    .from("size_guides")
+    .from("weight_guides")
     .select("id, name, description")
     .eq("id", guideId)
     .maybeSingle();
   if (error || !guide) return null;
 
   const { data: rows, error: rErr } = await supabase
-    .from("size_guide_rows")
+    .from("weight_guide_rows")
     .select(
-      "size_label, chest_cm, waist_cm, shoulder_cm, sleeve_cm, length_cm, neck_cm, sort_order",
+      "weight_label, chest_cm, waist_cm, shoulder_cm, sleeve_cm, length_cm, neck_cm, sort_order",
     )
-    .eq("size_guide_id", guide.id)
+    .eq("weight_guide_id", guide.id)
     .order("sort_order", { ascending: true });
   if (rErr) return null;
 
   return {
     id: guide.id as string,
-    name: (guide.name as string) || "راهنمای سایز",
+    name: (guide.name as string) || "راهنمای مناسبت‌ها بسته‌بندی",
     description: (guide.description as string | null) ?? null,
     rows: (rows ?? []).map((r) => ({
-      size_label: String(r.size_label ?? ""),
+      weight_label: String(r.weight_label ?? ""),
       chest_cm: r.chest_cm != null ? Number(r.chest_cm) : null,
       waist_cm: r.waist_cm != null ? Number(r.waist_cm) : null,
       shoulder_cm: r.shoulder_cm != null ? Number(r.shoulder_cm) : null,
@@ -52,12 +52,12 @@ async function loadGuideById(
   };
 }
 
-/** Global first guide (legacy / size-guide page). */
+/** Global first guide (legacy / weight-guide page). */
 export async function loadPrimarySizeGuide(): Promise<SizeGuideView | null> {
   try {
     const supabase = createServiceClient();
     const { data: guide, error } = await supabase
-      .from("size_guides")
+      .from("weight_guides")
       .select("id")
       .order("created_at", { ascending: true })
       .limit(1)
@@ -72,23 +72,23 @@ export async function loadPrimarySizeGuide(): Promise<SizeGuideView | null> {
 
 /**
  * PDP preference:
- * 1) explicit product.size_guide_id
+ * 1) explicit product.weight_guide_id
  * 2) first guide for product.category_id
  * 3) global primary
  */
 export async function loadSizeGuideForProduct(opts: {
-  sizeGuideId?: string | null;
+  weightGuideId?: string | null;
   categoryId?: string | null;
 }): Promise<SizeGuideView | null> {
   try {
     const supabase = createServiceClient();
-    if (opts.sizeGuideId) {
-      const g = await loadGuideById(supabase, opts.sizeGuideId);
+    if (opts.weightGuideId) {
+      const g = await loadGuideById(supabase, opts.weightGuideId);
       if (g) return g;
     }
     if (opts.categoryId) {
       const { data: byCat } = await supabase
-        .from("size_guides")
+        .from("weight_guides")
         .select("id")
         .eq("category_id", opts.categoryId)
         .order("created_at", { ascending: true })

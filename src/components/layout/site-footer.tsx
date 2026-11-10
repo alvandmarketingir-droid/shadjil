@@ -2,7 +2,6 @@
 
 import { Mail } from "lucide-react";
 import { Footer } from "@/components/ui/modem-animated-footer";
-import { Logo } from "@/components/brand/logo";
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -26,21 +25,18 @@ function InstagramIcon({ className }: { className?: string }) {
 export function SiteFooter() {
   return (
     <Footer
-      brandName="پیراهن مردانه"
-      watermarkName="PirahanMardane"
-      brandDescription="فروشگاه تخصصی پیراهن مردانه و اکسسوری"
+      brandName="شادجیل"
+      watermarkName="Shadjil"
+      brandDescription="فروشگاه تخصصی آجیل، خشکبار، خرما و سوغات"
       socialLinks={[
-        
         {
           icon: <Mail className="h-6 w-6" />,
-          href: "mailto:info@pirahanmardane.ir",
+          href: "mailto:info@shadjil.ir",
           label: "ایمیل",
         },
-        
       ]}
       navLinks={[
         { label: "درباره ما", href: "/about" },
-        { label: "راهنمای سایز", href: "/size-guide" },
         { label: "ارسال", href: "/shipping" },
         { label: "مرجوعی", href: "/returns" },
         { label: "سوالات متداول", href: "/faq" },
@@ -48,7 +44,6 @@ export function SiteFooter() {
         { label: "حریم خصوصی", href: "/privacy" },
         { label: "تماس", href: "/contact" },
       ]}
-      brandIcon={<Logo size="footer" className="pointer-events-none" />}
     />
   );
 }

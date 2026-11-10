@@ -1,5 +1,5 @@
 /**
- * Database types for پیراهن مردانه
+ * Database types for شادجیل
  * Generated manually to match production schema
  * Keep in sync with supabase/migrations
  */
@@ -159,7 +159,7 @@ export type Database = {
           average_rating: number | null;
           review_count: number;
           deleted_at: string | null;
-          size_guide_id: string | null;
+          weight_guide_id: string | null;
           published_at: string | null;
           focus_keyphrases: string[] | null;
           robots_index: boolean | null;
@@ -191,7 +191,7 @@ export type Database = {
           average_rating?: number | null;
           review_count?: number;
           deleted_at?: string | null;
-          size_guide_id?: string | null;
+          weight_guide_id?: string | null;
           published_at?: string | null;
           focus_keyphrases?: string[] | null;
           robots_index?: boolean | null;
@@ -223,7 +223,7 @@ export type Database = {
           average_rating?: number | null;
           review_count?: number;
           deleted_at?: string | null;
-          size_guide_id?: string | null;
+          weight_guide_id?: string | null;
           published_at?: string | null;
           focus_keyphrases?: string[] | null;
           robots_index?: boolean | null;
@@ -260,9 +260,9 @@ export type Database = {
           id: string;
           product_id: string;
           sku: string | null;
-          size: string | null;
-          color_name: string | null;
-          color_hex: string | null;
+          weight: string | null;
+          roast_name: string | null;
+          roast_hex: string | null;
           price: number;
           original_price: number | null;
           stock_quantity: number;
@@ -276,9 +276,9 @@ export type Database = {
           id?: string;
           product_id: string;
           sku?: string | null;
-          size?: string | null;
-          color_name?: string | null;
-          color_hex?: string | null;
+          weight?: string | null;
+          roast_name?: string | null;
+          roast_hex?: string | null;
           price: number;
           original_price?: number | null;
           stock_quantity?: number;
@@ -292,9 +292,9 @@ export type Database = {
           id?: string;
           product_id?: string;
           sku?: string | null;
-          size?: string | null;
-          color_name?: string | null;
-          color_hex?: string | null;
+          weight?: string | null;
+          roast_name?: string | null;
+          roast_hex?: string | null;
           price?: number;
           original_price?: number | null;
           stock_quantity?: number;
@@ -439,7 +439,7 @@ export type Database = {
           }
         ];
       };
-      size_guides: {
+      weight_guides: {
         Row: {
           id: string;
           category_id: string | null;
@@ -466,11 +466,11 @@ export type Database = {
         };
         Relationships: [];
       };
-      size_guide_rows: {
+      weight_guide_rows: {
         Row: {
           id: string;
-          size_guide_id: string;
-          size_label: string;
+          weight_guide_id: string;
+          weight_label: string;
           chest_cm: number | null;
           waist_cm: number | null;
           shoulder_cm: number | null;
@@ -481,8 +481,8 @@ export type Database = {
         };
         Insert: {
           id?: string;
-          size_guide_id: string;
-          size_label: string;
+          weight_guide_id: string;
+          weight_label: string;
           chest_cm?: number | null;
           waist_cm?: number | null;
           shoulder_cm?: number | null;
@@ -493,8 +493,8 @@ export type Database = {
         };
         Update: {
           id?: string;
-          size_guide_id?: string;
-          size_label?: string;
+          weight_guide_id?: string;
+          weight_label?: string;
           chest_cm?: number | null;
           waist_cm?: number | null;
           shoulder_cm?: number | null;
@@ -773,17 +773,17 @@ export type Database = {
       order_items: {
         Row: {
           id: string; order_id: string; variant_id: string; product_id: string;
-          title: string; size_name: string | null; color_name: string | null;
+          title: string; weight_name: string | null; roast_name: string | null;
           unit_price: number; quantity: number; line_total: number;
         };
         Insert: {
           id?: string; order_id: string; variant_id: string; product_id: string;
-          title: string; size_name?: string | null; color_name?: string | null;
+          title: string; weight_name?: string | null; roast_name?: string | null;
           unit_price: number; quantity: number; line_total: number;
         };
         Update: {
           id?: string; order_id?: string; variant_id?: string; product_id?: string;
-          title?: string; size_name?: string | null; color_name?: string | null;
+          title?: string; weight_name?: string | null; roast_name?: string | null;
           unit_price?: number; quantity?: number; line_total?: number;
         };
         Relationships: [
@@ -825,13 +825,13 @@ export type Database = {
         };
         Relationships: [];
       };
-      sizes: {
+      weights: {
         Row: { id: string; name: string; slug: string; sort_order: number; is_active: boolean; created_at: string; };
         Insert: { id?: string; name: string; slug: string; sort_order?: number; is_active?: boolean; created_at?: string; };
         Update: { id?: string; name?: string; slug?: string; sort_order?: number; is_active?: boolean; created_at?: string; };
         Relationships: [];
       };
-      colors: {
+      roasts: {
         Row: { id: string; name: string; slug: string; hex_code: string | null; sort_order: number; is_active: boolean; created_at: string; };
         Insert: { id?: string; name: string; slug: string; hex_code?: string | null; sort_order?: number; is_active?: boolean; created_at?: string; };
         Update: { id?: string; name?: string; slug?: string; hex_code?: string | null; sort_order?: number; is_active?: boolean; created_at?: string; };
@@ -1826,7 +1826,7 @@ export type Database = {
           mime_type: string | null;
           width: number | null;
           height: number | null;
-          size_bytes: number | null;
+          weight_bytes: number | null;
           created_at: string;
         };
         Insert: {
@@ -1837,7 +1837,7 @@ export type Database = {
           mime_type?: string | null;
           width?: number | null;
           height?: number | null;
-          size_bytes?: number | null;
+          weight_bytes?: number | null;
           created_at?: string;
         };
         Update: {
@@ -1848,7 +1848,7 @@ export type Database = {
           mime_type?: string | null;
           width?: number | null;
           height?: number | null;
-          size_bytes?: number | null;
+          weight_bytes?: number | null;
           created_at?: string;
         };
         Relationships: [];
@@ -1941,8 +1941,8 @@ export type ProductVariant = Tables<"product_variants">;
 export type Attribute = Tables<"attributes">;
 export type AttributeOption = Tables<"attribute_options">;
 export type ProductImage = Tables<"product_images">;
-export type SizeGuide = Tables<"size_guides">;
-export type SizeGuideRow = Tables<"size_guide_rows">;
+export type SizeGuide = Tables<"weight_guides">;
+export type SizeGuideRow = Tables<"weight_guide_rows">;
 export type Profile = Tables<"profiles">;
 export type Review = Tables<"reviews">;
 export type Wishlist = Tables<"wishlists">;
@@ -1951,7 +1951,7 @@ export type CartItem = Tables<"cart_items">;
 export type Discount = Tables<"discounts">;
 
 // =====================================================
-// Extended types (sizes, colors, tags) - migration 003
+// Extended types (weights, roasts, tags) - migration 003
 // =====================================================
 
 export type Size = {
@@ -1977,7 +1977,7 @@ export type Tag = {
   id: string;
   name: string;
   slug: string;
-  color: string | null;
+  roast: string | null;
   sort_order: number;
   is_active: boolean;
   created_at: string;

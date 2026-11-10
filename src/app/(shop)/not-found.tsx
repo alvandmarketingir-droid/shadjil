@@ -7,7 +7,7 @@ export default function ShopNotFound() {
         <Illustration className="text-foreground pointer-events-none absolute inset-0 h-[40vh] w-full opacity-[0.04] dark:opacity-[0.03]" />
         <NotFound
           title="صفحه پیدا نشد"
-          description="این بخش از فروشگاه موجود نیست. می‌توانید جستجو کنید یا به محصولات برگردید."
+          description="این بخش از فروشگاه موجود نیست. می‌توانید جستجوی آجیل و خشکبار... یا به محصولات برگردید."
         />
       </div>
     </div>

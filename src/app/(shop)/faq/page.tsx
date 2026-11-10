@@ -7,8 +7,8 @@ import { FaqView } from "@/components/content/faq-view";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "سوالات متداول | پیراهن مردانه",
-  description: "پاسخ به سوالات رایج درباره سفارش، سایز، ارسال و مرجوعی",
+  title: "سوالات متداول | شادجیل",
+  description: "پاسخ به سوالات رایج درباره سفارش، مناسبت‌ها، ارسال و مرجوعی",
 };
 
 export default async function FaqPage() {

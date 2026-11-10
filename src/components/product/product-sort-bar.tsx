@@ -37,13 +37,13 @@ export function ProductSortBar(props: Props) {
 
   return (
     <div className="mb-4 flex items-center gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      <span className="text-muted-foreground shrink-0 text-sm">مرتب‌سازی:</span>
+      <span className="text-muted-foreground shrink-0 text-sm">مرتب‌سازی بر اساس:</span>
       {SORTS.map((s) => (
         <Link
           key={s.value}
           href={buildHref(s.value, props)}
           className={cn(
-            "shrink-0 rounded-full border px-3 py-1.5 text-xs whitespace-nowrap transition-colors",
+            "shrink-0 rounded-full border px-3 py-1.5 text-xs whitespace-nowrap transition-roasts",
             current === s.value
               ? "border-primary bg-primary text-primary-foreground"
               : "bg-background hover:bg-muted"

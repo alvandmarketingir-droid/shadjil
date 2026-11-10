@@ -41,8 +41,8 @@ type Opt = { id: string; name: string };
 type VRow = {
   key: string;
   id?: string;
-  size: string;
-  color_name: string;
+  weight: string;
+  roast_name: string;
   sku: string;
   price: string;
   original_price: string;
@@ -53,16 +53,16 @@ type VRow = {
 function isColorAttribute(slug?: string | null, name?: string | null) {
   const s = (slug || "").trim().toLowerCase();
   const n = (name || "").trim().toLowerCase();
-  if (s === "color" || s === "colour" || s === "رنگ") return true;
-  if (n === "رنگ" || n.includes("رنگ") || n === "color" || n === "colour") return true;
-  if (s.includes("color") || s.includes("colour")) return true;
+  if (s === "roast" || s === "colour" || s === "وضعیت محصول") return true;
+  if (n === "وضعیت محصول" || n.includes("وضعیت محصول") || n === "roast" || n === "colour") return true;
+  if (s.includes("roast") || s.includes("colour")) return true;
   return false;
 }
 function isSizeAttribute(slug?: string | null, name?: string | null) {
   const s = (slug || "").trim().toLowerCase();
   const n = (name || "").trim().toLowerCase();
-  if (s === "size" || s === "سایز") return true;
-  if (n === "سایز" || n.includes("سایز") || n === "size") return true;
+  if (s === "weight" || s === "موجودی") return true;
+  if (n === "موجودی" || n.includes("موجودی") || n === "weight") return true;
   return false;
 }
 
@@ -80,8 +80,8 @@ const STEPS = [
 function emptyVariant(seed?: { price?: string; original?: string }): VRow {
   return {
     key: `n-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-    size: "",
-    color_name: "",
+    weight: "",
+    roast_name: "",
     sku: "",
     price: seed?.price ?? "",
     original_price: seed?.original ?? "",
@@ -139,10 +139,10 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
   const [imageUrl, setImageUrl] = useState("");
   const [gallery, setGallery] = useState<{ id?: string; url: string }[]>([]);
   const [attrDefs, setAttrDefs] = useState<AttrWithOptions[]>([]);
-  const sizeAttr = attrDefs.find((a) => isSizeAttribute(a.slug, a.name));
-  const colorAttr = attrDefs.find((a) => isColorAttribute(a.slug, a.name));
-  const sizeOpts = (sizeAttr?.options ?? []) as Array<{ id: string; value: string; hex?: string | null }>;
-  const colorOpts = (colorAttr?.options ?? []) as Array<{
+  const weightAttr = attrDefs.find((a) => isSizeAttribute(a.slug, a.name));
+  const roastAttr = attrDefs.find((a) => isColorAttribute(a.slug, a.name));
+  const weightOpts = (weightAttr?.options ?? []) as Array<{ id: string; value: string; hex?: string | null }>;
+  const roastOpts = (roastAttr?.options ?? []) as Array<{
     id: string;
     value: string;
     hex?: string | null;
@@ -158,15 +158,15 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
   /** option ids chosen on step 4 for variant axes */
   const [pickedSizeIds, setPickedSizeIds] = useState<string[]>([]);
   const [pickedColorIds, setPickedColorIds] = useState<string[]>([]);
-  const pickedSizeOpts = sizeOpts.filter((o) => pickedSizeIds.includes(o.id));
-  const pickedColorOpts = colorOpts.filter((o) => pickedColorIds.includes(o.id));
-  const sizeChoices = pickedSizeOpts.length ? pickedSizeOpts : sizeOpts;
-  const colorChoices = pickedColorOpts.length ? pickedColorOpts : colorOpts;
+  const pickedSizeOpts = weightOpts.filter((o) => pickedSizeIds.includes(o.id));
+  const pickedColorOpts = roastOpts.filter((o) => pickedColorIds.includes(o.id));
+  const weightChoices = pickedSizeOpts.length ? pickedSizeOpts : weightOpts;
+  const roastChoices = pickedColorOpts.length ? pickedColorOpts : roastOpts;
   const [cats, setCats] = useState<Opt[]>([]);
   const [brands, setBrands] = useState<Opt[]>([]);
   const [tags, setTags] = useState<Opt[]>([]);
   const [guides, setGuides] = useState<Opt[]>([]);
-  const [sizeGuideId, setSizeGuideId] = useState("");
+  const [weightGuideId, setSizeGuideId] = useState("");
   const [publishedAt, setPublishedAt] = useState("");
   const [publishMode, setPublishMode] = useState<"draft" | "now" | "schedule">("draft");
   const [slugStatus, setSlugStatus] = useState<"idle" | "checking" | "ok" | "taken" | "err">("idle");
@@ -215,7 +215,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
       setIsNew(p.is_new !== false);
       setIsActive(p.is_active !== false);
       setImageUrl(String(p.image_url ?? ""));
-      setSizeGuideId(String(p.size_guide_id ?? "") || "");
+      setSizeGuideId(String(p.weight_guide_id ?? "") || "");
       {
         const pa = p.published_at ? toJalaliInputValue(String(p.published_at)) : "";
         if (pa) {
@@ -240,12 +240,12 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
       for (const im of imgsEarly) {
         if (im.variant_id && im.url) byVariant.set(String(im.variant_id), String(im.url));
       }
-      const hasSized = vars.some((v) => v.size || v.color_name);
+      const hasSized = vars.some((v) => v.weight || v.roast_name);
       if (hasSized || vars.length > 1) {
         setProductType("variable");
         setVariants(
           vars
-            .filter((v) => v.size || v.color_name || vars.length === 1)
+            .filter((v) => v.weight || v.roast_name || vars.length === 1)
             .map((v) => {
               const vid = v.id ? String(v.id) : undefined;
               const pr = Number(v.price ?? 0);
@@ -256,8 +256,8 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
               return {
                 key: String(v.id ?? `e-${Math.random()}`),
                 id: vid,
-                size: String(v.size ?? ""),
-                color_name: String(v.color_name ?? ""),
+                weight: String(v.weight ?? ""),
+                roast_name: String(v.roast_name ?? ""),
                 sku: String(v.sku ?? ""),
                 price: sale !== "" ? String(sale) : "",
                 original_price: main > 0 ? String(main) : String(v.original_price ?? v.price ?? ""),
@@ -287,8 +287,8 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
           {
             key: String(vars[0].id ?? `e-${Math.random()}`),
             id: vid,
-            size: "",
-            color_name: "",
+            weight: "",
+            roast_name: "",
             sku: String(vars[0].sku ?? ""),
             price: "",
             original_price: String(
@@ -362,16 +362,16 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
 
 
 
-  // همگام‌سازی سایز/رنگ انتخاب‌شده با مقادیر واقعی واریانت‌ها (بعد از ریلود خالی نماند)
+  // همگام‌سازی مناسبت‌ها/وضعیت محصول انتخاب‌شده با مقادیر واقعی واریانت‌ها (بعد از ریلود خالی نماند)
   useEffect(() => {
     if (!variants.length) return;
-    if (sizeOpts.length) {
+    if (weightOpts.length) {
       const vals = new Set(
-        variants.map((v) => String(v.size || "").trim()).filter(Boolean),
+        variants.map((v) => String(v.weight || "").trim()).filter(Boolean),
       );
-      if (vals.size) {
+      if (vals.weight) {
         setPickedSizeIds((prev) => {
-          const fromVars = sizeOpts
+          const fromVars = weightOpts
             .filter((o) => vals.has(String(o.value).trim()))
             .map((o) => o.id);
           const merged = Array.from(new Set([...prev, ...fromVars]));
@@ -379,13 +379,13 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
         });
       }
     }
-    if (colorOpts.length) {
+    if (roastOpts.length) {
       const vals = new Set(
-        variants.map((v) => String(v.color_name || "").trim()).filter(Boolean),
+        variants.map((v) => String(v.roast_name || "").trim()).filter(Boolean),
       );
-      if (vals.size) {
+      if (vals.weight) {
         setPickedColorIds((prev) => {
-          const fromVars = colorOpts
+          const fromVars = roastOpts
             .filter((o) => vals.has(String(o.value).trim()))
             .map((o) => o.id);
           const merged = Array.from(new Set([...prev, ...fromVars]));
@@ -393,25 +393,25 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
         });
       }
     }
-  }, [variants, sizeOpts, colorOpts]);
+  }, [variants, weightOpts, roastOpts]);
 
   useEffect(() => {
     if (!loadedAttrRows.length || !attrDefs.length) return;
-    const sizeId = attrDefs.find((a) => isSizeAttribute(a.slug, a.name))?.id;
-    const colorId = attrDefs.find((a) => isColorAttribute(a.slug, a.name))?.id;
-    const sizes: string[] = [];
-    const colors: string[] = [];
+    const weightId = attrDefs.find((a) => isSizeAttribute(a.slug, a.name))?.id;
+    const roastId = attrDefs.find((a) => isColorAttribute(a.slug, a.name))?.id;
+    const weights: string[] = [];
+    const roasts: string[] = [];
     const map: Record<string, string> = {};
     for (const row of loadedAttrRows) {
       const oid = (row.option_id || row.value_text || "").trim();
       if (!oid) continue;
-      if (sizeId && row.attribute_id === sizeId) sizes.push(oid);
-      else if (colorId && row.attribute_id === colorId) colors.push(oid);
+      if (weightId && row.attribute_id === weightId) weights.push(oid);
+      else if (roastId && row.attribute_id === roastId) roasts.push(oid);
       else map[row.attribute_id] = oid;
     }
     if (Object.keys(map).length) setAttrValues((m) => ({ ...map, ...m }));
-    if (sizes.length) setPickedSizeIds(sizes);
-    if (colors.length) setPickedColorIds(colors);
+    if (weights.length) setPickedSizeIds(weights);
+    if (roasts.length) setPickedColorIds(roasts);
   }, [loadedAttrRows, attrDefs]);
 
   useEffect(() => {
@@ -445,7 +445,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
     if (s === 5) {
       if (!variants.length) return "حداقل یک واریانت لازم است";
       for (const v of variants) {
-        if (!v.size && !v.color_name) return "هر واریانت باید سایز یا رنگ داشته باشد";
+        if (!v.weight && !v.roast_name) return "هر واریانت باید مناسبت‌ها یا وضعیت محصول داشته باشد";
         const sale = parseLocaleNumber(v.price) ?? 0;
         const original = parseLocaleNumber(v.original_price) ?? 0;
         const main = original > 0 ? original : sale;
@@ -490,7 +490,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
         is_new: isNew,
         image_url: imageUrl || null,
         tag_ids: selectedTags,
-        size_guide_id: sizeGuideId || null,
+        weight_guide_id: weightGuideId || null,
         published_at: resolvedPublishedAt,
         meta_title: seo.metaTitle || null,
         meta_description: seo.metaDescription || null,
@@ -525,16 +525,16 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
         if (!upd.ok) return { ok: false as const, error: (upd as { detail?: string }).detail || upd.error || "به‌روزرسانی ناموفق" };
       }
 
-      // attributes (specs + picked size/color options for filters)
+      // attributes (specs + picked weight/roast options for filters)
       {
         const rows: Array<{ attribute_id: string; option_id: string }> = Object.entries(attrValues)
           .filter(([, v]) => v)
           .map(([attribute_id, option_id]) => ({ attribute_id, option_id }));
-        if (sizeAttr?.id) {
-          for (const oid of pickedSizeIds) rows.push({ attribute_id: sizeAttr.id, option_id: oid });
+        if (weightAttr?.id) {
+          for (const oid of pickedSizeIds) rows.push({ attribute_id: weightAttr.id, option_id: oid });
         }
-        if (colorAttr?.id) {
-          for (const oid of pickedColorIds) rows.push({ attribute_id: colorAttr.id, option_id: oid });
+        if (roastAttr?.id) {
+          for (const oid of pickedColorIds) rows.push({ attribute_id: roastAttr.id, option_id: oid });
         }
         const syncAttr = await adminSyncProductAttributesAction(id, rows as never);
         if (!syncAttr.ok) {
@@ -568,13 +568,13 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
               ? sale
               : main;
           if (!(main > 0) && !(sell > 0)) return null;
-          if (!v.size && !v.color_name) return null;
-          const hx = resolveColorHex(v.color_name, colorOpts.find((o) => o.value === v.color_name)?.hex);
+          if (!v.weight && !v.roast_name) return null;
+          const hx = resolveColorHex(v.roast_name, roastOpts.find((o) => o.value === v.roast_name)?.hex);
           return {
             id: v.id,
-            size: v.size || null,
-            color_name: v.color_name || null,
-            color_hex: hx,
+            weight: v.weight || null,
+            roast_name: v.roast_name || null,
+            roast_hex: hx,
             sku: v.sku || null,
             price: sell > 0 ? sell : main,
             original_price: main > sell ? main : sell > 0 ? sell : main,
@@ -592,7 +592,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
         if (mustHaveVariants) {
           return {
             ok: false as const,
-            error: "حداقل یک واریانت با سایز/رنگ و قیمت معتبر لازم است",
+            error: "حداقل یک واریانت با مناسبت‌ها/وضعیت محصول و قیمت معتبر لازم است",
           };
         }
         // draft: از sync واریانت رد شو
@@ -622,9 +622,9 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
     },
     [
       productId, name, slug, categoryId, brandId, shortDesc, description, status,
-      featured, isNew, isActive, imageUrl, selectedTags, attrValues, productType, pickedSizeIds, pickedColorIds, sizeAttr, colorAttr, colorOpts,
+      featured, isNew, isActive, imageUrl, selectedTags, attrValues, productType, pickedSizeIds, pickedColorIds, weightAttr, roastAttr, roastOpts,
       simpleSku, simpleStock, variants, sellingPrice, originalPrice,
-      sizeGuideId, publishedAt, publishMode,
+      weightGuideId, publishedAt, publishMode,
     ],
   );
 
@@ -978,7 +978,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
     setVariants((rows) =>
       rows.map((r, i) => (i === idx ? { ...r, image_url: url } : r)),
     );
-    setOkMsg("تصویر واریانت تنظیم شد — با ذخیره به رنگ لینک می‌شود");
+    setOkMsg("تصویر واریانت تنظیم شد — با ذخیره به وضعیت محصول لینک می‌شود");
   }
 
   if (loading) {
@@ -1087,7 +1087,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
               </select>
             </label>
             <label className="block space-y-1 text-sm">
-              <span>برند</span>
+              <span>برچسب‌ها</span>
               <select
                 className="border-input bg-background w-full rounded-lg border px-3 py-2"
                 value={brandId}
@@ -1135,12 +1135,12 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
             {!attrDefs.length ? (
               <p className="text-muted-foreground text-sm">مشخصه‌ای تعریف نشده. از ادمین → مشخصات اضافه کنید.</p>
             ) : null}
-{/* رنگ: سواچ + نام */}
-            {colorAttr ? (
+{/* وضعیت محصول: سواچ + نام */}
+            {roastAttr ? (
               <div className="space-y-2">
-                <p className="text-sm font-medium">{colorAttr.name}</p>
+                <p className="text-sm font-medium">{roastAttr.name}</p>
                 <div className="flex flex-wrap gap-2">
-                  {(colorAttr.options ?? []).map((o) => {
+                  {(roastAttr.options ?? []).map((o) => {
                     const hx = resolveColorHex(
                       o.value,
                       (o as { hex?: string | null }).hex,
@@ -1175,20 +1175,20 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
                     );
                   })}
                 </div>
-                {!colorAttr.options?.length ? (
+                {!roastAttr.options?.length ? (
                   <p className="text-muted-foreground text-xs">
-                    گزینه‌ای برای رنگ نیست — از مشخصات محصول رنگ + هگز اضافه کنید.
+                    گزینه‌ای برای وضعیت محصول نیست — از مشخصات محصول وضعیت محصول + هگز اضافه کنید.
                   </p>
                 ) : null}
               </div>
             ) : null}
 
-            {/* سایز */}
-            {sizeAttr ? (
+            {/* مناسبت‌ها */}
+            {weightAttr ? (
               <div className="space-y-2">
-                <p className="text-sm font-medium">{sizeAttr.name}</p>
+                <p className="text-sm font-medium">{weightAttr.name}</p>
                 <div className="flex flex-wrap gap-2">
-                  {(sizeAttr.options ?? []).map((o) => {
+                  {(weightAttr.options ?? []).map((o) => {
                     const on = pickedSizeIds.includes(o.id);
                     return (
                       <button
@@ -1238,7 +1238,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
               </label>
             ))}
             <p className="text-muted-foreground text-xs">
-              رنگ و سایز انتخاب‌شده در فیلتر فروشگاه می‌آیند؛ در گام واریانت برای هر ردیف رنگ/سایز را جداگانه مشخص کنید.
+              وضعیت محصول و مناسبت‌ها انتخاب‌شده در فیلتر فروشگاه می‌آیند؛ در گام واریانت برای هر ردیف وضعیت محصول/مناسبت‌ها را جداگانه مشخص کنید.
             </p>
           </div>
         )}
@@ -1309,8 +1309,8 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
         {step === 5 && (
           <div className="space-y-4">
             <p className="text-muted-foreground text-xs">
-              برای هر ترکیب سایز/رنگ یک ردیف بسازید. قیمت اصلی و در صورت نیاز قیمت بعد از تخفیف را وارد کنید.
-              سایز و رنگ هر ردیف را از لیست زیر انتخاب کنید.
+              برای هر ترکیب مناسبت‌ها/وضعیت محصول یک ردیف بسازید. قیمت اصلی و در صورت نیاز قیمت بعد از تخفیف را وارد کنید.
+              مناسبت‌ها و وضعیت محصول هر ردیف را از لیست زیر انتخاب کنید.
             </p>
             <button
               type="button"
@@ -1364,25 +1364,25 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
                           حذف تصویر
                         </button>
                       ) : null}
-                      {v.color_name ? (
+                      {v.roast_name ? (
                         <span className="text-muted-foreground text-xs">
-                          رنگ: {v.color_name}
+                          وضعیت محصول: {v.roast_name}
                         </span>
                       ) : null}
                     </div>
                     <div className="grid gap-2 sm:grid-cols-3">
                       <select
                         className="border-input bg-background min-w-[5.5rem] rounded-lg border px-2 py-1.5 text-sm"
-                        value={v.size}
+                        value={v.weight}
                         onChange={(e) => {
-                          const size = e.target.value;
+                          const weight = e.target.value;
                           setVariants((rows) =>
-                            rows.map((r, i) => (i === idx ? { ...r, size } : r)),
+                            rows.map((r, i) => (i === idx ? { ...r, weight } : r)),
                           );
                         }}
                       >
-                        <option value="">سایز…</option>
-                        {sizeOpts.map((o) => (
+                        <option value="">مناسبت‌ها…</option>
+                        {weightOpts.map((o) => (
                           <option key={o.id} value={o.value}>
                             {o.value}
                           </option>
@@ -1391,21 +1391,21 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
                       <div className="relative min-w-[9rem]">
                       <details className="group">
                         <summary className="border-input bg-background flex cursor-pointer list-none items-center gap-2 rounded-lg border px-2 py-1.5 text-sm [&::-webkit-details-marker]:hidden">
-                          {v.color_name ? (
+                          {v.roast_name ? (
                             <>
                               <span
                                 className="border-border h-4 w-4 shrink-0 rounded-full border shadow-sm"
                                 style={{
                                   backgroundColor: resolveColorHex(
-                                    v.color_name,
-                                    colorOpts.find((o) => o.value === v.color_name)?.hex,
+                                    v.roast_name,
+                                    roastOpts.find((o) => o.value === v.roast_name)?.hex,
                                   ),
                                 }}
                               />
-                              <span className="truncate">{v.color_name}</span>
+                              <span className="truncate">{v.roast_name}</span>
                             </>
                           ) : (
-                            <span className="text-muted-foreground">رنگ…</span>
+                            <span className="text-muted-foreground">وضعیت محصول…</span>
                           )}
                         </summary>
                         <div className="border-border bg-background absolute z-30 mt-1 max-h-52 w-full min-w-[10rem] overflow-auto rounded-lg border py-1 shadow-md">
@@ -1417,14 +1417,14 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
                               if (d) d.removeAttribute("open");
                               setVariants((rows) =>
                                 rows.map((r, i) =>
-                                  i === idx ? { ...r, color_name: "" } : r,
+                                  i === idx ? { ...r, roast_name: "" } : r,
                                 ),
                               );
                             }}
                           >
                             <span className="text-muted-foreground">—</span>
                           </button>
-                          {colorOpts.map((o) => (
+                          {roastOpts.map((o) => (
                             <button
                               key={o.id}
                               type="button"
@@ -1434,7 +1434,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
                                 if (d) d.removeAttribute("open");
                                 setVariants((rows) =>
                                   rows.map((r, i) =>
-                                    i === idx ? { ...r, color_name: o.value } : r,
+                                    i === idx ? { ...r, roast_name: o.value } : r,
                                   ),
                                 );
                               }}

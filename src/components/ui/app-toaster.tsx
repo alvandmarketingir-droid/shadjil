@@ -15,28 +15,28 @@ const toastTypes = [
   {
     type: "success" as const,
     icon: CheckCircle,
-    colors:
+    roasts:
       "bg-green-50 border-l-4 border-green-500 text-green-800 dark:bg-green-50 dark:text-green-800 dark:border-green-500",
     iconColor: "text-green-500",
   },
   {
     type: "error" as const,
     icon: AlertCircle,
-    colors:
+    roasts:
       "bg-red-50 border-l-4 border-red-500 text-red-800 dark:bg-red-50 dark:text-red-800 dark:border-red-500",
     iconColor: "text-red-500",
   },
   {
     type: "warning" as const,
     icon: AlertTriangle,
-    colors:
+    roasts:
       "bg-yellow-50 border-l-4 border-yellow-500 text-yellow-800 dark:bg-yellow-50 dark:text-yellow-800 dark:border-yellow-500",
     iconColor: "text-yellow-500",
   },
   {
     type: "info" as const,
     icon: Info,
-    colors:
+    roasts:
       "bg-blue-50 border-l-4 border-blue-500 text-blue-800 dark:bg-blue-50 dark:text-blue-800 dark:border-blue-500",
     iconColor: "text-blue-500",
   },
@@ -52,7 +52,7 @@ export function AppToaster() {
           return (
             <Toast.Root
               className={`relative min-w-80 rounded-lg p-4 shadow-lg transition-all duration-300 will-change-transform h-(--height) opacity-(--opacity) translate-x-(--x) translate-y-(--y) scale-(--scale) z-(--z-index) ${
-                cfg?.colors || "border border-gray-100 bg-white dark:bg-white dark:border-gray-100 dark:text-green-800"
+                cfg?.roasts || "border border-gray-100 bg-white dark:bg-white dark:border-gray-100 dark:text-green-800"
               }`}
             >
               <div className="flex items-start gap-3">

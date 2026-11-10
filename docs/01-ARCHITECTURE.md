@@ -1,4 +1,4 @@
-# Architecture - pirahanmardane.ir
+# Architecture - shadjil.ir
 
 Version: 1.1 | 2026-10-20 | Status: pre-launch (noindex)
 

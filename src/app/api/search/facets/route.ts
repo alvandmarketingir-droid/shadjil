@@ -15,11 +15,11 @@ function sb() {
 export async function GET() {
   try {
     const client = sb();
-    const [cats, brands, colors, sizes, attrs, opts] = await Promise.all([
+    const [cats, brands, roasts, weights, attrs, opts] = await Promise.all([
       client.from("categories").select("name,slug").order("name").limit(40),
       client.from("brands").select("name,slug").order("name").limit(40),
-      client.from("colors").select("name,slug").order("name").limit(30),
-      client.from("sizes").select("name,slug").order("name").limit(30),
+      client.from("roasts").select("name,slug").order("name").limit(30),
+      client.from("weights").select("name,slug").order("name").limit(30),
       client
         .from("attributes")
         .select("id,name,slug,is_filterable,sort_order")
@@ -33,7 +33,7 @@ export async function GET() {
         .limit(500),
     ]);
 
-    const skip = new Set(["color", "size"]);
+    const skip = new Set(["roast", "weight"]);
     const optionsByAttr = new Map<string, { id: string; value: string; slug: string }[]>();
     for (const o of opts.data ?? []) {
       const aid = String((o as { attribute_id: string }).attribute_id);
@@ -65,8 +65,8 @@ export async function GET() {
         brands: filterBlockedBrands(
           (brands.data ?? []) as { name?: string; slug?: string }[],
         ),
-        colors: colors.data ?? [],
-        sizes: sizes.data ?? [],
+        roasts: roasts.data ?? [],
+        weights: weights.data ?? [],
         attributes,
       },
       {
@@ -78,7 +78,7 @@ export async function GET() {
   } catch (e) {
     console.error("facets", e);
     return NextResponse.json(
-      { categories: [], brands: [], colors: [], sizes: [], attributes: [] },
+      { categories: [], brands: [], roasts: [], weights: [], attributes: [] },
       { status: 200 }
     );
   }

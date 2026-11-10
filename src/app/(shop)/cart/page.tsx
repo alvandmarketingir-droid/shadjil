@@ -10,7 +10,7 @@ import {
   sizeAvailable,
   colorAvailable,
   sameColor,
-  colorNorm,
+  roastNorm,
 } from "@/lib/variant-availability";
 import { useShopStore } from "@/lib/shop-store";
 import { useServerCartStore } from "@/lib/server-cart-store";
@@ -28,9 +28,9 @@ import { track } from "@/lib/analytics/track";
 export const dynamic = "force-dynamic";
 
 type VOpt = {
-  color?: string;
-  colorHex?: string;
-  size?: string;
+  roast?: string;
+  roastHex?: string;
+  weight?: string;
   stock: number;
 };
 
@@ -38,25 +38,25 @@ function fmtPrice(n: number) {
   return toPersianDigits(Math.round(n).toLocaleString("en-US")) + " تومان";
 }
 
-function colorsFromOpts(opts: VOpt[]): string[] {
+function roastsFromOpts(opts: VOpt[]): string[] {
   const out: string[] = [];
   for (const o of opts) {
-    const k = (o.colorHex || o.color || "").trim();
+    const k = (o.roastHex || o.roast || "").trim();
     if (!k) continue;
-    if (!out.some((x) => colorNorm(x) === colorNorm(k))) out.push(k);
+    if (!out.some((x) => roastNorm(x) === roastNorm(k))) out.push(k);
   }
   return out;
 }
 
-function sizesFromOpts(opts: VOpt[]): string[] {
-  return [...new Set(opts.map((o) => (o.size || "").trim()).filter(Boolean))];
+function weightsFromOpts(opts: VOpt[]): string[] {
+  return [...new Set(opts.map((o) => (o.weight || "").trim()).filter(Boolean))];
 }
 
 function toLikes(opts: VOpt[]) {
   return opts.map((o, i) => ({
     id: String(i),
-    size: o.size || null,
-    color: o.colorHex || o.color || null,
+    weight: o.weight || null,
+    roast: o.roastHex || o.roast || null,
     stock: Number(o.stock ?? 0),
   }));
 }
@@ -85,9 +85,9 @@ export default function CartPage() {
       price: l.price ?? 0,
       quantity: l.quantity ?? 1,
       image: l.image,
-      size: l.size,
-      color: l.color,
-      colorHex: l.colorHex,
+      weight: l.weight,
+      roast: l.roast,
+      roastHex: l.roastHex,
       variantOptions: (l.variantOptions ?? []) as VOpt[],
     }));
   }, [unifiedLines]);
@@ -166,26 +166,26 @@ export default function CartPage() {
 
   async function changeVariant(
     line: (typeof lines)[number],
-    patch: { size?: string; colorKey?: string },
+    patch: { weight?: string; roastKey?: string },
   ) {
     const opts = line.variantOptions;
     const likes = toLikes(opts);
     const nextColor =
-      patch.colorKey !== undefined
-        ? patch.colorKey
-        : line.colorHex || line.color || null;
+      patch.roastKey !== undefined
+        ? patch.roastKey
+        : line.roastHex || line.roast || null;
     const nextSize =
-      patch.size !== undefined ? patch.size : line.size || null;
+      patch.weight !== undefined ? patch.weight : line.weight || null;
 
     if (opts.length) {
       const ok = likes.some((v) => {
-        const colorOk =
-          !nextColor || !v.color || sameColor(v.color, nextColor);
-        const sizeOk = !nextSize || !v.size || v.size === nextSize;
-        return colorOk && sizeOk && (v.stock ?? 0) > 0;
+        const roastOk =
+          !nextColor || !v.roast || sameColor(v.roast, nextColor);
+        const weightOk = !nextSize || !v.weight || v.weight === nextSize;
+        return roastOk && weightOk && (v.stock ?? 0) > 0;
       });
       if (!ok) {
-        setMsg("این ترکیب رنگ/سایز تعریف نشده یا موجود نیست.");
+        setMsg("این ترکیب وضعیت محصول/مناسبت‌ها تعریف نشده یا موجود نیست.");
         return;
       }
     }
@@ -197,8 +197,8 @@ export default function CartPage() {
         const res = await swapCartVariantAction({
           oldVariantId: line.variantId,
           productId: line.productId,
-          colorHex: nextColor,
-          size: nextSize,
+          roastHex: nextColor,
+          weight: nextSize,
           quantity: line.quantity,
         });
         if (!res.ok) {
@@ -215,8 +215,8 @@ export default function CartPage() {
         await refreshServer();
       } else {
         updateCartItem(line.key, {
-          size: nextSize || undefined,
-          color: nextColor || undefined,
+          weight: nextSize || undefined,
+          roast: nextColor || undefined,
         });
       }
     } finally {
@@ -232,7 +232,7 @@ export default function CartPage() {
             سبد خرید
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            رنگ، سایز و تعداد — فوری به‌روز می‌شود
+            وضعیت محصول، مناسبت‌ها و تعداد — فوری به‌روز می‌شود
           </p>
         </div>
         <Link
@@ -270,10 +270,10 @@ export default function CartPage() {
               const busy = !!busyMap[p.key];
               const opts = p.variantOptions;
               const likes = toLikes(opts);
-              const colors = colorsFromOpts(opts);
-              const sizes = sizesFromOpts(opts);
-              const currentColor = p.colorHex || p.color || null;
-              const currentSize = p.size || null;
+              const roasts = roastsFromOpts(opts);
+              const weights = weightsFromOpts(opts);
+              const currentColor = p.roastHex || p.roast || null;
+              const currentSize = p.weight || null;
 
               return (
                 <li key={p.key} className="flex gap-3 p-4">
@@ -297,11 +297,11 @@ export default function CartPage() {
                       جمع: {fmtPrice(Number(p.price) * qty)}
                     </p>
 
-                    {colors.length > 0 ? (
+                    {roasts.length > 0 ? (
                       <div className="space-y-1">
-                        <p className="text-muted-foreground text-[11px]">رنگ</p>
+                        <p className="text-muted-foreground text-[11px]">وضعیت محصول</p>
                         <div className="flex flex-wrap justify-end gap-1.5">
-                          {colors.map((c) => {
+                          {roasts.map((c) => {
                             const hex = resolveColorHex(c) || c;
                             const active = sameColor(c, currentColor);
                             const ok = colorAvailable(c, likes, currentSize);
@@ -312,7 +312,7 @@ export default function CartPage() {
                                 disabled={busy || !ok}
                                 title={ok ? c : "ترکیب تعریف‌نشده"}
                                 onClick={() =>
-                                  ok && void changeVariant(p, { colorKey: c })
+                                  ok && void changeVariant(p, { roastKey: c })
                                 }
                                 className={`h-7 w-7 rounded-full border-2 ${
                                   active
@@ -327,11 +327,11 @@ export default function CartPage() {
                       </div>
                     ) : null}
 
-                    {sizes.length > 0 ? (
+                    {weights.length > 0 ? (
                       <div className="space-y-1">
-                        <p className="text-muted-foreground text-[11px]">سایز</p>
+                        <p className="text-muted-foreground text-[11px]">موجودی</p>
                         <div className="flex flex-wrap justify-end gap-1.5">
-                          {sizes.map((sz) => {
+                          {weights.map((sz) => {
                             const active =
                               (sz || "").toUpperCase() ===
                               (currentSize || "").toUpperCase();
@@ -341,9 +341,9 @@ export default function CartPage() {
                                 key={sz}
                                 type="button"
                                 disabled={busy || !ok}
-                                title={ok ? sz : `سایز ${sz} ناموجود`}
+                                title={ok ? sz : `مناسبت‌ها ${sz} ناموجود`}
                                 onClick={() =>
-                                  ok && void changeVariant(p, { size: sz })
+                                  ok && void changeVariant(p, { weight: sz })
                                 }
                                 className={`h-8 min-w-[2.25rem] rounded-lg border px-2 text-xs font-medium ${
                                   active && ok

@@ -234,8 +234,8 @@ export async function removeCartItemAction(variantId: string) {
 export async function swapCartVariantAction(input: {
   oldVariantId: string;
   productId: string;
-  colorHex?: string | null;
-  size?: string | null;
+  roastHex?: string | null;
+  weight?: string | null;
   quantity?: number;
 }): Promise<{ ok: boolean; error?: string; variantId?: string }> {
   try {
@@ -244,33 +244,33 @@ export async function swapCartVariantAction(input: {
     const supabase = await createClient();
     const { data: vars, error } = await supabase
       .from("product_variants")
-      .select("id, color_name, color_hex, size, is_active, stock_quantity")
+      .select("id, roast_name, roast_hex, weight, is_active, stock_quantity")
       .eq("product_id", input.productId)
       .eq("is_active", true);
     if (error) throw error;
 
     const norm = (s?: string | null) =>
       (s || "").trim().replace(/^#/, "").toLowerCase();
-    const wantHex = norm(input.colorHex);
-    const wantSize = (input.size || "").trim().toUpperCase();
+    const wantHex = norm(input.roastHex);
+    const wantSize = (input.weight || "").trim().toUpperCase();
 
     const match = (vars ?? []).find((v: any) => {
-      const hex = norm(v.color_hex);
-      const name = norm(v.color_name);
-      const szRaw = v.size;
+      const hex = norm(v.roast_hex);
+      const name = norm(v.roast_name);
+      const szRaw = v.weight;
       const sz =
         typeof szRaw === "string"
           ? szRaw.trim().toUpperCase()
           : szRaw && typeof szRaw === "object"
             ? String(szRaw.name || "").trim().toUpperCase()
             : "";
-      const colorOk =
+      const roastOk =
         !wantHex ||
         hex === wantHex ||
         name === wantHex ||
-        norm(v.color_hex || v.color_name) === wantHex;
-      const sizeOk = !wantSize || sz === wantSize;
-      return colorOk && sizeOk;
+        norm(v.roast_hex || v.roast_name) === wantHex;
+      const weightOk = !wantSize || sz === wantSize;
+      return roastOk && weightOk;
     });
 
     if (!match?.id) return { ok: false, error: "variant_not_found" };
@@ -305,12 +305,12 @@ export type CartLineDTO = {
   title: string;
   slug: string;
   image?: string;
-  size?: string;
-  color?: string;
-  colorHex?: string;
-  colors?: string[];
-  sizes?: string[];
-  /** وزن یک واحد به گرم — برای محاسبه ارسال */
+  weight?: string;
+  roast?: string;
+  roastHex?: string;
+  roasts?: string[];
+  weights?: string[];
+  /** مناسبت‌ها یک واحد به گرم — برای محاسبه ارسال */
   weightGrams?: number;
 };
 
@@ -360,14 +360,14 @@ export async function getCartAction(): Promise<{
         title: product?.name ?? "محصول",
         slug: product?.slug ?? "",
         image,
-        size: typeof v?.size === "string" ? v.size : v?.size?.name ?? undefined,
-        color: v?.color_name ?? (typeof v?.color === "string" ? v.color : v?.color?.name) ?? undefined,
-        colorHex: v?.color_hex ?? v?.color?.hex_code ?? undefined,
+        weight: typeof v?.weight === "string" ? v.weight : v?.weight?.name ?? undefined,
+        roast: v?.roast_name ?? (typeof v?.roast === "string" ? v.roast : v?.roast?.name) ?? undefined,
+        roastHex: v?.roast_hex ?? v?.roast?.hex_code ?? undefined,
         weightGrams: Math.max(0, Number(v?.weight_grams ?? 0) || 0) || undefined,
       };
     });
 
-    // گزینه‌های رنگ/سایز همه وریانت‌های همان محصول
+    // گزینه‌های وضعیت محصول/مناسبت‌ها همه وریانت‌های همان محصول
     const productIds = [...new Set(items.map((i) => i.productId).filter(Boolean))];
     if (productIds.length) {
       try {
@@ -375,49 +375,49 @@ export async function getCartAction(): Promise<{
         const supabase = await createClient();
         const { data: vars, error: vErr } = await supabase
           .from("product_variants")
-          .select("id, product_id, color_name, color_hex, size, is_active, stock_quantity")
+          .select("id, product_id, roast_name, roast_hex, weight, is_active, stock_quantity")
           .in("product_id", productIds)
           .eq("is_active", true);
         if (vErr) console.error("[getCart variants]", vErr);
-        const byProd = new Map<string, { colors: string[]; sizes: string[] }>();
+        const byProd = new Map<string, { roasts: string[]; weights: string[] }>();
         for (const v of vars ?? []) {
           const pid = (v as { product_id: string }).product_id;
           if (!pid) continue;
-          const entry = byProd.get(pid) ?? { colors: [], sizes: [] };
-          const hexRaw = ((v as { color_hex?: string }).color_hex || "").trim();
-          const nameRaw = ((v as { color_name?: string }).color_name || "").trim();
+          const entry = byProd.get(pid) ?? { roasts: [], weights: [] };
+          const hexRaw = ((v as { roast_hex?: string }).roast_hex || "").trim();
+          const nameRaw = ((v as { roast_name?: string }).roast_name || "").trim();
           // اولویت با hex؛ نام فقط اگر hex نبود
-          let colorKey = hexRaw;
-          if (!colorKey && nameRaw) colorKey = nameRaw;
-          if (colorKey) {
-            const exists = entry.colors.some(
-              (c) => c.replace(/^#/, "").toLowerCase() === colorKey.replace(/^#/, "").toLowerCase()
-                || c === colorKey,
+          let roastKey = hexRaw;
+          if (!roastKey && nameRaw) roastKey = nameRaw;
+          if (roastKey) {
+            const exists = entry.roasts.some(
+              (c) => c.replace(/^#/, "").toLowerCase() === roastKey.replace(/^#/, "").toLowerCase()
+                || c === roastKey,
             );
-            if (!exists) entry.colors.push(colorKey.startsWith("#") || !hexRaw ? colorKey : colorKey);
+            if (!exists) entry.roasts.push(roastKey.startsWith("#") || !hexRaw ? roastKey : roastKey);
             // اگر hex داریم همیشه با # نگه دار
-            if (hexRaw && !entry.colors.includes(hexRaw)) {
-              entry.colors = entry.colors.filter((c) => c !== nameRaw);
-              if (!entry.colors.includes(hexRaw)) entry.colors.push(hexRaw);
+            if (hexRaw && !entry.roasts.includes(hexRaw)) {
+              entry.roasts = entry.roasts.filter((c) => c !== nameRaw);
+              if (!entry.roasts.includes(hexRaw)) entry.roasts.push(hexRaw);
             }
           }
-          const szRaw = (v as { size?: string | { name?: string } }).size;
+          const szRaw = (v as { weight?: string | { name?: string } }).weight;
           const sz =
             typeof szRaw === "string"
               ? szRaw.trim()
               : szRaw && typeof szRaw === "object"
                 ? String(szRaw.name || "").trim()
                 : "";
-          if (sz && !entry.sizes.includes(sz)) entry.sizes.push(sz);
+          if (sz && !entry.weights.includes(sz)) entry.weights.push(sz);
           byProd.set(pid, entry);
         }
         // گزینه‌های کامل با موجودی برای دراور/کارت
-        const optsByProd = new Map<string, { color?: string; colorHex?: string; size?: string; stock: number }[]>();
+        const optsByProd = new Map<string, { roast?: string; roastHex?: string; weight?: string; stock: number }[]>();
         for (const v of vars ?? []) {
           const pid = (v as { product_id: string }).product_id;
           if (!pid) continue;
           const list = optsByProd.get(pid) ?? [];
-          const szRaw = (v as { size?: string | { name?: string } }).size;
+          const szRaw = (v as { weight?: string | { name?: string } }).weight;
           const sz =
             typeof szRaw === "string"
               ? szRaw.trim()
@@ -425,9 +425,9 @@ export async function getCartAction(): Promise<{
                 ? String(szRaw.name || "").trim()
                 : "";
           list.push({
-            color: ((v as { color_name?: string }).color_name || "").trim() || undefined,
-            colorHex: ((v as { color_hex?: string }).color_hex || "").trim() || undefined,
-            size: sz || undefined,
+            roast: ((v as { roast_name?: string }).roast_name || "").trim() || undefined,
+            roastHex: ((v as { roast_hex?: string }).roast_hex || "").trim() || undefined,
+            weight: sz || undefined,
             stock: Number((v as { stock_quantity?: number }).stock_quantity ?? 0),
           });
           optsByProd.set(pid, list);
@@ -435,8 +435,8 @@ export async function getCartAction(): Promise<{
         for (const it of items) {
           const opt = byProd.get(it.productId);
           if (opt) {
-            it.colors = opt.colors.length ? opt.colors : it.colorHex || it.color ? [it.colorHex || it.color!] : [];
-            it.sizes = opt.sizes.length ? opt.sizes : it.size ? [it.size] : [];
+            it.roasts = opt.roasts.length ? opt.roasts : it.roastHex || it.roast ? [it.roastHex || it.roast!] : [];
+            it.weights = opt.weights.length ? opt.weights : it.weight ? [it.weight] : [];
           }
           const vo = optsByProd.get(it.productId);
           if (vo) (it as { variantOptions?: unknown }).variantOptions = vo;
@@ -497,8 +497,8 @@ export async function createOrderAction(payload: CreateOrderPayload) {
         variantId: row.variant_id as string,
         productId: (v?.product_id ?? prod?.id) as string,
         title,
-        sizeName: (typeof v?.size === "string" ? v.size : v?.size?.name) as string | undefined,
-        colorName: (v?.color_name ?? (typeof v?.color === "string" ? v.color : v?.color?.name)) as string | undefined,
+        weightName: (typeof v?.weight === "string" ? v.weight : v?.weight?.name) as string | undefined,
+        roastName: (v?.roast_name ?? (typeof v?.roast === "string" ? v.roast : v?.roast?.name)) as string | undefined,
         unitPrice,
         quantity: row.quantity as number,
       };
@@ -773,8 +773,8 @@ export async function trackOrderAction(code: string) {
           (it: any) => ({
             id: it.id,
             title: it.title,
-            size_name: it.size_name,
-            color_name: it.color_name,
+            weight_name: it.weight_name,
+            roast_name: it.roast_name,
             quantity: it.quantity,
             line_total: Number(it.line_total ?? 0),
           })
@@ -1123,7 +1123,7 @@ async function eligibleDiscountBase(
       }
     }
   }
-  if (!allowed.size) return { base: 0, error: "not_applicable" };
+  if (!allowed.weight) return { base: 0, error: "not_applicable" };
 
   let base = 0;
   for (const line of lines) {

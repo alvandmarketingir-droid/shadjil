@@ -57,11 +57,11 @@
 | OTP / permission ریزدانه | ⏸ عمداً بعداً |
 
 ## معیار پذیرش بستن (باید توسط مالک تأیید شود)
-- [ ] https://pirahanmardane.ir بالا است
-- [ ] https://pirahanmardane.ir/api/health → ok
-- [ ] https://pirahanmardane.ir/about بدون «خطا در این بخش»
-- [ ] https://pirahanmardane.ir/products لیست می‌دهد
-- [ ] https://pirahanmardane.ir/admin/products لیست می‌دهد (با لاگین ادمین)
+- [ ] https://shadjil.ir بالا است
+- [ ] https://shadjil.ir/api/health → ok
+- [ ] https://shadjil.ir/about بدون «خطا در این بخش»
+- [ ] https://shadjil.ir/products لیست می‌دهد
+- [ ] https://shadjil.ir/admin/products لیست می‌دهد (با لاگین ادمین)
 - [ ] بیلد آخرین commit روی Vercel = Ready
 
 ## ضمانت این سند

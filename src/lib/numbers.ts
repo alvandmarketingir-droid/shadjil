@@ -73,7 +73,7 @@ export function otpPhoneEmail(phone: string): string {
       const d = digitsOnly(phone);
       return d.length === 10 && d.startsWith("9") ? `0${d}` : d;
     })();
-  return `${digitsOnly(normalized)}@phone.pirahanmardane.ir`;
+  return `${digitsOnly(normalized)}@phone.shadjil.ir`;
 }
 
 /** کد پستی ایران: ۱۰ رقم */

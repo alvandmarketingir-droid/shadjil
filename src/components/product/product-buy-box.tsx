@@ -20,8 +20,8 @@ import { track } from "@/lib/analytics/track";
 
 export type VariantOpt = {
   id: string;
-  size?: string | null;
-  color?: string | null;
+  weight?: string | null;
+  roast?: string | null;
   price?: number;
   original_price?: number | null;
   stock?: number;
@@ -36,8 +36,8 @@ type Props = {
   image?: string;
   href?: string;
   variants: VariantOpt[];
-  /** وقتی رنگ عوض می‌شود (برای همگام‌سازی گالری) */
-  onColorChange?: (color: string) => void;
+  /** وقتی وضعیت محصول عوض می‌شود (برای همگام‌سازی گالری) */
+  onColorChange?: (roast: string) => void;
 };
 
 export function ProductBuyBox({
@@ -83,33 +83,33 @@ export function ProductBuyBox({
     })();
   });
 
-  const sizes = useMemo(
+  const weights = useMemo(
     () =>
       [
         ...new Set(
-          variants.map((v) => v.size).filter((s): s is string => Boolean(s)),
+          variants.map((v) => v.weight).filter((s): s is string => Boolean(s)),
         ),
       ],
     [variants],
   );
-  const colors = useMemo(() => {
+  const roasts = useMemo(() => {
     const seen = new Set<string>();
     const out: { name: string; hex: string }[] = [];
     for (const v of variants) {
-      const name = String(v.color || "").trim();
+      const name = String(v.roast || "").trim();
       if (!name) continue;
       const key = name.toLowerCase();
       if (seen.has(key)) continue;
       seen.add(key);
-      out.push({ name, hex: resolveColorHex(v.color, null) || "" });
+      out.push({ name, hex: resolveColorHex(v.roast, null) || "" });
     }
     return out;
   }, [variants]);
 
   const [selectedSize, setSelectedSize] = useState<string | null>(
-    sizes.length === 1 ? sizes[0]! : null,
+    weights.length === 1 ? weights[0]! : null,
   );
-  const [selectedColor, setSelectedColor] = useState<string>(colors[0]?.name ?? "");
+  const [selectedColor, setSelectedColor] = useState<string>(roasts[0]?.name ?? "");
   const [qty, setQty] = useState(1);
 
   useEffect(() => {
@@ -121,32 +121,32 @@ export function ProductBuyBox({
   const [guestPhone, setGuestPhone] = useState("");
 
   const match = useMemo(() => {
-    const colorEq = (a?: string | null, b?: string | null) => {
+    const roastEq = (a?: string | null, b?: string | null) => {
       if (!a || !b) return false;
       return a.trim().replace(/^#/, "").toLowerCase() === b.trim().replace(/^#/, "").toLowerCase();
     };
-    // اول: سایز+رنگ دقیق
+    // اول: مناسبت‌ها+وضعیت محصول دقیق
     const exact = variants.find((v) => {
-      const sizeOk = !sizes.length || (!!selectedSize && v.size === selectedSize);
-      const colorOk =
-        !colors.length ||
+      const weightOk = !weights.length || (!!selectedSize && v.weight === selectedSize);
+      const roastOk =
+        !roasts.length ||
         !selectedColor ||
-        colorEq(v.color, selectedColor);
-      return sizeOk && colorOk;
+        roastEq(v.roast, selectedColor);
+      return weightOk && roastOk;
     });
     if (exact) return exact;
-    // اگر سایز هنوز انتخاب نشده: اولین واریانت همان رنگ (برای قیمت زنده)
-    if (selectedColor && colors.length) {
-      const byColor = variants.find((v) => colorEq(v.color, selectedColor));
+    // اگر مناسبت‌ها هنوز انتخاب نشده: اولین واریانت همان وضعیت محصول (برای قیمت زنده)
+    if (selectedColor && roasts.length) {
+      const byColor = variants.find((v) => roastEq(v.roast, selectedColor));
       if (byColor) return byColor;
     }
-    // اگر فقط سایز انتخاب شده
-    if (selectedSize && sizes.length) {
-      const bySize = variants.find((v) => v.size === selectedSize);
+    // اگر فقط مناسبت‌ها انتخاب شده
+    if (selectedSize && weights.length) {
+      const bySize = variants.find((v) => v.weight === selectedSize);
       if (bySize) return bySize;
     }
     return variants[0];
-  }, [variants, selectedSize, selectedColor, sizes.length, colors.length]);
+  }, [variants, selectedSize, selectedColor, weights.length, roasts.length]);
 
   const price = match?.price;
   const originalPrice = match?.original_price != null ? Number(match.original_price) : null;
@@ -168,14 +168,14 @@ export function ProductBuyBox({
     return a.trim().replace(/^#/, "").toLowerCase() === b.trim().replace(/^#/, "").toLowerCase();
   }
 
-  function sizeAvailable(size: string) {
+  function sizeAvailable(weight: string) {
     if (!selectedColor) {
-      return variants.some((v) => v.size === size && Number(v.stock ?? 0) > 0);
+      return variants.some((v) => v.weight === weight && Number(v.stock ?? 0) > 0);
     }
     return variants.some(
       (v) =>
-        v.size === size &&
-        sameColor(v.color, selectedColor) &&
+        v.weight === weight &&
+        sameColor(v.roast, selectedColor) &&
         Number(v.stock ?? 0) > 0,
     );
   }
@@ -183,8 +183,8 @@ export function ProductBuyBox({
 
 
   async function handleAdd() {
-    if (sizes.length > 0 && !selectedSize) {
-      toast.error("سایز را انتخاب کنید");
+    if (weights.length > 0 && !selectedSize) {
+      toast.error("مناسبت‌ها را انتخاب کنید");
       return;
     }
     if (!match?.id) {
@@ -208,8 +208,8 @@ export function ProductBuyBox({
         price: Number(price ?? 0),
         quantity: addQty,
         image,
-        size: selectedSize || undefined,
-        color: selectedColor || undefined,
+        weight: selectedSize || undefined,
+        roast: selectedColor || undefined,
       });
       if (!res.ok) {
         toast.error(mapCartError(res.error));
@@ -233,11 +233,11 @@ export function ProductBuyBox({
 
   return (
     <div className="space-y-4" dir="rtl">
-      {colors.length > 0 ? (
+      {roasts.length > 0 ? (
         <div className="space-y-2">
-          <p className="text-sm font-medium">رنگ</p>
+          <p className="text-sm font-medium">وضعیت محصول</p>
           <div className="flex flex-wrap gap-2">
-            {colors.map((c) => (
+            {roasts.map((c) => (
               <button
                 key={c.name}
                 type="button"
@@ -255,11 +255,11 @@ export function ProductBuyBox({
         </div>
       ) : null}
 
-      {sizes.length > 0 ? (
+      {weights.length > 0 ? (
         <div className="space-y-2">
-          <p className="text-sm font-medium">سایز</p>
+          <p className="text-sm font-medium">موجودی</p>
           <div className="flex flex-wrap gap-2">
-            {sizes.map((s) => {
+            {weights.map((s) => {
               const ok = sizeAvailable(s);
               return (
                 <button
@@ -267,7 +267,7 @@ export function ProductBuyBox({
                   type="button"
                   disabled={!ok}
                   onClick={() => ok && setSelectedSize(s)}
-                  title={ok ? s : selectedColor ? `سایز ${s} برای رنگ ${selectedColor} موجود نیست` : "ناموجود"}
+                  title={ok ? s : selectedColor ? `مناسبت‌ها ${s} برای وضعیت محصول ${selectedColor} موجود نیست` : "ناموجود"}
                   className={cn(
                     "border-border rounded-xl border px-3 py-1.5 text-sm",
                     selectedSize === s && ok && "bg-primary text-primary-foreground border-primary",
@@ -304,11 +304,11 @@ export function ProductBuyBox({
         </div>
         <div className="flex flex-nowrap items-center gap-2 whitespace-nowrap">
           {price != null && hasDiscount ? (
-            <Price amount={originalPrice!} size="sm" strike className="text-muted-foreground" />
+            <Price amount={originalPrice!} weight="sm" strike className="text-muted-foreground" />
           ) : null}
           {price != null ? (
             <span className="text-sm font-semibold">
-              <Price amount={Number(price)} size="pdp" />
+              <Price amount={Number(price)} weight="pdp" />
             </span>
           ) : null}
           <span
@@ -338,8 +338,8 @@ export function ProductBuyBox({
             disabled={alertLoading || alertDone}
             onClick={() => {
               void (async () => {
-                if (sizes.length > 0 && !selectedSize) {
-                  toast.error("سایز را انتخاب کنید");
+                if (weights.length > 0 && !selectedSize) {
+                  toast.error("مناسبت‌ها را انتخاب کنید");
                   return;
                 }
                 if (!match?.id) {

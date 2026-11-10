@@ -67,7 +67,7 @@ export default async function BlogPostPage({ params }: Props) {
     category?: { name: string } | null;
   };
 
-  const siteBase = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://pirahanmardane.ir").replace(/\/$/, "");
+  const siteBase = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://shadjil.ir").replace(/\/$/, "");
   return (
     <article className="w-full max-w-none space-y-6 p-6" dir="rtl">
       <JsonLd

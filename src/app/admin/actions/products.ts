@@ -29,14 +29,14 @@ async function linkVariantImages(
   productId: string,
   variants: {
     id?: string | null;
-    size?: string | null;
-    color_name?: string | null;
+    weight?: string | null;
+    roast_name?: string | null;
     image_url?: string | null;
   }[],
 ) {
   const { data: allVars, error: listErr } = await supabase
     .from("product_variants")
-    .select("id, size, color_name")
+    .select("id, weight, roast_name")
     .eq("product_id", productId);
   if (listErr) {
     console.error("[linkVariantImages list]", listErr);
@@ -44,8 +44,8 @@ async function linkVariantImages(
   }
   const rows = (allVars ?? []) as {
     id: string;
-    size: string | null;
-    color_name: string | null;
+    weight: string | null;
+    roast_name: string | null;
   }[];
 
   for (const vv of variants) {
@@ -54,15 +54,15 @@ async function linkVariantImages(
 
     let vid: string | null = (vv.id || "").trim() || null;
     if (!vid) {
-      const size = (vv.size || "").trim() || null;
-      const color = (vv.color_name || "").trim() || null;
+      const weight = (vv.weight || "").trim() || null;
+      const roast = (vv.roast_name || "").trim() || null;
       const match = rows.find(
-        (r) => (r.size || null) === size && (r.color_name || null) === color,
+        (r) => (r.weight || null) === weight && (r.roast_name || null) === roast,
       );
       vid = match?.id ?? null;
     }
     if (!vid) {
-      console.warn("[linkVariantImages] no variant", vv.size, vv.color_name, vv.id);
+      console.warn("[linkVariantImages] no variant", vv.weight, vv.roast_name, vv.id);
       continue;
     }
 
@@ -221,15 +221,15 @@ type CreateProductInput = {
   price?: number;
   original_price?: number | null;
   stock_quantity?: number;
-  size?: string;
-  color_name?: string;
-  color_hex?: string;
+  weight?: string;
+  roast_name?: string;
+  roast_hex?: string;
   sku?: string;
   tag_ids?: string[];
   image_url?: string;
   image_alt?: string;
   variants?: AdminVariantInput[];
-  size_guide_id?: string | null;
+  weight_guide_id?: string | null;
   published_at?: string | null;
 
   meta_title?: string | null;
@@ -249,9 +249,9 @@ type CreateProductInput = {
 
 export type AdminVariantInput = {
   id?: string;
-  size?: string | null;
-  color_name?: string | null;
-  color_hex?: string | null;
+  weight?: string | null;
+  roast_name?: string | null;
+  roast_hex?: string | null;
   sku?: string | null;
   price: number;
   original_price?: number | null;
@@ -311,7 +311,7 @@ export async function adminCreateProductAction(input: CreateProductInput) {
         is_featured: !!input.is_featured,
         is_new: !!input.is_new,
         is_bestseller: !!input.is_bestseller,
-        size_guide_id: input.size_guide_id || null,
+        weight_guide_id: input.weight_guide_id || null,
         published_at: input.published_at || null,
 
         meta_title: input.meta_title?.trim() || null,
@@ -337,9 +337,9 @@ export async function adminCreateProductAction(input: CreateProductInput) {
         : [
             {
               sku: input.sku,
-              size: input.size,
-              color_name: input.color_name,
-              color_hex: input.color_hex,
+              weight: input.weight,
+              roast_name: input.roast_name,
+              roast_hex: input.roast_hex,
               price,
               original_price: input.original_price,
               stock_quantity: input.stock_quantity,
@@ -359,9 +359,9 @@ export async function adminCreateProductAction(input: CreateProductInput) {
       const { error: vErr } = await gate.supabase.from("product_variants").insert({
         product_id: product.id,
         sku: skuVal,
-        size: (vv.size || "").trim() || null,
-        color_name: (vv.color_name || "").trim() || null,
-        color_hex: (vv.color_hex || "").trim() || null,
+        weight: (vv.weight || "").trim() || null,
+        roast_name: (vv.roast_name || "").trim() || null,
+        roast_hex: (vv.roast_hex || "").trim() || null,
         price: vp,
         original_price:
           vv.original_price != null && Number.isFinite(Number(vv.original_price))
@@ -430,7 +430,7 @@ export async function adminGetProductAction(id: string) {
         id, name, slug, category_id, brand_id,
         short_description, description, status,
         is_featured, is_new, is_bestseller,
-        product_variants ( id, sku, price, original_price, stock_quantity, size, color_name, color_hex, is_active ),
+        product_variants ( id, sku, price, original_price, stock_quantity, weight, roast_name, roast_hex, is_active ),
         product_images ( id, url, alt_text, is_primary, sort_order, variant_id ),
         product_tag_map ( tag_id )
       `,
@@ -449,16 +449,16 @@ export async function adminGetProductAction(id: string) {
     if (!data) return { ok: false as const, error: "not_found" };
 
     // فیلدهای اختیاری migration (اگر ستون نباشد نادیده)
-    let size_guide_id: string | null = null;
+    let weight_guide_id: string | null = null;
     let published_at: string | null = null;
     try {
       const { data: extra } = await gate.supabase
         .from("products")
-        .select("size_guide_id, published_at, meta_title, meta_description, focus_keyphrases, og_title, og_description, og_image_url, twitter_title, twitter_description, robots_index, robots_follow, is_cornerstone, canonical_url")
+        .select("weight_guide_id, published_at, meta_title, meta_description, focus_keyphrases, og_title, og_description, og_image_url, twitter_title, twitter_description, robots_index, robots_follow, is_cornerstone, canonical_url")
         .eq("id", id)
         .maybeSingle();
       if (extra) {
-        size_guide_id = (extra as { size_guide_id?: string | null }).size_guide_id ?? null;
+        weight_guide_id = (extra as { weight_guide_id?: string | null }).weight_guide_id ?? null;
         published_at = (extra as { published_at?: string | null }).published_at ?? null;
         Object.assign(data as object, extra);
       }
@@ -479,7 +479,7 @@ export async function adminGetProductAction(id: string) {
     });
     const shaped = {
       ...data,
-      size_guide_id,
+      weight_guide_id,
       published_at,
       tag_ids,
       images,
@@ -517,13 +517,13 @@ export async function adminUpdateProductAction(
     price?: number;
     original_price?: number | null;
     stock_quantity?: number;
-    size?: string | null;
-    color_name?: string | null;
-    color_hex?: string | null;
+    weight?: string | null;
+    roast_name?: string | null;
+    roast_hex?: string | null;
     image_url?: string | null;
     image_alt?: string | null;
     tag_ids?: string[];
-    size_guide_id?: string | null;
+    weight_guide_id?: string | null;
     published_at?: string | null;
 
   meta_title?: string | null;
@@ -583,7 +583,7 @@ export async function adminUpdateProductAction(
     if (input.is_new !== undefined) patch.is_new = !!input.is_new;
     if (input.is_bestseller !== undefined) patch.is_bestseller = !!input.is_bestseller;
     // products has no is_active column (only variants/categories/brands)
-    if (input.size_guide_id !== undefined) patch.size_guide_id = input.size_guide_id || null;
+    if (input.weight_guide_id !== undefined) patch.weight_guide_id = input.weight_guide_id || null;
     if (input.published_at !== undefined) patch.published_at = input.published_at || null;
 
     if (input.meta_title !== undefined) patch.meta_title = (input.meta_title || "").trim() || null;
@@ -633,21 +633,21 @@ export async function adminUpdateProductAction(
         ? Number(input.price)
         : undefined;
 
-    // فقط اگر محصول هنوز «تک‌واریانت ساده» است (بدون سایز/رنگ) قیمت را روی همان یکی بنویس.
-    // اگر واریانت سایز/رنگ‌دار وجود دارد، هرگز این‌جا دست نزن — sync جداگانه مسئول است.
+    // فقط اگر محصول هنوز «تک‌واریانت ساده» است (بدون مناسبت‌ها/وضعیت محصول) قیمت را روی همان یکی بنویس.
+    // اگر واریانت مناسبت‌ها/وضعیت محصول‌دار وجود دارد، هرگز این‌جا دست نزن — sync جداگانه مسئول است.
     const { data: allVars } = await gate.supabase
       .from("product_variants")
-      .select("id, size, color_name, is_active")
+      .select("id, weight, roast_name, is_active")
       .eq("product_id", id)
       .order("created_at", { ascending: true });
 
     const hasSized = (allVars ?? []).some(
-      (v: { size?: string | null; color_name?: string | null }) =>
-        !!(v.size || v.color_name),
+      (v: { weight?: string | null; roast_name?: string | null }) =>
+        !!(v.weight || v.roast_name),
     );
     const firstSimple = (allVars ?? []).find(
-      (v: { size?: string | null; color_name?: string | null }) =>
-        !v.size && !v.color_name,
+      (v: { weight?: string | null; roast_name?: string | null }) =>
+        !v.weight && !v.roast_name,
     );
 
     if (!hasSized && firstSimple?.id && price !== undefined) {
@@ -828,7 +828,7 @@ export async function adminSoftDeleteProductAction(id: string) {
 /** همگام‌سازی وریانت‌ها: upsert + حذف آن‌هایی که در لیست نیستند */
 /** همگام‌سازی وریانت‌ها: upsert + حذف آن‌هایی که در لیست نیستند + تصویر واریانت */
 /** همگام‌سازی وریانت‌ها — بدون حذف کور؛ فقط upsert + لینک تصویر */
-/** همگام‌سازی وریانت‌ها — match با id یا size+color؛ بدون duplicate */
+/** همگام‌سازی وریانت‌ها — match با id یا weight+roast؛ بدون duplicate */
 /** بازگردانی از بایگانی */
 export async function adminRestoreProductsAction(ids: string[]) {
   const gate = await requirePermission("admin.products");
@@ -871,9 +871,9 @@ export async function adminSyncProductVariantsAction(
         }
         return {
           id: (v.id || "").trim() || undefined,
-          size: (v.size || "").trim() || null,
-          color_name: (v.color_name || "").trim() || null,
-          color_hex: (v.color_hex || "").trim() || null,
+          weight: (v.weight || "").trim() || null,
+          roast_name: (v.roast_name || "").trim() || null,
+          roast_hex: (v.roast_hex || "").trim() || null,
           sku: (v.sku || "").trim() || null,
           price,
           original_price: rawOriginal,
@@ -902,14 +902,14 @@ export async function adminSyncProductVariantsAction(
       }
     }
 
-    // ترکیب size+color تکراری در payload → ادغام (اولی می‌ماند)
+    // ترکیب weight+roast تکراری در payload → ادغام (اولی می‌ماند)
     {
       const seenKey = new Set<string>();
       const deduped: typeof cleaned = [];
       for (const v of cleaned) {
-        const key = `${v.size ?? ""}||${v.color_name ?? ""}`;
+        const key = `${v.weight ?? ""}||${v.roast_name ?? ""}`;
         if (seenKey.has(key)) {
-          console.warn("[sync] duplicate size+color in form, skip", key);
+          console.warn("[sync] duplicate weight+roast in form, skip", key);
           continue;
         }
         seenKey.add(key);
@@ -921,7 +921,7 @@ export async function adminSyncProductVariantsAction(
 
     const { data: existingRows, error: listErr } = await gate.supabase
       .from("product_variants")
-      .select("id, size, color_name, sku")
+      .select("id, weight, roast_name, sku")
       .eq("product_id", productId);
     if (listErr) {
       console.error("[sync list]", listErr);
@@ -929,24 +929,24 @@ export async function adminSyncProductVariantsAction(
     }
     const existing = (existingRows ?? []) as {
       id: string;
-      size: string | null;
-      color_name: string | null;
+      weight: string | null;
+      roast_name: string | null;
       sku: string | null;
     }[];
 
     const resolved: {
       id: string;
-      size: string | null;
-      color_name: string | null;
+      weight: string | null;
+      roast_name: string | null;
       image_url: string | null;
     }[] = [];
 
     for (const v of cleaned) {
       const row = {
         product_id: productId,
-        size: v.size,
-        color_name: v.color_name,
-        color_hex: v.color_hex,
+        weight: v.weight,
+        roast_name: v.roast_name,
+        roast_hex: v.roast_hex,
         sku: v.sku,
         price: v.price,
         original_price: v.original_price,
@@ -956,22 +956,22 @@ export async function adminSyncProductVariantsAction(
 
       // 1) با id
       let targetId = v.id;
-      // 2) همان size+color
+      // 2) همان weight+roast
       if (!targetId) {
         const hit = existing.find(
           (e) =>
-            (e.size || null) === v.size &&
-            (e.color_name || null) === v.color_name,
+            (e.weight || null) === v.weight &&
+            (e.roast_name || null) === v.roast_name,
         );
         targetId = hit?.id;
       }
-      // 3) اگر id داده شده ولی size+color با دیگری تداخل دارد → همان ردیف size+color
+      // 3) اگر id داده شده ولی weight+roast با دیگری تداخل دارد → همان ردیف weight+roast
       if (targetId) {
         const clash = existing.find(
           (e) =>
             e.id !== targetId &&
-            (e.size || null) === v.size &&
-            (e.color_name || null) === v.color_name,
+            (e.weight || null) === v.weight &&
+            (e.roast_name || null) === v.roast_name,
         );
         if (clash) {
           targetId = clash.id;
@@ -1002,8 +1002,8 @@ export async function adminSyncProductVariantsAction(
         }
         resolved.push({
           id: targetId,
-          size: v.size,
-          color_name: v.color_name,
+          weight: v.weight,
+          roast_name: v.roast_name,
           image_url: v.image_url,
         });
       } else {
@@ -1013,17 +1013,17 @@ export async function adminSyncProductVariantsAction(
           .select("id")
           .single();
         if (error) {
-          // اگر unique خورد، دوباره با size+color پیدا کن و update کن
-          if (String(error.message || "").includes("product_variants_product_id_size_color_name")) {
+          // اگر unique خورد، دوباره با weight+roast پیدا کن و update کن
+          if (String(error.message || "").includes("product_variants_product_id_weight_roast_name")) {
             let qAgain = gate.supabase
               .from("product_variants")
               .select("id")
               .eq("product_id", productId);
-            qAgain = v.size == null ? qAgain.is("size", null) : qAgain.eq("size", v.size as string);
+            qAgain = v.weight == null ? qAgain.is("weight", null) : qAgain.eq("weight", v.weight as string);
             qAgain =
-              v.color_name == null
-                ? qAgain.is("color_name", null)
-                : qAgain.eq("color_name", v.color_name as string);
+              v.roast_name == null
+                ? qAgain.is("roast_name", null)
+                : qAgain.eq("roast_name", v.roast_name as string);
             const { data: again } = await qAgain.limit(1);
             const foundId = (again as { id: string }[] | null)?.[0]?.id;
             if (foundId) {
@@ -1040,8 +1040,8 @@ export async function adminSyncProductVariantsAction(
               }
               resolved.push({
                 id: foundId,
-                size: v.size,
-                color_name: v.color_name,
+                weight: v.weight,
+                roast_name: v.roast_name,
                 image_url: v.image_url,
               });
               continue;
@@ -1056,14 +1056,14 @@ export async function adminSyncProductVariantsAction(
         }
         resolved.push({
           id: inserted.id as string,
-          size: v.size,
-          color_name: v.color_name,
+          weight: v.weight,
+          roast_name: v.roast_name,
           image_url: v.image_url,
         });
         existing.push({
           id: inserted.id as string,
-          size: v.size,
-          color_name: v.color_name,
+          weight: v.weight,
+          roast_name: v.roast_name,
           sku: row.sku,
         });
       }
@@ -1086,8 +1086,8 @@ export async function adminSyncProductVariantsAction(
         productId,
         resolved.map((r) => ({
           id: r.id,
-          size: r.size,
-          color_name: r.color_name,
+          weight: r.weight,
+          roast_name: r.roast_name,
           image_url: r.image_url,
         })),
       );
@@ -1213,7 +1213,7 @@ export async function adminListSizeGuidesAction() {
   if (!gate.ok) return { ok: false as const, error: gate.error };
   try {
     const { data, error } = await gate.supabase
-      .from("size_guides")
+      .from("weight_guides")
       .select("id, name, category_id, description")
       .order("name", { ascending: true });
     if (error) throw error;

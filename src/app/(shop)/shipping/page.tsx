@@ -5,7 +5,7 @@ import { ShippingView } from "@/components/content/shipping-view";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "ارسال و تحویل | پیراهن مردانه",
+  title: "ارسال و تحویل | شادجیل",
   description: "روش‌ها و زمان تقریبی ارسال سفارش‌ها",
 };
 

@@ -5,10 +5,10 @@ import { paginationSchema } from "./common";
 export const productFilterSchema = paginationSchema.extend({
   categorySlug: z.string().optional(),
   brandSlug: z.string().optional(),
-  sizeId: z.string().uuid().optional(),
-  colorId: z.string().uuid().optional(),
-  sizeValue: z.string().optional(),
-  colorValue: z.string().optional(),
+  weightId: z.string().uuid().optional(),
+  roastId: z.string().uuid().optional(),
+  weightValue: z.string().optional(),
+  roastValue: z.string().optional(),
   tagSlug: z.string().optional(),
   minPrice: z.coerce.number().min(0).optional(),
   maxPrice: z.coerce.number().min(0).optional(),
@@ -21,7 +21,7 @@ export const productFilterSchema = paginationSchema.extend({
     .enum(["newest", "price_asc", "price_desc", "popular"])
     .default("newest")
     .optional(),
-  /** فیلتر facet: { "fit": "slim-fit", "fabric": "cotton" } */
+  /** فیلتر facet: { "pack-weight": "slim-fit", "weight": "cotton" } */
   attrs: z.record(z.string(), z.string()).optional(),
 });
 
@@ -52,8 +52,8 @@ export type ProductCreateInput = z.infer<typeof productCreateSchema>;
 
 /** واریانت */
 export const variantSchema = z.object({
-  sizeId: z.string().uuid().optional().nullable(),
-  colorId: z.string().uuid().optional().nullable(),
+  weightId: z.string().uuid().optional().nullable(),
+  roastId: z.string().uuid().optional().nullable(),
   sku: z.string().max(50).optional().nullable(),
   price: z.number().min(0, "قیمت نامعتبر است"),
   originalPrice: z.number().min(0).optional().nullable(),

@@ -45,7 +45,7 @@ export function AnimatedTicket({
           <div className="flex justify-between gap-3">
             <span className="text-muted-foreground">مبلغ قابل پرداخت</span>
             <span className="font-semibold">
-              <Price amount={amount} size="sm" />
+              <Price amount={amount} weight="sm" />
             </span>
           </div>
           <div className="flex justify-between gap-3">

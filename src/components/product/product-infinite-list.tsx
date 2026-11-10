@@ -22,8 +22,8 @@ type Props = {
   sort?: "newest" | "price_asc" | "price_desc" | "popular";
   featured?: boolean;
   attrs?: Record<string, string>;
-  colorId?: string;
-  sizeId?: string;
+  roastId?: string;
+  weightId?: string;
   minPrice?: number;
   maxPrice?: number;
 };
@@ -38,8 +38,8 @@ export function ProductInfiniteList({
   sort,
   featured,
   attrs,
-  colorId,
-  sizeId,
+  roastId,
+  weightId,
   minPrice,
   maxPrice,
 }: Props) {
@@ -69,8 +69,8 @@ export function ProductInfiniteList({
         sort,
         featured,
         attrs,
-        colorId,
-        sizeId,
+        roastId,
+        weightId,
         minPrice,
         maxPrice,
       });
@@ -88,8 +88,8 @@ export function ProductInfiniteList({
     sort,
     featured,
     attrs,
-    colorId,
-    sizeId,
+    roastId,
+    weightId,
     minPrice,
     maxPrice,
   ]);
@@ -117,8 +117,8 @@ export function ProductInfiniteList({
         sort,
         featured,
         attrs,
-        colorId,
-        sizeId,
+        roastId,
+        weightId,
         minPrice,
         maxPrice,
       });
@@ -151,8 +151,8 @@ export function ProductInfiniteList({
     sort,
     featured,
     attrs,
-    colorId,
-    sizeId,
+    roastId,
+    weightId,
     minPrice,
     maxPrice,
   ]);
@@ -172,7 +172,7 @@ export function ProductInfiniteList({
     return () => observer.disconnect();
   }, [loadMore]);
 
-  if (products.length === 0) {
+  if (products?.length ?? 0 === 0) {
     return (
       <EmptyBlock
         title="محصولی یافت نشد"
@@ -198,7 +198,7 @@ export function ProductInfiniteList({
             <LumaSpin />
           </div>
         ) : null}
-        {!hasMore && products.length > 0 ? (
+        {!hasMore && (products?.length ?? 0) > 0 ? (
           <p className="text-muted-foreground text-sm">
             همه محصولات نمایش داده شد
           </p>

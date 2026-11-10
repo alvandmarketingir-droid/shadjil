@@ -42,7 +42,7 @@ const ToolbarButton = ({
   >
     <button
       type="button"
-      className={`flex h-8 w-8 items-center justify-center rounded-md transition-colors duration-200 hover:bg-primary-foreground/15 focus:outline-none ${
+      className={`flex h-8 w-8 items-center justify-center rounded-md transition-roasts duration-200 hover:bg-primary-foreground/15 focus:outline-none ${
         isActive ? "bg-primary-foreground/20" : ""
       }`}
       aria-label={label}
@@ -87,7 +87,7 @@ const Toolbar = () => {
           className="bg-primary text-primary-foreground border-primary/20 absolute z-50 flex items-center gap-1 rounded-lg border p-1 shadow-lg"
         >
           <ToolbarButton
-            label="پررنگ"
+            label="پروضعیت محصول"
             icon={Bold}
             isActive={activeButtons.includes("bold")}
             onClick={() => toggleActiveButton("bold")}
@@ -151,10 +151,10 @@ const Toolbar = () => {
             hideTooltip={() => setTooltip(null)}
           />
           <ToolbarButton
-            label="رنگ"
+            label="وضعیت محصول"
             icon={Palette}
-            isActive={activeButtons.includes("color")}
-            onClick={() => toggleActiveButton("color")}
+            isActive={activeButtons.includes("roast")}
+            onClick={() => toggleActiveButton("roast")}
             tooltip={tooltip}
             showTooltip={setTooltip}
             hideTooltip={() => setTooltip(null)}

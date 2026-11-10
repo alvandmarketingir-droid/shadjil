@@ -44,7 +44,7 @@ export function NotificationBell({ className, variant = "header" }: Props) {
           className,
         )
       : cn(
-          "relative inline-flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5",
+          "relative inline-flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-roasts hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5",
           className,
         );
 
@@ -108,7 +108,7 @@ export function NotificationBell({ className, variant = "header" }: Props) {
                     <button
                       type="button"
                       className={cn(
-                        "w-full rounded-xl border p-2.5 text-right transition-colors",
+                        "w-full rounded-xl border p-2.5 text-right transition-roasts",
                         n.read_at
                           ? "border-transparent opacity-70 hover:bg-muted/50"
                           : "border-border bg-primary/5 hover:bg-primary/10",

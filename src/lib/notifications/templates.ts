@@ -2,7 +2,7 @@ export const PREDEFINED_NOTIFICATIONS = [
   {
     id: "welcome",
     title: "خوش آمدید",
-    body: "به فروشگاه پیراهن مردانه خوش آمدید. از خریدتان سپاسگزاریم.",
+    body: "به فروشگاه شادجیل خوش آمدید. از خریدتان سپاسگزاریم.",
     type: "system",
   },
   {

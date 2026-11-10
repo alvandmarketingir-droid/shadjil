@@ -20,17 +20,17 @@ import { applySeoTemplate } from "@/lib/seo/template";
 export const revalidate = 60;
 
 const FACET_KEYS = [
-  "fabric",
-  "pattern",
-  "season",
-  "collar-type",
-  "sleeve-type",
-  "button-type",
-  "fit",
-  "tie-width",
-  "tie-length",
-  "bow-tie-type",
-  "cufflink-material",
+  "weight",
+  "nut-type",
+  "origin",
+  "grade",
+  "salted",
+  "raw",
+  "pack-weight",
+  "weight-250",
+  "weight-500",
+  "weight-1kg",
+  "premium",
 ] as const;
 
 type Props = {
@@ -58,7 +58,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const brandService = new BrandService();
   const result = await brandService.getBySlug(slug);
   if (!result.success || !result.data) {
-    return { title: "برند" };
+    return { title: "برچسب‌ها" };
   }
   const d = result.data as {
     name: string;
@@ -71,7 +71,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description =
     applySeoTemplate(d.meta_description, { name: d.name, description: d.description || undefined }) ||
     d.description ||
-    `محصولات برند ${d.name}`;
+    `محصولات برچسب ${d.name}`;
   return {
     title,
     description,
@@ -108,10 +108,10 @@ export default async function BrandListingPage({ params, searchParams }: Props) 
     typeof sp.maxPrice === "string" && sp.maxPrice
       ? Number(sp.maxPrice)
       : undefined;
-  const colorSlug =
-    typeof sp.color === "string" && sp.color ? sp.color : undefined;
-  const sizeSlug =
-    typeof sp.size === "string" && sp.size ? sp.size : undefined;
+  const roastSlug =
+    typeof sp.roast === "string" && sp.roast ? sp.roast : undefined;
+  const weightSlug =
+    typeof sp.weight === "string" && sp.weight ? sp.weight : undefined;
 
   const attrs: Record<string, string> = {};
   for (const key of FACET_KEYS) {
@@ -129,56 +129,56 @@ export default async function BrandListingPage({ params, searchParams }: Props) 
   const allowed = new Set(facetSlugsForCategory(categorySlug));
   const facets = allFacets.filter((f) => allowed.has(f.slug));
 
-  const colorAttr = allFacets.find((f) => f.slug === "color");
-  const sizeAttr = allFacets.find((f) => f.slug === "size");
+  const roastAttr = allFacets.find((f) => f.slug === "roast");
+  const weightAttr = allFacets.find((f) => f.slug === "weight");
   type Chip = { id: string; name: string; slug: string; hex?: string | null };
-  let colors: Chip[] = (colorAttr?.options ?? []).map((o) => ({
+  let roasts: Chip[] = (roastAttr?.options ?? []).map((o) => ({
     id: o.id,
     name: o.value,
     slug: o.slug || o.value,
     hex: (o as { hex?: string | null }).hex ?? null,
   }));
-  let sizes: Chip[] = (sizeAttr?.options ?? []).map((o) => ({
+  let weights: Chip[] = (weightAttr?.options ?? []).map((o) => ({
     id: o.id,
     name: o.value,
     slug: o.slug || o.value,
   }));
-  const colorRepo = new ColorRepository();
-  const sizeRepo = new SizeRepository();
-  if (!colors.length || !sizes.length) {
+  const roastRepo = new ColorRepository();
+  const weightRepo = new SizeRepository();
+  if (!roasts.length || !weights.length) {
     const [legacyColors, legacySizes] = await Promise.all([
-      colorRepo.findAllActive().catch(() => [] as Awaited<ReturnType<ColorRepository["findAllActive"]>>),
-      sizeRepo.findAllActive().catch(() => [] as Awaited<ReturnType<SizeRepository["findAllActive"]>>),
+      roastRepo.findAllActive().catch(() => [] as Awaited<ReturnType<ColorRepository["findAllActive"]>>),
+      weightRepo.findAllActive().catch(() => [] as Awaited<ReturnType<SizeRepository["findAllActive"]>>),
     ]);
-    if (!colors.length) {
-      colors = legacyColors.map((c) => ({
+    if (!roasts.length) {
+      roasts = legacyColors.map((c) => ({
         id: c.id,
         name: c.name,
         slug: c.slug,
         hex: (c as { hex_code?: string | null }).hex_code ?? null,
       }));
     }
-    if (!sizes.length) {
-      sizes = legacySizes.map((s) => ({ id: s.id, name: s.name, slug: s.slug }));
+    if (!weights.length) {
+      weights = legacySizes.map((s) => ({ id: s.id, name: s.name, slug: s.slug }));
     }
   }
-  const colorOpt = colorSlug
-    ? colors.find((c) => c.slug === colorSlug || c.name === colorSlug)
+  const roastOpt = roastSlug
+    ? roasts.find((c) => c.slug === roastSlug || c.name === roastSlug)
     : undefined;
-  const sizeOpt = sizeSlug
-    ? sizes.find((s) => s.slug === sizeSlug || s.name === sizeSlug)
+  const weightOpt = weightSlug
+    ? weights.find((s) => s.slug === weightSlug || s.name === weightSlug)
     : undefined;
-  const colorValue = colorOpt?.name;
-  const sizeValue = sizeOpt?.name;
-  let colorId: string | undefined;
-  let sizeId: string | undefined;
-  if (colorSlug && !colorAttr) {
-    const c = await colorRepo.findBySlug(colorSlug).catch(() => null);
-    colorId = c?.id;
+  const roastValue = roastOpt?.name;
+  const weightValue = weightOpt?.name;
+  let roastId: string | undefined;
+  let weightId: string | undefined;
+  if (roastSlug && !roastAttr) {
+    const c = await roastRepo.findBySlug(roastSlug).catch(() => null);
+    roastId = c?.id;
   }
-  if (sizeSlug && !sizeAttr) {
-    const s = await sizeRepo.findBySlug(sizeSlug).catch(() => null);
-    sizeId = s?.id;
+  if (weightSlug && !weightAttr) {
+    const s = await weightRepo.findBySlug(weightSlug).catch(() => null);
+    weightId = s?.id;
   }
 
   const result = await productService.getPublishedProducts({
@@ -190,12 +190,12 @@ export default async function BrandListingPage({ params, searchParams }: Props) 
     sort,
     featured,
     attrs: Object.keys(attrs).length ? attrs : undefined,
-    sizeValue,
-    colorValue,
+    weightValue,
+    roastValue,
     minPrice: minPrice && !Number.isNaN(minPrice) ? minPrice : undefined,
     maxPrice: maxPrice && !Number.isNaN(maxPrice) ? maxPrice : undefined,
-    colorId,
-    sizeId,
+    roastId,
+    weightId,
   });
 
   if (!result.success || !result.data) {
@@ -210,9 +210,9 @@ export default async function BrandListingPage({ params, searchParams }: Props) 
             logo: (brand as { logo_url?: string | null }).logo_url ?? null,
           }),
           breadcrumbSchema([
-            { name: "خانه", url: ((process.env.NEXT_PUBLIC_SITE_URL ?? "https://pirahanmardane.ir").replace(/\/$/, "")) + "/" },
-            { name: "برندها", url: ((process.env.NEXT_PUBLIC_SITE_URL ?? "https://pirahanmardane.ir").replace(/\/$/, "")) + "/brands" },
-            { name: brand.name, url: ((process.env.NEXT_PUBLIC_SITE_URL ?? "https://pirahanmardane.ir").replace(/\/$/, "")) + "/" + encodeURIComponent(slug) },
+            { name: "خانه", url: ((process.env.NEXT_PUBLIC_SITE_URL ?? "https://shadjil.ir").replace(/\/$/, "")) + "/" },
+            { name: "برچسبها", url: ((process.env.NEXT_PUBLIC_SITE_URL ?? "https://shadjil.ir").replace(/\/$/, "")) + "/brands" },
+            { name: brand.name, url: ((process.env.NEXT_PUBLIC_SITE_URL ?? "https://shadjil.ir").replace(/\/$/, "")) + "/" + encodeURIComponent(slug) },
           ]),
         ]}
       />
@@ -243,7 +243,7 @@ export default async function BrandListingPage({ params, searchParams }: Props) 
           }),
           breadcrumbSchema([
             { name: "خانه", url: "/" },
-            { name: "برندها", url: "/brands" },
+            { name: "برچسبها", url: "/brands" },
             { name: brand.name, url: "/" + encodeURIComponent(slug) },
           ]),
         ]}
@@ -256,10 +256,10 @@ export default async function BrandListingPage({ params, searchParams }: Props) 
       </div>
 
       <ProductFiltersMobile
-        colors={colors}
-        sizes={sizes}
-        colorSlug={colorSlug}
-        sizeSlug={sizeSlug}
+        roasts={roasts}
+        weights={weights}
+        roastSlug={roastSlug}
+        weightSlug={weightSlug}
         facets={facets}
         current={attrs}
         categories={categories}
@@ -279,10 +279,10 @@ export default async function BrandListingPage({ params, searchParams }: Props) 
           }
         >
           <ProductFiltersSidebar
-            colors={colors}
-            sizes={sizes}
-            colorSlug={colorSlug}
-            sizeSlug={sizeSlug}
+            roasts={roasts}
+            weights={weights}
+            roastSlug={roastSlug}
+            weightSlug={weightSlug}
             facets={facets}
             current={attrs}
             categories={categories}
@@ -297,8 +297,8 @@ export default async function BrandListingPage({ params, searchParams }: Props) 
         </Suspense>
         <div className="min-w-0 flex-1">
           <ProductInfiniteList
-            colorId={colorId}
-            sizeId={sizeId}
+            roastId={roastId}
+            weightId={weightId}
             initialProducts={products}
             initialPage={page}
             initialHasMore={page < totalPages}

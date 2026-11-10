@@ -49,9 +49,9 @@ const OrderTrackBox = dynamic(
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "فروشگاه تخصصی پیراهن مردانه",
+  title: "شادجیل | خرید آنلاین آجیل و خشکبار",
   description:
-    "خرید پیراهن مردانه، کروات، پاپیون و اکسسوری از فروشگاه تخصصی پیراهن مردانه",
+    "خرید شادجیل، ،  و سوغات از فروشگاه تخصصی شادجیل",
 };
 
 function HomeHeroPreloads() {
@@ -180,10 +180,10 @@ export default async function HomePage() {
   const deals = flashActive ? featured : [];
 
   const features = [
-    { title: "ضمانت کالا", desc: "کالای با کیفیت", icon: ShieldCheck },
-    { title: "ارسال سریع", desc: "ارسال به سراسر کشور", icon: Truck },
-    { title: "۷ روز بازگشت", desc: "مرجوعی آسان طبق شرایط", icon: RotateCcw },
-    { title: "پشتیبانی", desc: "همراه شما قبل و بعد خرید", icon: Headphones },
+    { title: "تضمین تازگی", desc: "آجیل و خشکبار تازه و مرغوب", icon: ShieldCheck },
+    { title: "ارسال سریع", desc: "ارسال به تمام نقاط ایران", icon: Truck },
+    { title: "۷ روز ضمانت", desc: "امکان مرجوعی طبق شرایط", icon: RotateCcw },
+    { title: "پشتیبانی", desc: "پاسخگویی قبل و بعد از خرید", icon: Headphones },
   ];
 
   return (
@@ -201,7 +201,7 @@ export default async function HomePage() {
                 key={f.title}
                 className="bg-card flex flex-col gap-2 rounded-2xl border p-4"
               >
-                <f.icon className="text-primary size-6" />
+                <f.icon className="text-primary weight-6" />
                 <h3 className="text-sm font-semibold text-primary">{f.title}</h3>
                 <p className="text-muted-foreground text-xs leading-6">{f.desc}</p>
               </div>
@@ -212,7 +212,7 @@ export default async function HomePage() {
 
           {brands.length > 0 ? (
             <CarouselLinks
-              title="برندها"
+              title="محصولات ویژه"
               viewAllHref="/brands"
               variant="brand"
               items={brands.map((b) => ({
@@ -232,7 +232,7 @@ export default async function HomePage() {
             );
             return homeCats.length > 0 ? (
               <CarouselLinks
-                title="دسته‌بندی‌ها"
+                title="دسته‌بندی آجیل و خشکبار"
                 viewAllHref="/products"
                 variant="category"
                 items={homeCats.map((cat) => ({
@@ -248,15 +248,15 @@ export default async function HomePage() {
 
           {newest.length > 0 ? (
             <ProductCarousel
-              title="محصولات جدید"
+              title="تازه‌ترین آجیل و خشکبار"
               viewAllHref="/products?sort=newest"
               products={newest}
               liveQuery={{ sort: "newest", pageSize: 8 }}
             />
           ) : (
-            <section aria-label="محصولات جدید">
+            <section aria-label="تازه‌ترین آجیل و خشکبار">
               <h2 className="mb-5 text-xl font-bold text-primary md:text-2xl">
-                محصولات جدید
+                تازه‌ترین آجیل و خشکبار
               </h2>
               <p className="text-muted-foreground text-sm">
                 فعلاً محصول جدیدی موجود نیست.
@@ -264,10 +264,10 @@ export default async function HomePage() {
             </section>
           )}
 
-          <section aria-label="پیشنهاد شگفت‌انگیز">
+          <section aria-label="پیشنهاد ویژه شادجیل">
             {flashActive && (deals.length > 0 || flashEndsAt) ? (
               <ProductCarousel
-                title="پیشنهاد شگفت‌انگیز"
+                title="پیشنهاد ویژه شادجیل"
                 viewAllHref="/products?featured=1"
                 products={deals}
                 liveQuery={{ featured: true, pageSize: 8 }}
@@ -280,10 +280,10 @@ export default async function HomePage() {
             ) : (
               <>
                 <h2 className="mb-5 text-xl font-bold text-primary md:text-2xl">
-                  پیشنهاد شگفت‌انگیز
+                  پیشنهاد ویژه شادجیل
                 </h2>
                 <p className="text-muted-foreground text-sm">
-                  پیشنهاد شگفت‌انگیزی فعلاً فعال نیست.
+                  پیشنهاد ویژه شادجیلی فعلاً فعال نیست.
                 </p>
               </>
             )}
@@ -291,18 +291,18 @@ export default async function HomePage() {
 
           {bestsellers.length > 0 ? (
             <ProductCarousel
-              title="پرفروش‌ترین‌ها"
+              title="پرفروش‌ترین آجیل‌ها"
               viewAllHref="/products?sort=popular"
               products={bestsellers}
               liveQuery={{ sort: "popular", pageSize: 12 }}
             />
           ) : (
-            <section aria-label="پرفروش‌ترین‌ها">
+            <section aria-label="پرفروش‌ترین آجیل‌ها">
               <h2 className="mb-5 text-xl font-bold text-primary md:text-2xl">
-                پرفروش‌ترین‌ها
+                پرفروش‌ترین آجیل‌ها
               </h2>
               <p className="text-muted-foreground text-sm">
-                پرفروش‌ترین‌ها فعلاً خالی است.
+                پرفروش‌ترین آجیل‌ها فعلاً خالی است.
               </p>
             </section>
           )}

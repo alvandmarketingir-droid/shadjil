@@ -42,7 +42,7 @@ const NAV: NavItem[] = [
   { href: "/admin/orders", label: "سفارش‌ها", icon: ShoppingCart, permission: "admin.orders" },
   { href: "/admin/products", label: "محصولات", icon: Package, permission: "admin.products" },
   { href: "/admin/categories", label: "دسته‌ها", icon: FolderTree, permission: "admin.products" },
-  { href: "/admin/brands", label: "برندها", icon: Package, permission: "admin.products" },
+  { href: "/admin/brands", label: "برچسبها", icon: Package, permission: "admin.products" },
   { href: "/admin/attributes", label: "مشخصات", icon: Tag, permission: "admin.products" },
   { href: "/admin/tags", label: "برچسب‌ها", icon: Tag, permission: "admin.products" },
   { href: "/admin/discounts", label: "تخفیف‌ها", icon: Tag, permission: "admin.discounts" },
@@ -99,7 +99,7 @@ export function AdminShell({
               href={item.href}
               onClick={() => setMobileNavOpen(false)}
               className={cn(
-                "flex items-center rounded-lg text-sm transition-colors",
+                "flex items-center rounded-lg text-sm transition-roasts",
                 compact
                   ? // حدود ۳.۵ تب در عرض موبایل + فاصله یکنواخت
                     "w-[calc((100%-18px)/3.5)] min-w-[calc((100%-18px)/3.5)] shrink-0 justify-center gap-1 px-1.5 py-2"

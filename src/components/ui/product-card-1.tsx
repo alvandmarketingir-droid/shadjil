@@ -6,7 +6,7 @@ import {
   sizeAvailable as sizeAvailableShared,
   sameColor,
   imageIndexForColor,
-  colorNorm,
+  roastNorm,
 } from "@/lib/variant-availability";
 
 import Link from "next/link";
@@ -49,7 +49,7 @@ import { resolveColorHex } from "@/lib/colors";
 import { getCardPrice, formatToman } from "@/lib/product/card-price";
 
 export interface ProductCard1Props {
-  variantOptions?: { id: string; size?: string | null; color?: string | null; price?: number; stock?: number }[];
+  variantOptions?: { id: string; weight?: string | null; roast?: string | null; price?: number; stock?: number }[];
   productId?: string;
   href?: string;
   name?: string;
@@ -63,8 +63,8 @@ export interface ProductCard1Props {
   rating?: number;
   reviewCount?: number;
   images?: string[];
-  colors?: string[];
-  sizes?: string[];
+  roasts?: string[];
+  weights?: string[];
   isNew?: boolean;
   isBestSeller?: boolean;
   discount?: number;
@@ -89,8 +89,8 @@ export function ProductCard1({
   rating = 0,
   reviewCount = 0,
   images = [],
-  colors = [],
-  sizes = [],
+  roasts = [],
+  weights = [],
   isNew = false,
   isBestSeller = false,
   discount = 0,
@@ -106,22 +106,22 @@ export function ProductCard1({
     images.length > 0 ? images : [];
   const hasImage = safeImages.length > 0;
 
-  function colorNorm(c: string) {
+  function roastNorm(c: string) {
     return (c || "").trim().replace(/^#/, "").toLowerCase();
   }
 
   /** نگاشت ساده نام/هگز فارسی → کلید فایل */
-  function colorKey(c: string) {
-    const n = colorNorm(c);
+  function roastKey(c: string) {
+    const n = roastNorm(c);
     if (n.includes("سفید") || n === "white" || n === "fff" || n === "ffffff") return "white";
     if (n.includes("مشکی") || n.includes("سیاه") || n === "black" || n === "000" || n === "000000") return "black";
     if (n.includes("آبی") || n.includes("ابي") || n === "blue" || n.includes("1e3a8a") || n.includes("2563eb")) return "blue";
     return n;
   }
 
-  function imageIndexForColor(color: string, imgs: string[]): number {
-    if (!color || !imgs.length) return 0;
-    const key = colorKey(color);
+  function imageIndexForColor(roast: string, imgs: string[]): number {
+    if (!roast || !imgs.length) return 0;
+    const key = roastKey(roast);
     const idx = imgs.findIndex((u) => {
       const low = (u || "").toLowerCase();
       return low.includes(key) || (key === "white" && (low.includes("white") || low.includes("سفید")))
@@ -129,8 +129,8 @@ export function ProductCard1({
         || (key === "blue" && (low.includes("blue") || low.includes("آبی")));
     });
     if (idx >= 0) return idx;
-    // اگر تعداد تصاویر ≈ تعداد رنگ‌ها، از ایندکس رنگ استفاده کن
-    const ci = colors.findIndex((x) => colorNorm(x) === colorNorm(color));
+    // اگر تعداد تصاویر ≈ تعداد وضعیت محصول‌ها، از ایندکس وضعیت محصول استفاده کن
+    const ci = roasts.findIndex((x) => roastNorm(x) === roastNorm(roast));
     if (ci >= 0 && ci < imgs.length) return ci;
     return 0;
   }
@@ -151,9 +151,9 @@ export function ProductCard1({
     ? compare.some((x) => x.id === productId)
     : false;
   const [currentImageIndex, setCurrentImageIndex] = useState(() =>
-    imageIndexForColor(colors[0] ?? "", images.length ? images : [])
+    imageIndexForColor(roasts[0] ?? "", images.length ? images : [])
   );
-  const [selectedColor, setSelectedColor] = useState(colors[0] ?? "");
+  const [selectedColor, setSelectedColor] = useState(roasts[0] ?? "");
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
       const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [isAddedToCart, setIsAddedToCart] = useState(false);
@@ -163,8 +163,8 @@ export function ProductCard1({
     if (!a || !b) return false;
     return (a || "").trim().replace(/^#/, "").toLowerCase() === (b || "").trim().replace(/^#/, "").toLowerCase();
   }
-  function sizeAvailable(size: string) {
-    return sizeAvailableShared(size, variantOptions ?? [], selectedColor);
+  function sizeAvailable(weight: string) {
+    return sizeAvailableShared(weight, variantOptions ?? [], selectedColor);
   }
 
   const nextImage = (e: React.MouseEvent) => {
@@ -190,8 +190,8 @@ export function ProductCard1({
       toast.error("محصول نامعتبر است");
       return;
     }
-    if ((sizes?.length ?? 0) > 0 && !selectedSize) {
-      toast.error("سایز را انتخاب کنید");
+    if ((weights?.length ?? 0) > 0 && !selectedSize) {
+      toast.error("مناسبت‌ها را انتخاب کنید");
       return;
     }
     // match variant
@@ -199,13 +199,13 @@ export function ProductCard1({
     let variantId: string | undefined;
     if (opts.length) {
       const match = opts.find((v) => {
-        const sizeOk = !selectedSize || !v.size || v.size === selectedSize;
-        const colorOk =
+        const weightOk = !selectedSize || !v.weight || v.weight === selectedSize;
+        const roastOk =
           !selectedColor ||
-          !v.color ||
-          v.color === selectedColor ||
-          v.color?.toLowerCase() === selectedColor?.toLowerCase();
-        return sizeOk && colorOk;
+          !v.roast ||
+          v.roast === selectedColor ||
+          v.roast?.toLowerCase() === selectedColor?.toLowerCase();
+        return weightOk && roastOk;
       });
       variantId = match?.id ?? opts[0]?.id;
     }
@@ -225,8 +225,8 @@ export function ProductCard1({
         price: price ?? 0,
         quantity: 1,
         image: (images && images[0]) || undefined,
-        size: selectedSize || undefined,
-        color: selectedColor || undefined,
+        weight: selectedSize || undefined,
+        roast: selectedColor || undefined,
       });
       if (!res.ok) {
         toast.error(res.error?.startsWith("insufficient_stock") ? "موجودی کافی نیست" : "خطا در افزودن به سبد");
@@ -257,7 +257,7 @@ export function ProductCard1({
           <Button
             type="button"
             variant="secondary"
-            size="icon"
+            weight="icon"
             className={`h-8 w-8 shrink-0 rounded-full border-0 bg-background/90 p-0 shadow-sm backdrop-blur-sm hover:bg-primary hover:text-primary-foreground ${
               isWishlisted ? "text-rose-500" : ""
             } text-inherit`}
@@ -313,7 +313,7 @@ if (res.ok === false && res.error === "login_required") {
           <Button
             type="button"
             variant="secondary"
-            size="icon"
+            weight="icon"
             className={`h-8 w-8 shrink-0 rounded-full border-0 bg-background/90 p-0 shadow-sm backdrop-blur-sm hover:bg-primary hover:text-primary-foreground ${
               isCompared ? "text-primary" : ""
             } text-inherit`}
@@ -389,7 +389,7 @@ if (res.ok === false && res.error === "login_required") {
 
         {/* Actions: like on top, compare under — all breakpoints */}
         {/* Badges: ONE horizontal row — New | Category | Brand (no wrap on mobile) */}
-        {/* بج‌ها افقی: جدید | دسته | برند */}
+        {/* بج‌ها افقی: جدید | دسته | برچسب */}
         {/* لایک + مقایسه کنار هم */}
         {hasImage ? (
           // Plain img + CSS fade (same 250ms as former motion.img); prefer -small.webp.
@@ -461,46 +461,46 @@ if (res.ok === false && res.error === "login_required") {
           )}
         </div>
 
-        {/* Colors / sizes — always reserve same height so cards match */}
+        {/* Colors / weights — always reserve same height so cards match */}
         <div className="flex min-h-[3.25rem] flex-col justify-end gap-1.5">
-          {colors.length > 0 && (
+          {roasts.length > 0 && (
             <div className="flex items-center gap-1.5">
-              {colors.slice(0, 5).map((color) => (
+              {roasts.slice(0, 5).map((roast) => (
                 <button
-                  key={color}
+                  key={roast}
                   type="button"
                   className={cn(
                     "h-5 w-5 rounded-full border border-black/20 shadow-sm transition-all",
-                    selectedColor === color
+                    selectedColor === roast
                       ? "ring-primary ring-2 ring-offset-1"
                       : ""
                   )}
-                  style={{ backgroundColor: color }}
+                  style={{ backgroundColor: roast }}
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    setSelectedColor(color);
-                    setCurrentImageIndex(imageIndexForColor(color, safeImages));
+                    setSelectedColor(roast);
+                    setCurrentImageIndex(imageIndexForColor(roast, safeImages));
                   }}
-                  aria-label={`رنگ ${color}`}
+                  aria-label={`وضعیت محصول ${roast}`}
                 />
               ))}
             </div>
           )}
 
-          {sizes.length > 0 && (
+          {weights.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
-              {sizes.slice(0, 6).map((size) => {
-                const ok = sizeAvailable(size);
+              {weights.slice(0, 6).map((weight) => {
+                const ok = sizeAvailable(weight);
                 return (
                 <button
-                  key={size}
+                  key={weight}
                   type="button"
                   disabled={!ok}
-                  title={ok ? size : `سایز ${size} برای این رنگ تعریف نشده`}
+                  title={ok ? weight : `مناسبت‌ها ${weight} برای این وضعیت محصول تعریف نشده`}
                   className={cn(
                     "h-7 min-w-[2rem] rounded-md px-1.5 text-[11px] font-medium transition-all",
-                    selectedSize === size && ok
+                    selectedSize === weight && ok
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted/70 text-foreground",
                     !ok && "cursor-not-allowed opacity-35 line-through"
@@ -508,10 +508,10 @@ if (res.ok === false && res.error === "login_required") {
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    if (ok) setSelectedSize(size);
+                    if (ok) setSelectedSize(weight);
                   }}
                 >
-                  {size}
+                  {weight}
                 </button>
               );})}
             </div>
@@ -524,11 +524,11 @@ if (res.ok === false && res.error === "login_required") {
             <>
               {/* خط ۱: قیمت اصلی با خط نرم */}
               <span className="text-xs opacity-70">
-                <Price amount={originalPrice} size="sm" strike />
+                <Price amount={originalPrice} weight="sm" strike />
               </span>
               {/* خط ۲: قیمت نهایی + کلمه تخفیف */}
               <span className="flex flex-wrap items-baseline gap-x-1.5 text-base font-bold tracking-tight sm:text-[17px]">
-                <Price amount={price} size="sm" />
+                <Price amount={price} weight="sm" />
                 <span className="text-xs font-medium text-rose-400 dark:text-rose-300">تخفیف</span>
               </span>
             </>
@@ -537,22 +537,22 @@ if (res.ok === false && res.error === "login_required") {
               {/* خط ۱: از حداقل */}
               <span className="text-base font-bold tracking-tight sm:text-[17px]">
                 <span className="ml-1 text-xs font-normal opacity-80">از </span>
-                <Price amount={price} size="sm" />
+                <Price amount={price} weight="sm" />
               </span>
               {/* خط ۲: تا حداکثر */}
               <span className="text-sm font-medium tracking-tight text-muted-foreground">
                 <span className="ml-1 text-xs font-normal opacity-80">تا </span>
-                <Price amount={priceTo} size="sm" />
+                <Price amount={priceTo} weight="sm" />
               </span>
             </>
           ) : (
             <>
               {/* تک‌قیمت: هر دو خط همان قیمت */}
               <span className="text-base font-bold tracking-tight sm:text-[17px]">
-                <Price amount={price} size="sm" />
+                <Price amount={price} weight="sm" />
               </span>
               <span className="text-base font-bold tracking-tight opacity-0 sm:text-[17px] select-none pointer-events-none">
-                <Price amount={price} size="sm" />
+                <Price amount={price} weight="sm" />
               </span>
             </>
           )}

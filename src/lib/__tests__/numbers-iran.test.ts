@@ -33,10 +33,10 @@ describe("Iran numbers", () => {
     expect(v).toContain("9391926236");
     expect(phoneLookupVariants("bad")).toEqual([]);
     expect(otpPhoneEmail("09391926236")).toBe(
-      "09391926236@phone.pirahanmardane.ir",
+      "09391926236@phone.shadjil.ir",
     );
     expect(otpPhoneEmail("+989391926236")).toBe(
-      "09391926236@phone.pirahanmardane.ir",
+      "09391926236@phone.shadjil.ir",
     );
   });
 });

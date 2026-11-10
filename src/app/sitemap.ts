@@ -6,7 +6,7 @@ import { isBlockedBrand } from "@/lib/brands/blocked";
 /**
  * زیرساخت sitemap آماده است.
  * تا noindex: خروجی خالی (ایندکس نمی‌شود).
- * بعد از ALLOW_INDEX=true: صفحات استاتیک + محصولات + دسته‌ها + برندها + بلاگ.
+ * بعد از ALLOW_INDEX=true: صفحات استاتیک + محصولات + دسته‌ها + برچسبها + بلاگ.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   if (!isSiteIndexable()) {
@@ -27,7 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/returns",
     "/privacy",
     "/terms",
-    "/size-guide",
+    "/weight-guide",
     "/search",
     "/track",
   ];

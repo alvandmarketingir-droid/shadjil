@@ -10,11 +10,11 @@ export type ShopProduct = {
   image?: string;
   brand?: string;
   category?: string;
-  color?: string;
-  size?: string;
+  roast?: string;
+  weight?: string;
   variantId?: string;
-  colors?: string[];
-  sizes?: string[];
+  roasts?: string[];
+  weights?: string[];
   quantity?: number;
   href?: string;
 };
@@ -25,7 +25,7 @@ type ShopState = {
   compare: ShopProduct[];
   recentlyViewed: ShopProduct[];
   addToCart: (p: ShopProduct) => void;
-  removeFromCart: (id: string, opts?: { color?: string; size?: string }) => void;
+  removeFromCart: (id: string, opts?: { roast?: string; weight?: string }) => void;
   updateCartItem: (key: string, patch: Partial<ShopProduct>) => void;
   setCartQuantity: (key: string, quantity: number) => void;
   toggleWishlist: (p: ShopProduct) => void;
@@ -53,14 +53,14 @@ export const useShopStore = create<ShopState>()(
 
       addToCart: (p) =>
         set((s) => {
-          const key = `${p.id}|${p.color ?? ""}|${p.size ?? ""}`;
+          const key = `${p.id}|${p.roast ?? ""}|${p.weight ?? ""}`;
           const existing = s.cart.find(
-            (x) => `${x.id}|${x.color ?? ""}|${x.size ?? ""}` === key
+            (x) => `${x.id}|${x.roast ?? ""}|${x.weight ?? ""}` === key
           );
           if (existing) {
             return {
               cart: s.cart.map((x) =>
-                `${x.id}|${x.color ?? ""}|${x.size ?? ""}` === key
+                `${x.id}|${x.roast ?? ""}|${x.weight ?? ""}` === key
                   ? { ...x, quantity: (x.quantity ?? 1) + 1 }
                   : x
               ),
@@ -75,23 +75,23 @@ export const useShopStore = create<ShopState>()(
         set((s) => ({
           cart: s.cart.filter((x) => {
             if (x.id !== id) return true;
-            // اگر color/size داده شد، فقط همان خط
-            if (opts && (opts.color !== undefined || opts.size !== undefined)) {
-              const colorOk = (opts.color ?? "") === (x.color ?? "");
-              const sizeOk = (opts.size ?? "") === (x.size ?? "");
-              return !(colorOk && sizeOk);
+            // اگر roast/weight داده شد، فقط همان خط
+            if (opts && (opts.roast !== undefined || opts.weight !== undefined)) {
+              const roastOk = (opts.roast ?? "") === (x.roast ?? "");
+              const weightOk = (opts.weight ?? "") === (x.weight ?? "");
+              return !(roastOk && weightOk);
             }
             // بدون opts: رفتار قدیمی (کل محصول) — ترجیحاً از UI استفاده نشود
             return false;
           }),
         })),
-      cartKey: (p: { id: string; color?: string; size?: string }) =>
-        `${p.id}|${p.color ?? ""}|${p.size ?? ""}`,
+      cartKey: (p: { id: string; roast?: string; weight?: string }) =>
+        `${p.id}|${p.roast ?? ""}|${p.weight ?? ""}`,
 
       updateCartItem: (key, patch) =>
         set((s) => ({
           cart: s.cart.map((x) =>
-            `${x.id}|${x.color ?? ""}|${x.size ?? ""}` === key
+            `${x.id}|${x.roast ?? ""}|${x.weight ?? ""}` === key
               ? { ...x, ...patch }
               : x
           ),
@@ -101,7 +101,7 @@ export const useShopStore = create<ShopState>()(
         set((s) => ({
           cart: s.cart
             .map((x) =>
-              `${x.id}|${x.color ?? ""}|${x.size ?? ""}` === key
+              `${x.id}|${x.roast ?? ""}|${x.weight ?? ""}` === key
                 ? { ...x, quantity: Math.max(1, quantity) }
                 : x
             )

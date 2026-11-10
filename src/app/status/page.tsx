@@ -19,7 +19,7 @@ export default async function StatusPage() {
 
   try {
     const h = await headers();
-    const host = h.get("x-forwarded-host") || h.get("host") || "pirahanmardane.ir";
+    const host = h.get("x-forwarded-host") || h.get("host") || "shadjil.ir";
     const proto = h.get("x-forwarded-proto") || "https";
     const base = `${proto}://${host}`;
     const res = await fetch(`${base}/api/health`, {
@@ -86,7 +86,7 @@ export default async function StatusPage() {
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
           <h1 className="text-2xl font-bold">وضعیت سیستم</h1>
-          <p className="text-muted-foreground mt-1 text-sm">pirahanmardane.ir</p>
+          <p className="text-muted-foreground mt-1 text-sm">shadjil.ir</p>
         </div>
 
         <div

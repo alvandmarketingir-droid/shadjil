@@ -18,8 +18,8 @@ import { ProductSpecs } from "@/components/product/product-specs";
 import { getProductSpecRows } from "@/lib/product-specs";
 import { getProductPriceHistory, averageVariantPrice } from "@/lib/price-history";
 import { resolveColorHex } from "@/lib/colors";
-import { loadSizeGuideForProduct } from "@/lib/size-guide/load";
-import { SizeGuideSnippet } from "@/components/product/size-guide-snippet";
+import { loadSizeGuideForProduct } from "@/lib/weight-guide/load";
+import { SizeGuideSnippet } from "@/components/product/weight-guide-snippet";
 import { normalizeProductSlug } from "@/lib/product-slug";
 import { JsonLd } from "@/components/seo/json-ld";
 import { productSchema, breadcrumbSchema } from "@/lib/seo/schema";
@@ -98,9 +98,9 @@ export default async function ProductDetailPage({ params }: Props) {
   }
 
   const product = result.data;
-  const siteBase = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://pirahanmardane.ir").replace(/\/$/, "");
-  const sizeGuide = await loadSizeGuideForProduct({
-    sizeGuideId: (product as { size_guide_id?: string | null }).size_guide_id,
+  const siteBase = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://shadjil.ir").replace(/\/$/, "");
+  const weightGuide = await loadSizeGuideForProduct({
+    weightGuideId: (product as { weight_guide_id?: string | null }).weight_guide_id,
     categoryId: (product as { category_id?: string | null }).category_id,
   });
   const images = product.images ?? [];
@@ -112,11 +112,11 @@ export default async function ProductDetailPage({ params }: Props) {
     activeVariants.length > 0
       ? Math.min(...activeVariants.map((v) => Number(v.price)))
       : null;
-  const sizes = [
+  const weights = [
     ...new Set(
       activeVariants
         .map((v) => {
-          const s = (v as { size?: string | { name?: string | null } | null }).size;
+          const s = (v as { weight?: string | { name?: string | null } | null }).weight;
           if (typeof s === "string" && s) return s;
           if (s && typeof s === "object" && s.name) return s.name;
           return null;
@@ -124,20 +124,20 @@ export default async function ProductDetailPage({ params }: Props) {
         .filter((s): s is string => Boolean(s))
     ),
   ];
-  const colors = [
+  const roasts = [
     ...new Map(
       activeVariants
         .map((v) => {
           const c = (v as {
-            color_name?: string | null;
-            color_hex?: string | null;
-            color?: string | { name?: string | null; hex_code?: string | null; hex?: string | null } | null;
+            roast_name?: string | null;
+            roast_hex?: string | null;
+            roast?: string | { name?: string | null; hex_code?: string | null; hex?: string | null } | null;
           });
-          if (c.color_name) return [c.color_name, c.color_hex ?? null] as const;
-          if (typeof c.color === "string" && c.color) return [c.color, null] as const;
-          if (c.color && typeof c.color === "object") {
-            const name = c.color.name ?? c.color.hex_code ?? c.color.hex ?? null;
-            const hex = c.color.hex_code ?? c.color.hex ?? null;
+          if (c.roast_name) return [c.roast_name, c.roast_hex ?? null] as const;
+          if (typeof c.roast === "string" && c.roast) return [c.roast, null] as const;
+          if (c.roast && typeof c.roast === "object") {
+            const name = c.roast.name ?? c.roast.hex_code ?? c.roast.hex ?? null;
+            const hex = c.roast.hex_code ?? c.roast.hex ?? null;
             if (name) return [name, hex] as const;
           }
           return null;
@@ -149,36 +149,36 @@ export default async function ProductDetailPage({ params }: Props) {
 
 
   const variantOptions = activeVariants.map((v) => {
-    const s = (v as { size?: string | { name?: string | null } | null }).size;
-    const sizeName =
+    const s = (v as { weight?: string | { name?: string | null } | null }).weight;
+    const weightName =
       typeof s === "string" ? s : s && typeof s === "object" ? s.name ?? null : null;
     const c = (v as {
-      color?: string | { name?: string | null; hex_code?: string | null; hex?: string | null } | null;
-      color_hex?: string | null;
-      color_name?: string | null;
+      roast?: string | { name?: string | null; hex_code?: string | null; hex?: string | null } | null;
+      roast_hex?: string | null;
+      roast_name?: string | null;
     });
     const nameHint =
-      (c.color_name || "").trim() ||
-      (typeof c.color === "string" ? c.color : c.color?.name || "") ||
+      (c.roast_name || "").trim() ||
+      (typeof c.roast === "string" ? c.roast : c.roast?.name || "") ||
       "";
-    let colorVal: string | null = resolveColorHex(
-      nameHint || c.color_hex,
-      c.color_hex ||
-        (c.color && typeof c.color === "object"
-          ? c.color.hex_code ?? c.color.hex
+    let roastVal: string | null = resolveColorHex(
+      nameHint || c.roast_hex,
+      c.roast_hex ||
+        (c.roast && typeof c.roast === "object"
+          ? c.roast.hex_code ?? c.roast.hex
           : null),
     );
-    if (!colorVal && c.color && typeof c.color === "object") {
-      colorVal = c.color.hex_code ?? c.color.hex ?? c.color.name ?? null;
-    } else if (typeof c.color === "string") {
-      colorVal = c.color;
+    if (!roastVal && c.roast && typeof c.roast === "object") {
+      roastVal = c.roast.hex_code ?? c.roast.hex ?? c.roast.name ?? null;
+    } else if (typeof c.roast === "string") {
+      roastVal = c.roast;
     }
     const op = Number((v as { original_price?: number | null }).original_price ?? 0);
     const pr = Number((v as { price?: number }).price ?? 0);
     return {
       id: (v as { id: string }).id,
-      size: sizeName,
-      color: colorVal,
+      weight: weightName,
+      roast: roastVal,
       price: pr,
       original_price: op > pr && op > 0 ? op : null,
       stock: Number((v as { stock_quantity?: number }).stock_quantity ?? 0),
@@ -343,7 +343,7 @@ export default async function ProductDetailPage({ params }: Props) {
             <div className="pdp-desktop-after-buy hidden lg:block space-y-4">
               <div className="grid grid-cols-1 gap-4 text-sm">
                 <div>
-                  <SizeGuideSnippet guide={sizeGuide} />
+                  <SizeGuideSnippet guide={weightGuide} />
                 </div>
                 <div>
                   <Link href="/shipping" className="text-muted-foreground font-medium underline-offset-4 hover:underline">
@@ -381,7 +381,7 @@ export default async function ProductDetailPage({ params }: Props) {
       <div className="mt-6 space-y-4 lg:hidden">
         <div className="grid grid-cols-1 gap-4 text-sm">
           <div>
-            <SizeGuideSnippet guide={sizeGuide} />
+            <SizeGuideSnippet guide={weightGuide} />
           </div>
           <div>
             <Link href="/shipping" className="text-muted-foreground font-medium underline-offset-4 hover:underline">

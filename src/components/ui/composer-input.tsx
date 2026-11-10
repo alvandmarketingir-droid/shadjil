@@ -47,7 +47,7 @@ export function ComposerInput({
       )}
     >
       <textarea
-        className="placeholder:text-muted-foreground min-h-[88px] w-full resize-y rounded-xl bg-transparent px-3 py-2 text-sm outline-none"
+        className="placeholder:text-muted-foreground min-h-[88px] w-full reweight-y rounded-xl bg-transparent px-3 py-2 text-sm outline-none"
         placeholder={placeholder}
         value={value}
         disabled={disabled || busy}
@@ -62,7 +62,7 @@ export function ComposerInput({
       <div className="mt-1 flex items-center justify-end gap-2 px-1">
         <Button
           type="button"
-          size="sm"
+          weight="sm"
           className="gap-1.5"
           disabled={disabled || busy || !value.trim()}
           onClick={() => void submit()}

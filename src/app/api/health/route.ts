@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
 
   const body = {
     ok: supabase !== "error",
-    service: "pirahanmardane",
+    service: "shadjil",
     requestId,
     ts: new Date().toISOString(),
     latencyMs: Date.now() - started,

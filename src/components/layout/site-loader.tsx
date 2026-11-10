@@ -13,7 +13,7 @@ export function useSiteLoading() {
 
 /**
  * فقط لودینگ تمام‌صفحه — بدون هدر/فوتر/محتوا.
- * بک‌گراند = secondary برند | اسپین = primary برند
+ * بک‌گراند = secondary برچسب | اسپین = primary برچسب
  */
 export function SiteLoaderProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

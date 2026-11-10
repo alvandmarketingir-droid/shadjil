@@ -31,8 +31,8 @@ type TrackOrder = {
   items: {
     id: string;
     title: string;
-    size_name?: string | null;
-    color_name?: string | null;
+    weight_name?: string | null;
+    roast_name?: string | null;
     quantity: number;
   }[];
 };
@@ -160,7 +160,7 @@ function TrackForm() {
             {result.items.map((it) => (
               <li key={it.id}>
                 {it.title}
-                {it.size_name ? ` · ${it.size_name}` : ""}
+                {it.weight_name ? ` · ${it.weight_name}` : ""}
                 {it.quantity > 1
                   ? ` × ${toPersianDigits(String(it.quantity))}`
                   : ""}

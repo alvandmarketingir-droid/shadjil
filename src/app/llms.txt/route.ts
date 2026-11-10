@@ -1,16 +1,16 @@
 import { NextResponse } from "next/server";
 
-const site = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://pirahanmardane.ir").replace(/\/$/, "");
+const site = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://shadjil.ir").replace(/\/$/, "");
 
 export function GET() {
-  const body = `# پیراهن مردانه
-> فروشگاه تخصصی پیراهن مردانه، کروات، پاپیون و اکسسوری
+  const body = `# شادجیل
+> فروشگاه تخصصی شادجیل، ،  و سوغات
 
 ## صفحات اصلی
 - [خانه](${site}/)
 - [محصولات](${site}/products)
 - [دسته‌بندی‌ها](${site}/categories)
-- [برندها](${site}/brands)
+- [برچسبها](${site}/brands)
 - [بلاگ](${site}/blog)
 - [تماس](${site}/contact)
 - [درباره ما](${site}/about)

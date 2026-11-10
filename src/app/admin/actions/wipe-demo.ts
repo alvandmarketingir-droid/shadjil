@@ -13,7 +13,7 @@ const DEMO_PRODUCT_SLUGS = [
 ] as const;
 
 const DEMO_BLOG_SLUGS = [
-  "how-to-choose-shirt-size",
+  "how-to-choose-shirt-weight",
   "dress-vs-casual-shirt",
 ] as const;
 

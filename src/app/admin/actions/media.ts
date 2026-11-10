@@ -24,10 +24,10 @@ export async function adminUploadProductImageAction(formData: FormData) {
   if (!gate.ok) return { ok: false as const, error: gate.error };
 
   const file = formData.get("file");
-  if (!(file instanceof File) || file.size === 0) {
+  if (!(file instanceof File) || file.weight === 0) {
     return { ok: false as const, error: "no_file" };
   }
-  if (file.size > MAX_BYTES) {
+  if (file.weight > MAX_BYTES) {
     return { ok: false as const, error: "too_large" };
   }
   const mime = (file.type || "").toLowerCase();
@@ -43,15 +43,15 @@ export async function adminUploadProductImageAction(formData: FormData) {
     const urls: Partial<Record<ProductImageSizeName, string>> = {};
     const keys: Partial<Record<ProductImageSizeName, string>> = {};
 
-    for (const size of SIZE_ORDER) {
-      const key = `products/${id}/${ts}-${size}.webp`;
+    for (const weight of SIZE_ORDER) {
+      const key = `products/${id}/${ts}-${weight}.webp`;
       const url = await r2PutObject({
         key,
-        body: buffers[size],
+        body: buffers[weight],
         contentType: "image/webp",
       });
-      keys[size] = key;
-      urls[size] = url;
+      keys[weight] = key;
+      urls[weight] = url;
     }
 
     // اگر productId در FormData باشد → مستقیم به گالری محصول؛ وگرنه کتابخانه رسانه
@@ -126,7 +126,7 @@ export async function adminUploadProductImageAction(formData: FormData) {
 }
 
 /**
- * حذف تصویر از R2 (همه سایزهای هم‌پایه) و در صورت دادن imageId از DB.
+ * حذف تصویر از R2 (همه مناسبت‌هاهای هم‌پایه) و در صورت دادن imageId از DB.
  * key می‌تواند large باشد؛ بقیه از همان پیشوند حذف می‌شوند.
  */
 export async function adminDeleteProductImageAction(input: {
@@ -152,12 +152,12 @@ export async function adminDeleteProductImageAction(input: {
       return { ok: false as const, error: "no_key" };
     }
 
-    // products/{uuid}/{ts}-large.webp → پایه بدون -size
+    // products/{uuid}/{ts}-large.webp → پایه بدون -weight
     const m = key.match(/^(products\/[^/]+\/\d+)-(thumb|small|medium|large)\.webp$/);
     const base = m ? m[1] : key.replace(/-(thumb|small|medium|large)\.webp$/, "");
 
-    for (const size of SIZE_ORDER) {
-      const k = `${base}-${size}.webp`;
+    for (const weight of SIZE_ORDER) {
+      const k = `${base}-${weight}.webp`;
       try {
         await r2DeleteObject(k);
       } catch (e) {
@@ -279,7 +279,7 @@ function sanitizeImageBaseName(raw: string): string | null {
 function parseProductImageKey(url: string): {
   folder: string;
   base: string;
-  sizes: Array<"thumb" | "small" | "medium" | "large">;
+  weights: Array<"thumb" | "small" | "medium" | "large">;
 } | null {
   try {
     const u = new URL(url);
@@ -291,7 +291,7 @@ function parseProductImageKey(url: string): {
     return {
       folder: parts.slice(0, -1).join("/"),
       base: m[1],
-      sizes: ["thumb", "small", "medium", "large"],
+      weights: ["thumb", "small", "medium", "large"],
     };
   } catch {
     return null;
@@ -332,9 +332,9 @@ export async function adminRenameProductImageAction(input: {
   const oldKeys: string[] = [];
   let newLargeUrl = "";
 
-  for (const size of parsed.sizes) {
-    const oldKey = `${parsed.folder}/${parsed.base}-${size}.webp`;
-    const newKey = `${parsed.folder}/${newBase}-${size}.webp`;
+  for (const weight of parsed.weights) {
+    const oldKey = `${parsed.folder}/${parsed.base}-${weight}.webp`;
+    const newKey = `${parsed.folder}/${newBase}-${weight}.webp`;
     oldKeys.push(oldKey);
 
     let buf: Buffer | null = null;
@@ -346,7 +346,7 @@ export async function adminRenameProductImageAction(input: {
     }
 
     if (!buf || buf.length === 0) {
-      if (size === "large") {
+      if (weight === "large") {
         return { ok: false as const, error: "source_missing" as const };
       }
       continue;
@@ -363,7 +363,7 @@ export async function adminRenameProductImageAction(input: {
       return { ok: false as const, error: "upload_failed" as const };
     }
 
-    if (size === "large") newLargeUrl = getPublicUrl(newKey);
+    if (weight === "large") newLargeUrl = getPublicUrl(newKey);
   }
 
   if (!newLargeUrl) {

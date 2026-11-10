@@ -41,7 +41,7 @@ export default function AdminShowcasePage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">رنگ و دکمه</h2>
+        <h2 className="text-lg font-semibold">وضعیت محصول و دکمه</h2>
         <div className="flex flex-wrap gap-2">
           <Button>Primary</Button>
           <Button variant="secondary">Secondary</Button>

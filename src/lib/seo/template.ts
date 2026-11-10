@@ -14,7 +14,7 @@ export type SeoTemplateContext = {
   year?: string | number;
 };
 
-const DEFAULT_SITE = "پیراهن مردانه";
+const DEFAULT_SITE = "شادجیل";
 
 export function applySeoTemplate(
   template: string | null | undefined,

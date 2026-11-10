@@ -8,12 +8,12 @@
 const SAFE = new Set(["GET", "HEAD", "OPTIONS"]);
 
 export function getTrustedOrigins(): string[] {
-  const site = (process.env.NEXT_PUBLIC_SITE_URL || "https://pirahanmardane.ir").replace(/\/$/, "");
+  const site = (process.env.NEXT_PUBLIC_SITE_URL || "https://shadjil.ir").replace(/\/$/, "");
   const extra = (process.env.CSRF_TRUSTED_ORIGINS || "")
     .split(",")
     .map((s) => s.trim().replace(/\/$/, ""))
     .filter(Boolean);
-  const list = new Set<string>([site, "https://pirahanmardane.ir", "https://www.pirahanmardane.ir", ...extra]);
+  const list = new Set<string>([site, "https://shadjil.ir", "https://www.shadjil.ir", ...extra]);
   return [...list];
 }
 

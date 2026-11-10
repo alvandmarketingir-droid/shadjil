@@ -12,5 +12,5 @@ export function isSiteIndexable(): boolean {
 }
 
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://pirahanmardane.ir"
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://shadjil.ir"
 ).replace(/\/$/, "");

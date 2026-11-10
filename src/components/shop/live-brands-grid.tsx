@@ -25,7 +25,7 @@ export function LiveBrandsGrid({ initialBrands }: { initialBrands: Brand[] }) {
     setBrands(initialBrands);
   }, [initialBrands]);
 
-  // با سیگنال catalog صفحه را از سرور تازه کن (لیست برند از SSR)
+  // با سیگنال catalog صفحه را از سرور تازه کن (لیست برچسب از SSR)
   useRtEvent(RT.catalog, () => {
     startTransition(() => {
       // parent page is force-dynamic; router.refresh from parent helper
@@ -37,7 +37,7 @@ export function LiveBrandsGrid({ initialBrands }: { initialBrands: Brand[] }) {
 
   if (!brands.length) {
     return (
-      <p className="text-muted-foreground text-center">برندی ثبت نشده است.</p>
+      <p className="text-muted-foreground text-center">برچسبی ثبت نشده است.</p>
     );
   }
 
@@ -47,7 +47,7 @@ export function LiveBrandsGrid({ initialBrands }: { initialBrands: Brand[] }) {
         <Link
           key={b.id}
           href={`/brands/${b.slug}`}
-          className="bg-card hover:border-foreground/20 flex h-24 items-center justify-center rounded-2xl border px-3 text-center text-sm font-medium transition-colors hover:bg-muted/40"
+          className="bg-card hover:border-foreground/20 flex h-24 items-center justify-center rounded-2xl border px-3 text-center text-sm font-medium transition-roasts hover:bg-muted/40"
         >
           {b.name}
         </Link>

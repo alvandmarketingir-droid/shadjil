@@ -32,8 +32,8 @@ type TrackOrder = {
   items: {
     id: string;
     title: string;
-    size_name?: string;
-    color_name?: string;
+    weight_name?: string;
+    roast_name?: string;
     quantity: number;
     line_total: number;
   }[];
@@ -131,7 +131,7 @@ export function OrderTrackBox() {
             {result.shipping_name ? ` · ${result.shipping_name}` : ""}
           </p>
           <p className="font-medium">
-            <Price amount={result.total_amount || 0} size="sm" />
+            <Price amount={result.total_amount || 0} weight="sm" />
           </p>
           {result.tracking_number ? (
             <div className="border-border mt-2 space-y-1 rounded-lg border bg-muted/30 p-3 text-xs">
@@ -155,7 +155,7 @@ export function OrderTrackBox() {
             {result.items.map((it) => (
               <li key={it.id}>
                 {it.title}
-                {it.size_name ? ` · ${it.size_name}` : ""}
+                {it.weight_name ? ` · ${it.weight_name}` : ""}
                 {it.quantity > 1 ? ` × ${it.quantity}` : ""}
               </li>
             ))}

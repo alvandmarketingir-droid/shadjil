@@ -33,7 +33,7 @@ function decodeSlug(raw: string): string {
 const RESERVED = new Set([
   "about", "blog", "brands", "cart", "categories", "checkout", "contact",
   "dashboard", "faq", "login", "products", "register", "privacy", "returns",
-  "shipping", "size-guide", "terms", "track", "tag", "wishlist", "compare",
+  "shipping", "weight-guide", "terms", "track", "tag", "wishlist", "compare",
   "api", "admin", "ورود", "ثبت-نام", "علاقه-مندی-ها", "مقایسه", "سبد-خرید", "محصولات",
 ]);
 
@@ -73,7 +73,7 @@ export default async function RootSlugPage(props: Props) {
 
   const fixed = await resolvedProps(props);
 
-  // برند را اول چک کن تا با اسلاگ مشترک دسته تداخل کمتر شود
+  // برچسب را اول چک کن تا با اسلاگ مشترک دسته تداخل کمتر شود
   const brandService = new BrandService();
   const brand = await brandService.getBySlug(slug);
   if (brand.success && brand.data) {

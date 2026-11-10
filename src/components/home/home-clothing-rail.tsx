@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Decorative clothing rail — demo garments removed for shop-ready empty catalog.
+ * Decorative nuts rail — demo garments removed for shop-ready empty catalog.
  * Re-enable by supplying real garments from catalog when available.
  */
 export function HomeClothingRail() {

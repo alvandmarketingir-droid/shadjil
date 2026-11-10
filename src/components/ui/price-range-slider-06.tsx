@@ -123,7 +123,7 @@ export function PriceRangeSlider06({
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <p className="text-muted-foreground mb-1 text-xs font-medium">
-            محدوده قیمت
+            بازه قیمت
           </p>
           <p className="text-foreground text-sm font-bold tabular-nums leading-relaxed">
             <span>{formatToman(low)}</span>
@@ -137,12 +137,12 @@ export function PriceRangeSlider06({
         <Button
           type="button"
           variant="outline"
-          size="sm"
+          weight="sm"
           onClick={() => commit([min, max], true)}
           disabled={isDefault}
           className="text-muted-foreground hover:text-foreground h-8 shrink-0 gap-1 px-2 text-xs"
         >
-          <X className="size-3" />
+          <X className="weight-3" />
           پاک کردن
         </Button>
       </div>

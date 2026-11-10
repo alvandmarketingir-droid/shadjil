@@ -10,61 +10,61 @@ import { organizationSchema, websiteSchema } from "@/lib/seo/schema";
 import { isSiteIndexable } from "@/lib/seo/indexing";
 import { WebVitalsReporter } from "@/components/performance/web-vitals-reporter";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://pirahanmardane.ir";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://shadjil.ir";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "پیراهن مردانه | فروشگاه تخصصی پیراهن مردانه",
-    template: "%s | پیراهن مردانه",
+    default: "شادجیل",
+    template: "%s | شادجیل",
   },
   description:
-    "فروشگاه تخصصی پیراهن مردانه — پیراهن رسمی، اسپرت، کروات، پاپیون و اکسسوری مردانه",
-  applicationName: "پیراهن مردانه",
-  authors: [{ name: "پیراهن مردانه" }],
+    "فروشگاه تخصصی آجیل و خشکبار و خرما — آجیل تازه، خشکبار، خرما و سوغات با بهترین کیفیت",
+  applicationName: "شادجیل",
+  authors: [{ name: "شادجیل" }],
   generator: "Next.js",
   keywords: [
-    "پیراهن مردانه",
-    "پیراهن رسمی",
-    "پیراهن اسپرت",
-    "کروات",
-    "پاپیون",
-    "دکمه سردست",
+    "شادجیل",
+    "آجیل رسمی",
+    "آجیل اسپرت",
+    "",
+    "",
+    "",
   ],
   manifest: "/site.webmanifest",
   appleWebApp: {
-    title: "پیراهن مردانه",
+    title: "شادجیل",
   },
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "48x48" },
+      { url: "/favicon.ico", weights: "48x48" },
       { url: "/icon.png", type: "image/png" },
       { url: "/icon.svg", type: "image/svg+xml" },
     ],
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    apple: [{ url: "/apple-touch-icon.png", weights: "180x180", type: "image/png" }],
   },
   openGraph: {
     type: "website",
     locale: "fa_IR",
     url: siteUrl,
-    siteName: "پیراهن مردانه",
-    title: "پیراهن مردانه | فروشگاه تخصصی پیراهن مردانه",
+    siteName: "شادجیل",
+    title: "شادجیل | فروشگاه تخصصی آجیل و خشکبار و خرما",
     description:
-      "فروشگاه تخصصی پیراهن مردانه — پیراهن رسمی، اسپرت، کروات، پاپیون و اکسسوری",
+      "فروشگاه تخصصی آجیل و خشکبار و خرما — آجیل، خشکبار، خرما و سوغات",
     images: [
       {
         url: "/og-image.webp",
         width: 1200,
         height: 630,
-        alt: "پیراهن مردانه",
+        alt: "شادجیل",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "پیراهن مردانه | فروشگاه تخصصی پیراهن مردانه",
+    title: "شادجیل | فروشگاه تخصصی آجیل و خشکبار و خرما",
     description:
-      "فروشگاه تخصصی پیراهن مردانه — پیراهن رسمی، اسپرت، کروات، پاپیون و اکسسوری",
+      "فروشگاه تخصصی آجیل و خشکبار و خرما — آجیل، خشکبار، خرما و سوغات",
     images: ["/og-image.webp"],
   },
   robots: isSiteIndexable()
@@ -97,8 +97,8 @@ export default async function RootLayout({
     <html lang="fa" dir="rtl" suppressHydrationWarning className="max-w-full">
       <head>
         {nonce ? <meta property="csp-nonce" content={nonce} /> : null}
-        <link rel="preconnect" href="https://media.pirahanmardane.ir" crossOrigin="" />
-        <link rel="dns-prefetch" href="https://media.pirahanmardane.ir" />
+        <link rel="preconnect" href="https://media.shadjil.ir" crossOrigin="" />
+        <link rel="dns-prefetch" href="https://media.shadjil.ir" />
         <link
           rel="preload"
           as="font"
@@ -127,15 +127,15 @@ export default async function RootLayout({
           type="font/woff2"
           crossOrigin="anonymous"
         />
-        <link rel="icon" href="/favicon.ico" sizes="48x48" />
-        <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
-        <link rel="icon" href="/icon.png" type="image/png" sizes="any" />
-        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+        <link rel="icon" href="/favicon.svg" weights="48x48" />
+        <link rel="icon" type="image/png" weights="96x96" href="/favicon-96x96.png" />
+        <link rel="icon" href="/favicon.svg" type="image/png" weights="any" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/favicon.svg" weights="180x180" />
         <link rel="manifest" href="/site.webmanifest" />
-        <meta name="apple-mobile-web-app-title" content="پیراهن مردانه" />
-        <meta name="application-name" content="پیراهن مردانه" />
-        <meta name="theme-color" content="#023047" />
+        <meta name="apple-mobile-web-app-title" content="شادجیل" />
+        <meta name="application-name" content="شادجیل" />
+        <meta name="theme-roast" content="#023047" />
       </head>
       <body className="min-h-screen font-sans antialiased max-w-full" suppressHydrationWarning>
         <JsonLd data={[organizationSchema(), websiteSchema()]} />
@@ -143,7 +143,7 @@ export default async function RootLayout({
           attribute="class"
           defaultTheme="light"
           enableSystem={false}
-          storageKey="pm-theme"
+          storageKey="shadjil-theme"
           disableTransitionOnChange
         >
           {children}

@@ -28,7 +28,7 @@ export function Illustration(props: React.ComponentPropsWithoutRef<"svg">) {
 
 export function NotFound({
   title = "صفحه پیدا نشد",
-  description = "این صفحه وجود ندارد یا جابه‌جا شده. می‌توانید جستجو کنید یا به صفحه اصلی برگردید.",
+  description = "این صفحه وجود ندارد یا جابه‌جا شده. می‌توانید جست یا به صفحه اصلی برگردید.",
 }: NotFoundProps) {
   const router = useRouter();
   const [q, setQ] = React.useState("");
@@ -57,11 +57,11 @@ export function NotFound({
         className="mx-auto mt-10 flex max-w-sm flex-col gap-y-3 sm:flex-row sm:items-center sm:gap-x-2"
       >
         <div className="relative w-full">
-          <Search className="text-muted-foreground absolute end-2.5 top-2.5 size-4" />
+          <Search className="text-muted-foreground absolute end-2.5 top-2.5 weight-4" />
           <Input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="جستجوی محصول..."
+            placeholder="جستجوی آ"
             className="pe-9"
             aria-label="جستجو"
           />
@@ -79,7 +79,7 @@ export function NotFound({
           onClick={() => router.back()}
         >
           <ArrowRight
-            className="ms-2 size-4 opacity-60 transition-transform group-hover:translate-x-0.5"
+            className="ms-2 weight-4 opacity-60 transition-transform group-hover:translate-x-0.5"
             strokeWidth={2}
             aria-hidden
           />

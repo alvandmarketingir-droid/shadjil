@@ -67,16 +67,16 @@ export function SmartSearch({ className }: { className?: string }) {
 
   const [category, setCategory] = useState("");
   const [brand, setBrand] = useState("");
-  const [color, setColor] = useState("");
-  const [size, setSize] = useState("");
+  const [roast, setType] = useState("");
+  const [weight, setWeight] = useState("");
   const [sort, setSort] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
 
   const [facetCats, setFacetCats] = useState<SuggestItem[]>([]);
   const [facetBrands, setFacetBrands] = useState<SuggestItem[]>([]);
-  const [facetColors, setFacetColors] = useState<SuggestItem[]>([]);
-  const [facetSizes, setFacetSizes] = useState<SuggestItem[]>([]);
+  const [facetTypes, setFacetTypes] = useState<SuggestItem[]>([]);
+  const [facetWeights, setFacetWeights] = useState<SuggestItem[]>([]);
   const [facetAttrs, setFacetAttrs] = useState<FacetAttr[]>([]);
   const [attrSel, setAttrSel] = useState<Record<string, string>>({});
   const [moreOpen, setMoreOpen] = useState(false);
@@ -87,13 +87,13 @@ export function SmartSearch({ className }: { className?: string }) {
     let n = 0;
     if (category) n++;
     if (brand) n++;
-    if (color) n++;
-    if (size) n++;
+    if (roast) n++;
+    if (weight) n++;
     if (sort) n++;
     if (minPrice || maxPrice) n++;
     n += Object.keys(attrSel).length;
     return n;
-  }, [category, brand, color, size, sort, minPrice, maxPrice, attrSel]);
+  }, [category, brand, roast, weight, sort, minPrice, maxPrice, attrSel]);
 
   const hasSuggest =
     products.length > 0 ||
@@ -108,8 +108,8 @@ export function SmartSearch({ className }: { className?: string }) {
       if (text) params.set("q", text);
       if (category) params.set("category", category);
       if (brand) params.set("brand", brand);
-      if (color) params.set("color", color);
-      if (size) params.set("size", size);
+      if (roast) params.set("roast", roast);
+      if (weight) params.set("weight", weight);
       if (sort) params.set("sort", sort);
       if (minPrice) params.set("minPrice", minPrice);
       if (maxPrice) params.set("maxPrice", maxPrice);
@@ -127,7 +127,7 @@ export function SmartSearch({ className }: { className?: string }) {
         }).catch(() => {});
       }
       const hasFilter =
-        Boolean(category || brand || color || size || sort || minPrice || maxPrice) ||
+        Boolean(category || brand || roast || weight || sort || minPrice || maxPrice) ||
         Object.keys(attrSel).length > 0;
       if (text && !hasFilter) {
         router.push(`/search?q=${encodeURIComponent(text)}`);
@@ -137,7 +137,7 @@ export function SmartSearch({ className }: { className?: string }) {
       setSuggestOpen(false);
       setFilterOpen(false);
     },
-    [q, category, brand, color, size, sort, minPrice, maxPrice, attrSel, router]
+    [q, category, brand, roast, weight, sort, minPrice, maxPrice, attrSel, router]
   );
 
   function submit(e?: React.FormEvent) {
@@ -148,8 +148,8 @@ export function SmartSearch({ className }: { className?: string }) {
   function clearFilters() {
     setCategory("");
     setBrand("");
-    setColor("");
-    setSize("");
+    setType("");
+    setWeight("");
     setSort("");
     setMinPrice("");
     setMaxPrice("");
@@ -180,8 +180,8 @@ export function SmartSearch({ className }: { className?: string }) {
         if (cancelled) return;
         setFacetCats(data.categories ?? []);
         setFacetBrands(data.brands ?? []);
-        setFacetColors(data.colors ?? []);
-        setFacetSizes(data.sizes ?? []);
+        setFacetTypes(data.roasts ?? []);
+        setFacetWeights(data.weights ?? []);
         setFacetAttrs(data.attributes ?? []);
         setFacetsLoaded(true);
       } catch {
@@ -240,7 +240,7 @@ export function SmartSearch({ className }: { className?: string }) {
 
   const chip = (active: boolean) =>
     cn(
-      "rounded-xl border px-3 py-1.5 text-xs transition-colors",
+      "rounded-xl border px-3 py-1.5 text-xs transition-roasts",
       active
         ? "border-primary bg-primary/10 text-primary"
         : "border-border hover:bg-muted"
@@ -265,7 +265,7 @@ export function SmartSearch({ className }: { className?: string }) {
               setRecent(loadRecent());
               setSuggestOpen(true);
             }}
-            placeholder="جستجوی محصول، برند، دسته…"
+            placeholder="جستجوی آجیل، خشکبار، خرما و سوغات..."
             className="placeholder:text-muted-foreground h-full min-w-0 flex-1 bg-transparent text-sm outline-none"
             dir="rtl"
             autoComplete="off"
@@ -404,7 +404,7 @@ export function SmartSearch({ className }: { className?: string }) {
           ) : null}
           {categories.length > 0 ? (
             <div className="border-border border-t px-3 py-2">
-              <p className="text-muted-foreground mb-1 text-[11px]">دسته‌بندی</p>
+              <p className="text-muted-foreground mb-1 text-[11px]">دسته‌بندی‌ها</p>
               <ul className="space-y-0.5">
                 {categories.map((c) => (
                   <li key={c.slug}>
@@ -423,7 +423,7 @@ export function SmartSearch({ className }: { className?: string }) {
           ) : null}
           {brands.length > 0 ? (
             <div className="border-border border-t px-3 py-2">
-              <p className="text-muted-foreground mb-1 text-[11px]">برند</p>
+              <p className="text-muted-foreground mb-1 text-[11px]">برچسب‌ها</p>
               <ul className="space-y-0.5">
                 {brands.map((b) => (
                   <li key={b.slug}>
@@ -473,7 +473,7 @@ export function SmartSearch({ className }: { className?: string }) {
         <div className="border-border bg-card fixed inset-x-0 top-14 z-[120] max-h-[min(80vh,40rem)] overflow-y-auto rounded-none border-x-0 border-b border-t px-4 py-3 shadow-xl xl:top-16">
           <div className="mx-auto w-full max-w-6xl">
           <div className="mb-3 flex items-center justify-between">
-            <span className="text-sm font-medium">فیلتر پیشرفته</span>
+            <span className="text-sm font-medium">فیلترها</span>
             <div className="flex items-center gap-2">
               {activeFilters > 0 ? (
                 <button
@@ -508,7 +508,7 @@ export function SmartSearch({ className }: { className?: string }) {
           <div className="space-y-4">
             <div>
               <p className="text-muted-foreground mb-1.5 text-xs font-medium">
-                مرتب‌سازی
+                مرتب‌سازی بر اساس
               </p>
               <div className="flex flex-wrap gap-2">
                 {SORTS.map((s) => (
@@ -526,7 +526,7 @@ export function SmartSearch({ className }: { className?: string }) {
 
             <div>
               <p className="text-muted-foreground mb-1.5 text-xs font-medium">
-                دسته‌بندی
+                دسته‌بندی‌ها
               </p>
               <div className="flex flex-wrap gap-2">
                 <button
@@ -556,7 +556,7 @@ export function SmartSearch({ className }: { className?: string }) {
 
             <div>
               <p className="text-muted-foreground mb-1.5 text-xs font-medium">
-                برند
+                برچسب
               </p>
               <div className="flex flex-wrap gap-2">
                 <button
@@ -580,7 +580,7 @@ export function SmartSearch({ className }: { className?: string }) {
             </div>
 
             <div className="space-y-2">
-              <p className="text-muted-foreground text-xs font-medium">محدوده قیمت (تومان)</p>
+              <p className="text-muted-foreground text-xs font-medium">بازه قیمت</p>
               <PriceRangeSlider06
                 min={0}
                 max={50_000_000}
@@ -598,15 +598,15 @@ export function SmartSearch({ className }: { className?: string }) {
 
             <div>
               <p className="text-muted-foreground mb-1.5 text-xs font-medium">
-                رنگ
+                وضعیت محصول
               </p>
               <div className="flex flex-wrap gap-2">
-                {facetColors.map((c) => (
+                {facetTypes.map((c) => (
                   <button
                     key={c.slug}
                     type="button"
-                    onClick={() => setColor(color === c.slug ? "" : c.slug)}
-                    className={chip(color === c.slug)}
+                    onClick={() => setType(roast === c.slug ? "" : c.slug)}
+                    className={chip(roast === c.slug)}
                   >
                     {c.name}
                   </button>
@@ -616,15 +616,15 @@ export function SmartSearch({ className }: { className?: string }) {
 
             <div>
               <p className="text-muted-foreground mb-1.5 text-xs font-medium">
-                سایز
+                مناسبت‌ها
               </p>
               <div className="flex flex-wrap gap-2">
-                {facetSizes.map((s) => (
+                {facetWeights.map((s) => (
                   <button
                     key={s.slug}
                     type="button"
-                    onClick={() => setSize(size === s.slug ? "" : s.slug)}
-                    className={chip(size === s.slug)}
+                    onClick={() => setWeight(weight === s.slug ? "" : s.slug)}
+                    className={chip(weight === s.slug)}
                   >
                     {s.name}
                   </button>

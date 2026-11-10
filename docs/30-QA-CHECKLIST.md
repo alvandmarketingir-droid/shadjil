@@ -1,6 +1,6 @@
 # فاز 30 — QA رسمی
 
-محیط: https://pirahanmardane.ir
+محیط: https://shadjil.ir
 علامت: [ ] نشده | [x] پاس | [F] شکست | [N/A] غیرکاربردی
 
 ## A) Functional

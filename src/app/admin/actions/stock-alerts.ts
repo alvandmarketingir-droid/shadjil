@@ -13,8 +13,8 @@ export type AdminStockAlertRow = {
   created_at: string;
   notified_at: string | null;
   product_name?: string | null;
-  size?: string | null;
-  color_name?: string | null;
+  weight?: string | null;
+  roast_name?: string | null;
   stock_quantity?: number | null;
 };
 
@@ -45,12 +45,12 @@ export async function adminListStockAlertsAction(opts?: {
 
     const { data: variants } = await service
       .from("product_variants")
-      .select("id, size, color_name, stock_quantity, product_id, products(name)")
+      .select("id, weight, roast_name, stock_quantity, product_id, products(name)")
       .in("id", variantIds);
 
     const map = new Map<string, {
-      size?: string | null;
-      color_name?: string | null;
+      weight?: string | null;
+      roast_name?: string | null;
       stock_quantity?: number | null;
       product_name?: string | null;
       product_id?: string | null;
@@ -58,8 +58,8 @@ export async function adminListStockAlertsAction(opts?: {
     for (const v of variants ?? []) {
       const prod = (v as { products?: { name?: string } | null }).products;
       map.set(v.id as string, {
-        size: (v as { size?: string | null }).size ?? null,
-        color_name: (v as { color_name?: string | null }).color_name ?? null,
+        weight: (v as { weight?: string | null }).weight ?? null,
+        roast_name: (v as { roast_name?: string | null }).roast_name ?? null,
         stock_quantity: Number((v as { stock_quantity?: number }).stock_quantity ?? 0),
         product_name: prod?.name ?? null,
         product_id: (v as { product_id?: string }).product_id ?? null,
@@ -70,8 +70,8 @@ export async function adminListStockAlertsAction(opts?: {
       const m = map.get(r.variant_id);
       return {
         ...r,
-        size: m?.size ?? null,
-        color_name: m?.color_name ?? null,
+        weight: m?.weight ?? null,
+        roast_name: m?.roast_name ?? null,
         stock_quantity: m?.stock_quantity ?? null,
         product_name: m?.product_name ?? null,
         product_id: r.product_id ?? m?.product_id ?? null,

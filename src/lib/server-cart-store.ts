@@ -11,15 +11,15 @@ export type ServerCartLine = {
   price: number;
   quantity: number;
   image?: string;
-  size?: string;
-  color?: string;
-  colorHex?: string;
-  colors?: string[];
-  sizes?: string[];
+  weight?: string;
+  roast?: string;
+  roastHex?: string;
+  roasts?: string[];
+  weights?: string[];
   variantOptions?: {
-    color?: string;
-    colorHex?: string;
-    size?: string;
+    roast?: string;
+    roastHex?: string;
+    weight?: string;
     stock: number;
   }[];
   slug?: string;
@@ -49,11 +49,11 @@ function mapItems(
     price: l.price,
     quantity: l.quantity,
     image: l.image,
-    size: l.size,
-    color: l.color,
-    colorHex: (l as { colorHex?: string }).colorHex,
-    colors: (l as { colors?: string[] }).colors,
-    sizes: (l as { sizes?: string[] }).sizes,
+    weight: l.weight,
+    roast: l.roast,
+    roastHex: (l as { roastHex?: string }).roastHex,
+    roasts: (l as { roasts?: string[] }).roasts,
+    weights: (l as { weights?: string[] }).weights,
     variantOptions: (l as { variantOptions?: unknown })
       .variantOptions as ServerCartLine["variantOptions"],
     slug: l.slug,

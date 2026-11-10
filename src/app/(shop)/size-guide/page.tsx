@@ -2,18 +2,18 @@ import type { Metadata } from "next";
 
 export const revalidate = 60;
 import { StaticPage } from "@/components/content/static-page";
-import { formatCm, loadPrimarySizeGuide } from "@/lib/size-guide/load";
+import { formatCm, loadPrimarySizeGuide } from "@/lib/weight-guide/load";
 
 export const metadata: Metadata = {
-  title: "راهنمای سایز | پیراهن مردانه",
-  description: "جدول راهنمای انتخاب سایز پیراهن مردانه",
+  title: "راهنمای مناسبت‌ها بسته‌بندی | شادجیل",
+  description: "جدول راهنمای انتخاب مناسبت‌ها شادجیل",
 };
 
 const FALLBACK = [
-  { size_label: "S", chest_cm: 92, neck_cm: 37.5, sleeve_cm: 62.5 },
-  { size_label: "M", chest_cm: 97, neck_cm: 39.5, sleeve_cm: 63.5 },
-  { size_label: "L", chest_cm: 102, neck_cm: 41.5, sleeve_cm: 64.5 },
-  { size_label: "XL", chest_cm: 107.5, neck_cm: 43.5, sleeve_cm: 65.5 },
+  { weight_label: "S", chest_cm: 92, neck_cm: 37.5, sleeve_cm: 62.5 },
+  { weight_label: "M", chest_cm: 97, neck_cm: 39.5, sleeve_cm: 63.5 },
+  { weight_label: "L", chest_cm: 102, neck_cm: 41.5, sleeve_cm: 64.5 },
+  { weight_label: "XL", chest_cm: 107.5, neck_cm: 43.5, sleeve_cm: 65.5 },
 ] as const;
 
 export default async function SizeGuidePage() {
@@ -22,7 +22,7 @@ export default async function SizeGuidePage() {
     guide && guide.rows.length
       ? guide.rows
       : FALLBACK.map((r) => ({
-          size_label: r.size_label,
+          weight_label: r.weight_label,
           chest_cm: r.chest_cm,
           waist_cm: null as number | null,
           shoulder_cm: null as number | null,
@@ -39,16 +39,16 @@ export default async function SizeGuidePage() {
   const showChest = rows.some((r) => r.chest_cm != null);
 
   return (
-    <StaticPage title={guide?.name || "راهنمای سایز"}>
+    <StaticPage title={guide?.name || "راهنمای مناسبت‌ها بسته‌بندی"}>
       <p>
         {guide?.description?.trim() ||
-          "اندازه‌گیری را با متر روی بدن انجام دهید: دور سینه، دور گردن، قد و طول آستین. بین دو سایز، معمولاً سایز بزرگ‌تر برای راحتی بیشتر مناسب است."}
+          "اندازه‌گیری را با متر روی بدن انجام دهید: دور سینه، دور گردن، قد و طول آستین. بین دو مناسبت‌ها، معمولاً مناسبت‌ها بزرگ‌تر برای راحتی بیشتر مناسب است."}
       </p>
       <div className="table-scroll border-border overflow-x-auto rounded-xl border">
         <table className="w-full min-w-[28rem] text-center text-sm">
           <thead className="bg-muted/50">
             <tr>
-              <th className="p-2">سایز</th>
+              <th className="p-2">موجودی</th>
               {showChest ? <th className="p-2">سینه (cm)</th> : null}
               {showWaist ? <th className="p-2">کمر (cm)</th> : null}
               {showShoulder ? <th className="p-2">شانه (cm)</th> : null}
@@ -59,8 +59,8 @@ export default async function SizeGuidePage() {
           </thead>
           <tbody>
             {rows.map((row) => (
-              <tr key={row.size_label} className="border-border border-t">
-                <td className="p-2 font-medium">{row.size_label}</td>
+              <tr key={row.weight_label} className="border-border border-t">
+                <td className="p-2 font-medium">{row.weight_label}</td>
                 {showChest ? (
                   <td className="p-2 tabular-nums">{formatCm(row.chest_cm)}</td>
                 ) : null}
