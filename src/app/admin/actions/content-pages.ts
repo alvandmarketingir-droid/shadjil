@@ -2,7 +2,6 @@
 
 import { revalidatePath } from "next/cache";
 import { requirePermission } from "@/lib/admin/require-permission";
-import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import {
   CONTENT_KEYS,

@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "سوالات متداول | شادجیل",
-  description: "پاسخ به سوالات رایج درباره سفارش، مناسبت‌ها، ارسال و مرجوعی",
+  description: "پاسخ به سوالات رایج درباره سفارش، وزن، ارسال و مرجوعی",
 };
 
 export default async function FaqPage() {

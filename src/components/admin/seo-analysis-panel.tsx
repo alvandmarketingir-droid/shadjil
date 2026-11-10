@@ -13,7 +13,7 @@ import {
 import { adminSeoSuggestAction } from "@/app/admin/actions/seo-ai";
 import { suggestMetaTitle, suggestMetaDescription, suggestSocial } from "@/lib/seo/suggest";
 import { summarizeText } from "@/lib/seo/summarize";
-import { applySeoTemplate, SEO_TEMPLATE_HINT } from "@/lib/seo/template";
+import { applySeoTemplate } from "@/lib/seo/template";
 import { adminSuggestInternalLinksAction } from "@/app/admin/actions/seo-links";
 
 export type SeoPanelValue = {

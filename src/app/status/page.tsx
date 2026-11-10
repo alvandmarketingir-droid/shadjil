@@ -135,6 +135,8 @@ export default async function StatusPage() {
 
         <p className="text-muted-foreground text-center text-xs">
           مانیتورینگ:{" "}
+          {/* API endpoint (not an App Router page) */}
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
           <a className="underline" href="/api/health">
             /api/health
           </a>{" "}

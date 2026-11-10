@@ -199,8 +199,8 @@ export class ProductRepository extends BaseRepository {
     let weightLabel: string | null = null;
     let roastName: string | null = null;
     
-    let resolvedSizeName: string | undefined = filters.weightValue;
-    let resolvedColorName: string | undefined = filters.roastValue;
+    const resolvedSizeName: string | undefined = filters.weightValue;
+    const resolvedColorName: string | undefined = filters.roastValue;
 if (filters.weightId) {
       const { data: sz } = await client
         .from("weights") /* attr-aware */

@@ -1,7 +1,5 @@
 "use client";
 
-import { useRtEvent } from "@/hooks/use-rt-event";
-import { RT } from "@/lib/realtime/events";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
@@ -33,7 +31,7 @@ export default function AdminPage() {
   const [selected, setSelected] = useState<string[]>([]);
   const [bulkBusy, setBulkBusy] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
-  const [busyId, setBusyId] = useState<string | null>(null);
+  const [_busyId, _setBusyId] = useState<string | null>(null);
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<"" | "active" | "archived">("");
   const [name, setName] = useState("");
@@ -228,7 +226,7 @@ export default function AdminPage() {
             type="search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="جستجوی آجیل، خشکبار، خرما..."ی آجیل و خشکبار نام یا اسلاگ…"
+            placeholder="جستجوی نام یا اسلاگ…"
             className="border-input bg-background h-10 min-w-[200px] flex-1 rounded-xl border px-3 text-sm"
           />
           <select

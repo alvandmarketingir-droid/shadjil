@@ -13,30 +13,51 @@ const CORE_FACETS = [
   "raw",
   "gift-box",
   "usage",
-  "origin",
 ] as const;
 
-const SHIRT_FACETS = [...CORE_FACETS] as const;
-
-const TIE_FACETS = ["weight", "nut-type", "origin", "weight-250", "weight-500"] as const;
-const BOW_FACETS = ["weight", "nut-type", "origin", "weight-1kg"] as const;
-const CUFF_FACETS = ["premium"] as const;
+const NUTS_FACETS = [...CORE_FACETS] as const;
+const DRIED_FACETS = [
+  "weight",
+  "nut-type",
+  "origin",
+  "pack-weight",
+  "packaging",
+  "grade",
+  "organic",
+  "quality",
+] as const;
+const DATES_FACETS = [
+  "weight",
+  "origin",
+  "pack-weight",
+  "packaging",
+  "grade",
+  "organic",
+] as const;
+const SOUVENIR_FACETS = ["weight", "origin", "gift-box", "usage", "premium"] as const;
 
 export const FACET_BY_CATEGORY: Record<string, string[]> = {
-  shirts: [...SHIRT_FACETS],
-  "dress-shirts": [...SHIRT_FACETS],
-  "casual-shirts": [...SHIRT_FACETS],
-  "linen-shirts": [...SHIRT_FACETS],
-  "oxford-shirts": [...SHIRT_FACETS],
-  overshirts: [...SHIRT_FACETS],
-  ties: [...TIE_FACETS],
-  "tie-clips": ["weight", "nut-type"],
-  "bow-ties": [...BOW_FACETS],
-  cufflinks: [...CUFF_FACETS],
-  accessories: ["weight", "nut-type", "origin", "usage"],
-  "pocket-squares": ["weight", "nut-type"],
-  "formal-belts": ["weight", "nut-type"],
-  "formal-socks": ["weight", "nut-type", "origin"],
+  // آجیل
+  ajil: [...NUTS_FACETS],
+  nuts: [...NUTS_FACETS],
+  pistachio: [...NUTS_FACETS],
+  almond: [...NUTS_FACETS],
+  cashew: [...NUTS_FACETS],
+  hazelnut: [...NUTS_FACETS],
+  walnut: [...NUTS_FACETS],
+  // خشکبار
+  khoshkbar: [...DRIED_FACETS],
+  "dried-fruit": [...DRIED_FACETS],
+  raisins: [...DRIED_FACETS],
+  figs: [...DRIED_FACETS],
+  // خرما
+  khorma: [...DATES_FACETS],
+  dates: [...DATES_FACETS],
+  // سوغات / هدیه
+  soghat: [...SOUVENIR_FACETS],
+  souvenirs: [...SOUVENIR_FACETS],
+  gifts: [...SOUVENIR_FACETS],
+  accessories: [...SOUVENIR_FACETS],
 };
 
 export const DEFAULT_FACET_SLUGS = [...CORE_FACETS] as const;

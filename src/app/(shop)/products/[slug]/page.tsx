@@ -1,15 +1,11 @@
-import { Price } from "@/components/ui/price";
 import { RelatedStrip } from "@/components/shop/related-strip";
 import { getRelatedProducts } from "@/lib/related-products";
 import type { Metadata } from "next";
 // ISR: HTML کامل سرور-ساید، کش ۶۰ ثانیه — ظاهر و عملکرد دست‌نخورده
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCachedProductBySlug } from "@/lib/cache/product";
-import { toPersianDigits } from "@/lib/numbers";
 import { Badge } from "@/components/ui/badge";
-import { ProductBuyBox } from "@/components/product/product-buy-box";
 import { TrackRecentlyViewed } from "@/components/product/track-recently-viewed";
 import { ProductReviews } from "@/components/shop/product-reviews";
 import { PriceHistory } from "@/components/product/price-history";
@@ -32,7 +28,7 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
-function formatPrice(_p: number) { return null; }
+function _formatPrice(_p: number) { return null; }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug: rawSlug } = await params;
@@ -112,7 +108,7 @@ export default async function ProductDetailPage({ params }: Props) {
     activeVariants.length > 0
       ? Math.min(...activeVariants.map((v) => Number(v.price)))
       : null;
-  const weights = [
+  const _weights = [
     ...new Set(
       activeVariants
         .map((v) => {
@@ -124,7 +120,7 @@ export default async function ProductDetailPage({ params }: Props) {
         .filter((s): s is string => Boolean(s))
     ),
   ];
-  const roasts = [
+  const _roasts = [
     ...new Map(
       activeVariants
         .map((v) => {

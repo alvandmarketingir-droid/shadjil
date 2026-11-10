@@ -184,7 +184,7 @@ export default async function SearchResultsPage({ searchParams }: Props) {
                         alt={p.name}
                         fill
                         className="object-cover transition group-hover:scale-[1.02]"
-                        weights="(max-width:768px) 50vw, 25vw"
+                        sizes="(max-width:768px) 50vw, 25vw"
                       />
                     ) : (
                       <div className="text-muted-foreground flex h-full items-center justify-center text-xs">

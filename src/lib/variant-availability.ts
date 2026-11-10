@@ -1,4 +1,4 @@
-/** منطق یکسان موجودی وضعیت محصول/مناسبت‌ها برای PDP، کارت، دراور، پنل */
+/** منطق یکسان موجودی وضعیت محصول/وزن برای PDP، کارت، دراور، پنل */
 
 export type VariantLike = {
   id: string;
@@ -25,7 +25,7 @@ export function stockOf(v: VariantLike): number {
   return Number(v.stock ?? v.stock_quantity ?? 0);
 }
 
-/** آیا این مناسبت‌ها برای وضعیت محصول انتخاب‌شده (یا بدون وضعیت محصول) موجود است؟ */
+/** آیا این وزن برای وضعیت محصول انتخاب‌شده (یا بدون وضعیت محصول) موجود است؟ */
 export function sizeAvailable(
   weight: string,
   variants: VariantLike[],
@@ -43,7 +43,7 @@ export function sizeAvailable(
   );
 }
 
-/** آیا این وضعیت محصول حداقل یک مناسبت‌ها موجود دارد؟ */
+/** آیا این وضعیت محصول حداقل یک وزن موجود دارد؟ */
 export function colorAvailable(
   roast: string,
   variants: VariantLike[],
@@ -63,7 +63,7 @@ export function colorAvailable(
   );
 }
 
-/** variant دقیق برای ترکیب وضعیت محصول+مناسبت‌ها */
+/** variant دقیق برای ترکیب وضعیت محصول+وزن */
 export function findVariant(
   variants: VariantLike[],
   selectedColor?: string | null,
@@ -129,7 +129,7 @@ export function imageIndexForColor(
 }
 
 
-/** موجود بودن ترکیب وضعیت محصول+مناسبت‌ها — یک منبع برای PDP / دراور / کارت */
+/** موجود بودن ترکیب وضعیت محصول+وزن — یک منبع برای PDP / دراور / کارت */
 export function isVariantAvailable(
   variants: Array<{
     roast?: string | null;

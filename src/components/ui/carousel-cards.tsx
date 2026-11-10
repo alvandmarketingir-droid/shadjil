@@ -33,7 +33,7 @@ type CarouselCardsProps = {
   leading?: React.ReactNode;
 };
 
-function formatPrice(_p: number) {
+function _formatPrice(_p: number) {
   return null;
 }
 
@@ -110,7 +110,7 @@ export function CarouselCards({
                       alt={item.imageAlt || item.title}
                       fill
                       className="object-contain transition-transform duration-300 group-hover:scale-105"
-                      weights="(max-width: 640px) 75vw, (max-width: 1024px) 33vw, 25vw"
+                      sizes="(max-width: 640px) 75vw, (max-width: 1024px) 33vw, 25vw"
                     />
                     {item.badge && (
                       <Badge className="absolute top-3 right-3">{item.badge}</Badge>
@@ -130,7 +130,7 @@ export function CarouselCards({
                     </h3>
                     {typeof item.rating === "number" && (
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Star className="weight-3.5 fill-amber-400 text-amber-400" />
+                        <Star className="size-3.5 fill-amber-400 text-amber-400" />
                         <span>{toPersianDigits(item.rating.toFixed(1))}</span>
                       </div>
                     )}
@@ -192,8 +192,8 @@ export function CarouselLinks({
 
   if (!items?.length) return null;
 
-  const brandChip =
-    "bg-muted/40 hover:border-foreground/20 flex h-20 w-full items-center justify-center rounded-2xl border px-3 text-center text-sm font-medium transition-roasts hover:bg-muted/60";
+  const _brandChip =
+    "bg-muted/40 hover:border-foreground/20 flex h-20 w-full items-center justify-center rounded-2xl border px-3 text-center text-sm font-medium transition-colors hover:bg-muted/60";
 
   const brandBasis =
     "basis-[calc((100%-0.5rem)/1.5)] pr-3 sm:basis-[calc((100%-1rem)/2.5)] lg:basis-[calc((100%-1.5rem)/4.5)]";
@@ -238,7 +238,7 @@ export function CarouselLinks({
                     className="group flex aspect-square w-full flex-col items-center justify-center gap-4 rounded-2xl border bg-card px-1.5 py-2 text-center shadow-sm transition hover:border-primary/30 hover:bg-muted/20 hover:shadow-md"
                   >
                     <span className="flex h-[5.75rem] w-[5.75rem] items-center justify-center rounded-2xl bg-primary/5 ring-1 ring-primary/10 transition group-hover:bg-primary/10">
-                      <CategorySvgIcon name={item.label} slug={item.href} className="weight-[4.14rem]" />
+                      <CategorySvgIcon name={item.label} slug={item.href} className="size-[4.14rem]" />
                     </span>
                     <span className="line-clamp-2 text-[20px] font-thin leading-snug tracking-wide text-primary">
                       {item.label}
@@ -247,7 +247,7 @@ export function CarouselLinks({
                 ) : (
                   <Link
                     href={item.href}
-                    className="bg-secondary hover:bg-secondary/90 border-secondary flex aspect-square w-full flex-col items-center justify-center gap-4 rounded-2xl border px-2 py-2.5 shadow-sm transition-roasts"
+                    className="bg-secondary hover:bg-secondary/90 border-secondary flex aspect-square w-full flex-col items-center justify-center gap-4 rounded-2xl border px-2 py-2.5 shadow-sm transition-colors"
                     aria-label={item.label}
                   >
                     {item.imageUrl ? (

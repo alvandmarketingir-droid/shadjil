@@ -3,7 +3,7 @@
 import { useNotifications } from "@/lib/notifications/use-notifications";
 import { LumaSpin } from "@/components/ui/luma-spin";
 import { cn } from "@/lib/utils";
-import { formatJalaliDate, formatJalaliDateTime } from "@/lib/dates/jalali";
+import { formatJalaliDate } from "@/lib/dates/jalali";
 
 
 export function NotificationsPanel({ onNavigate }: { onNavigate?: () => void }) {
@@ -40,7 +40,7 @@ export function NotificationsPanel({ onNavigate }: { onNavigate?: () => void }) 
                 <button
                   type="button"
                   className={cn(
-                    "w-full rounded-xl border p-3 text-right transition-roasts",
+                    "w-full rounded-xl border p-3 text-right transition-colors",
                     n.read_at
                       ? "border-transparent opacity-70 hover:bg-muted/50"
                       : "border-border bg-primary/5 hover:bg-primary/10",

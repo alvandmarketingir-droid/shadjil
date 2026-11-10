@@ -15,7 +15,7 @@ export type ShippingMethodRow = {
 export type QuoteInput = {
   providerCode: string;
   apiConfig: Record<string, unknown>;
-  /** مناسبت‌ها به گرم */
+  /** وزن به گرم */
   weightGrams: number;
   /** شهر مقصد (نام یا کد) */
   destCity?: string;

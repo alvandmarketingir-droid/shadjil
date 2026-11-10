@@ -486,7 +486,7 @@ export async function adminHardDeleteUsersAction(ids: string[]) {
   const list = cleanIds(ids).filter((id) => id !== gate.userId);
   if (!list.length) return { ok: false as const, error: "empty" as const };
   try {
-    const { count, error: cErr } = await gate.supabase
+    const { count: _count, error: cErr } = await gate.supabase
       .from("orders")
       .select("id", { count: "exact", head: true })
       .in("user_id", list);

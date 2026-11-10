@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 /** استایل یکسان با دکمه لایت/دارک: بردر + اندازه */
 export const headerIconClass =
-  "inline-flex h-9 w-9 min-h-9 min-w-9 max-h-9 max-w-9 shrink-0 items-center justify-center rounded-md border border-border bg-background p-0 text-foreground shadow-sm transition-roasts hover:bg-primary hover:text-primary-foreground hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+  "inline-flex h-9 w-9 min-h-9 min-w-9 max-h-9 max-w-9 shrink-0 items-center justify-center rounded-md border border-border bg-background p-0 text-foreground shadow-sm transition-colors hover:bg-primary hover:text-primary-foreground hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
 type Props = {
   href?: string;

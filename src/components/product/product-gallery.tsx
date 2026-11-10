@@ -178,7 +178,7 @@ export function ProductGallery({
                 ? { transformOrigin: `${zoomPos.x}% ${zoomPos.y}%` }
                 : undefined
             }
-            weights="(max-width: 1024px) 100vw, 50vw"
+            sizes="(max-width: 1024px) 100vw, 50vw"
             priority
           />
           <span className="bg-background/80 text-muted-foreground pointer-events-none absolute bottom-3 left-3 rounded-lg px-2 py-1 text-[11px] backdrop-blur-sm max-lg:hidden">
@@ -223,7 +223,7 @@ export function ProductGallery({
                 alt={ensureAlt(null, { pageName: productName })}
                 fill
                 className="object-cover p-0"
-                weights="56px"
+                sizes="56px"
               />
             </button>
           ))}

@@ -16,8 +16,6 @@ import { useShopStore } from "@/lib/shop-store";
 import { useServerCartStore } from "@/lib/server-cart-store";
 import { useUnifiedCart } from "@/lib/use-unified-cart";
 import {
-  removeCartItemAction,
-  updateCartQuantityAction,
   swapCartVariantAction,
 } from "@/app/(shop)/actions/shop";
 import { toPersianDigits } from "@/lib/numbers";
@@ -62,14 +60,14 @@ function toLikes(opts: VOpt[]) {
 }
 
 export default function CartPage() {
-  const localCart = useShopStore((s) => s.cart);
-  const removeFromCart = useShopStore((s) => s.removeFromCart);
-  const setCartQuantity = useShopStore((s) => s.setCartQuantity);
+  const _localCart = useShopStore((s) => s.cart);
+  const _removeFromCart = useShopStore((s) => s.removeFromCart);
+  const _setCartQuantity = useShopStore((s) => s.setCartQuantity);
   const updateCartItem = useShopStore((s) => s.updateCartItem);
   const setQuantityOptimistic = useServerCartStore((s) => s.setQuantityOptimistic);
-  const removeOptimistic = useServerCartStore((s) => s.removeOptimistic);
+  const _removeOptimistic = useServerCartStore((s) => s.removeOptimistic);
   const refreshServer = useServerCartStore((s) => s.refresh);
-  const { lines: unifiedLines, total: unifiedTotal, isLoggedIn } =
+  const { lines: unifiedLines, total: unifiedTotal, isLoggedIn: _isLoggedIn } =
     useUnifiedCart();
   const [busyMap, setBusyMap] = useState<Record<string, boolean>>({});
   const [msg, setMsg] = useState<string | null>(null);
@@ -185,7 +183,7 @@ export default function CartPage() {
         return roastOk && weightOk && (v.stock ?? 0) > 0;
       });
       if (!ok) {
-        setMsg("این ترکیب وضعیت محصول/مناسبت‌ها تعریف نشده یا موجود نیست.");
+        setMsg("این ترکیب وضعیت محصول/وزن تعریف نشده یا موجود نیست.");
         return;
       }
     }
@@ -232,7 +230,7 @@ export default function CartPage() {
             سبد خرید
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            وضعیت محصول، مناسبت‌ها و تعداد — فوری به‌روز می‌شود
+            وضعیت محصول، وزن و تعداد — فوری به‌روز می‌شود
           </p>
         </div>
         <Link
@@ -341,7 +339,7 @@ export default function CartPage() {
                                 key={sz}
                                 type="button"
                                 disabled={busy || !ok}
-                                title={ok ? sz : `مناسبت‌ها ${sz} ناموجود`}
+                                title={ok ? sz : `وزن ${sz} ناموجود`}
                                 onClick={() =>
                                   ok && void changeVariant(p, { weight: sz })
                                 }

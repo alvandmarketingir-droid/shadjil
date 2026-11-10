@@ -13,7 +13,7 @@ import {
   adminReplyTicketAction,
 } from "@/app/admin/actions/support";
 import { LumaSpin } from "@/components/ui/luma-spin";
-import { formatJalaliDate, formatJalaliDateTime } from "@/lib/dates/jalali";
+import { formatJalaliDateTime } from "@/lib/dates/jalali";
 import { useRtEvent } from "@/hooks/use-rt-event";
 import { RT } from "@/lib/realtime/events";
 

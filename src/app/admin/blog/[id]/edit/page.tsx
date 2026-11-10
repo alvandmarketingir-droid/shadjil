@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AdminMediaPicker } from "@/components/admin/media-picker";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import {

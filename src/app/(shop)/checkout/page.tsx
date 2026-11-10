@@ -1,6 +1,5 @@
 "use client";
 
-import { getTrackingUrl } from "@/lib/iran-shipping-tracking";
 
 import { Price } from "@/components/ui/price";
 import { normalizeIranMobile, normalizeIranPostalCode } from "@/lib/numbers";
@@ -200,7 +199,7 @@ export default function CheckoutPage() {
         return;
       }
 
-      // مناسبت‌ها واقعی واریانت‌ها؛ اگر نبود هر قلم ۴۰۰ گرم
+      // وزن واقعی واریانت‌ها؛ اگر نبود هر قلم ۴۰۰ گرم
       const weightGrams = Math.max(
         100,
         items.reduce((sum, it) => {
@@ -661,7 +660,7 @@ export default function CheckoutPage() {
               <>
                 <h2 className="font-semibold text-primary">۱. تأیید آیتم‌های سبد</h2>
                 <p className="text-muted-foreground text-xs">
-                  تعداد، وضعیت محصول و مناسبت‌ها انتخاب‌شده را بررسی کنید.
+                  تعداد، وضعیت محصول و وزن انتخاب‌شده را بررسی کنید.
                 </p>
                 <ul className="space-y-3">
                   {items.map((it) => (
@@ -676,7 +675,7 @@ export default function CheckoutPage() {
                             alt={it.title}
                             fill
                             className="object-cover"
-                            weights="64px"
+                            sizes="64px"
                           />
                         ) : null}
                       </div>
@@ -685,7 +684,7 @@ export default function CheckoutPage() {
                         <div className="text-muted-foreground mt-1 flex flex-wrap gap-2 text-xs">
                           {it.weight ? (
                             <span className="bg-muted rounded-md px-2 py-0.5">
-                              مناسبت‌ها: {it.weight}
+                              وزن: {it.weight}
                             </span>
                           ) : null}
                           {it.roast || it.roastHex ? (
@@ -751,7 +750,7 @@ export default function CheckoutPage() {
                         if (def) applyAddress(def);
                         setAddressMode("default");
                       }}
-                      className={`rounded-xl border p-3 text-sm font-medium transition-roasts ${
+                      className={`rounded-xl border p-3 text-sm font-medium transition-colors ${
                         addressMode === "default"
                           ? "border-primary bg-primary/10 text-primary"
                           : "border-border hover:bg-muted/50"
@@ -772,7 +771,7 @@ export default function CheckoutPage() {
                           note: "",
                         }));
                       }}
-                      className={`rounded-xl border p-3 text-sm font-medium transition-roasts ${
+                      className={`rounded-xl border p-3 text-sm font-medium transition-colors ${
                         addressMode === "new"
                           ? "border-primary bg-primary/10 text-primary"
                           : "border-border hover:bg-muted/50"

@@ -24,10 +24,10 @@ export async function adminUploadProductImageAction(formData: FormData) {
   if (!gate.ok) return { ok: false as const, error: gate.error };
 
   const file = formData.get("file");
-  if (!(file instanceof File) || file.weight === 0) {
+  if (!(file instanceof File) || file.size === 0) {
     return { ok: false as const, error: "no_file" };
   }
-  if (file.weight > MAX_BYTES) {
+  if (file.size > MAX_BYTES) {
     return { ok: false as const, error: "too_large" };
   }
   const mime = (file.type || "").toLowerCase();
@@ -126,7 +126,7 @@ export async function adminUploadProductImageAction(formData: FormData) {
 }
 
 /**
- * حذف تصویر از R2 (همه مناسبت‌هاهای هم‌پایه) و در صورت دادن imageId از DB.
+ * حذف تصویر از R2 (همه سایزهای هم‌پایه) و در صورت دادن imageId از DB.
  * key می‌تواند large باشد؛ بقیه از همان پیشوند حذف می‌شوند.
  */
 export async function adminDeleteProductImageAction(input: {
@@ -411,10 +411,10 @@ export async function adminSetPrimaryProductImageAction(input: {
     .eq("is_primary", true)
     .is("variant_id", null);
 
-  const oldPrimaryIds = new Set(
+  const _oldPrimaryIds = new Set(
     (oldPrimaries ?? []).map((r: { id: string }) => r.id),
   );
-  const oldPrimaryUrls = new Set(
+  const _oldPrimaryUrls = new Set(
     (oldPrimaries ?? []).map((r: { url: string }) => (r.url || "").split("?")[0]),
   );
 

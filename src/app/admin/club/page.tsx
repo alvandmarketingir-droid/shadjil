@@ -164,7 +164,7 @@ export default function AdminClubPage() {
         </button>
         <input
           className="border-border bg-background mr-auto min-w-[12rem] flex-1 rounded-xl border px-3 py-2 text-sm"
-          placeholder="جستجوی آجیل، خشکبار، خرما..."ی آجیل و خشکباری شماره…"
+          placeholder="جستجوی شماره…"
           value={q}
           onChange={(e) => setQ(e.target.value)}
           inputMode="tel"

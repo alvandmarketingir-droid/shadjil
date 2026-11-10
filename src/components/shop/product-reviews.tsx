@@ -6,7 +6,7 @@ import {
   listProductReviewsAction,
 } from "@/app/(shop)/actions/reviews";
 import { ComposerInput } from "@/components/ui/composer-input";
-import { formatJalaliDate, formatJalaliDateTime } from "@/lib/dates/jalali";
+import { formatJalaliDate } from "@/lib/dates/jalali";
 import { useRtEvent } from "@/hooks/use-rt-event";
 import { RT } from "@/lib/realtime/events";
 

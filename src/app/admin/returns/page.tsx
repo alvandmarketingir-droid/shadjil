@@ -14,7 +14,7 @@ import {
   adminSetReturnStatusAction,
 } from "@/app/admin/actions/support";
 import { LumaSpin } from "@/components/ui/luma-spin";
-import { formatJalaliDate, formatJalaliDateTime } from "@/lib/dates/jalali";
+import { formatJalaliDate } from "@/lib/dates/jalali";
 
 
 type Row = {
@@ -86,7 +86,7 @@ export default function AdminReturnsPage() {
     setSelected([]);
     void load();
   }
-  async function archiveOne(id: string, name: string) {
+  async function _archiveOne(id: string, name: string) {
     if (!confirm(`آرشیو «${name}»؟`)) return;
     setBulkBusy(true);
     const res = await adminArchiveReturnsAction([id]);
@@ -94,7 +94,7 @@ export default function AdminReturnsPage() {
     if (!res.ok) { setError("آرشیو ناموفق"); return; }
     void load();
   }
-  async function hardDeleteOne(id: string, name: string) {
+  async function _hardDeleteOne(id: string, name: string) {
     if (!confirm(`حذف دائمی «${name}»؟`)) return;
     setBulkBusy(true);
     const res = await adminHardDeleteReturnsAction([id]);

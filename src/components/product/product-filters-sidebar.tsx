@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { cn } from "@/lib/utils";
@@ -136,7 +135,7 @@ function FilterLink({
         onNavigate(href);
       }}
       className={cn(
-        "flex items-center gap-2 rounded-md px-1.5 py-1.5 text-xs transition-roasts",
+        "flex items-center gap-2 rounded-md px-1.5 py-1.5 text-xs transition-colors",
         active
           ? "bg-primary/10 text-primary font-medium"
           : "text-foreground hover:bg-muted"
@@ -151,7 +150,7 @@ function CheckBox({ active }: { active: boolean }) {
   return (
     <span
       className={cn(
-        "flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-roasts",
+        "flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors",
         active
           ? "border-primary bg-primary text-primary-foreground"
           : "border-muted-foreground/40"
@@ -166,7 +165,7 @@ function RadioDot({ active }: { active: boolean }) {
   return (
     <span
       className={cn(
-        "flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-roasts",
+        "flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors",
         active ? "border-primary bg-primary" : "border-muted-foreground/40"
       )}
     >
@@ -210,7 +209,7 @@ export function ProductFiltersSidebar(props: Props) {
     });
   }
 
-  function isActive(key: string, serverActive: boolean) {
+  function _isActive(key: string, serverActive: boolean) {
     if (pendingKey === key) return true;
     // اگر چیز دیگری pending است، server state همان گزینه را خاموش نشان بده
     if (pendingKey && pendingKey !== key) {
@@ -395,7 +394,7 @@ export function ProductFiltersSidebar(props: Props) {
                       {c.hex ? (
                         <span
                           className="h-3.5 w-3.5 shrink-0 rounded-full border border-black/10"
-                          style={{ backgroundType: c.hex }}
+                          style={{ background: c.hex }}
                         />
                       ) : null}
                       <span className="leading-snug">{c.name}</span>
@@ -407,7 +406,7 @@ export function ProductFiltersSidebar(props: Props) {
           </div>
         ) : null}
 
-        {/* —— مناسبت‌ها —— */}
+        {/* —— وزن —— */}
         {(props.weights?.length ?? 0) > 0 ? (
           <div>
             <p className="mb-2 text-xs font-medium">موجودی</p>
@@ -436,7 +435,7 @@ export function ProductFiltersSidebar(props: Props) {
           </div>
         ) : null}
 
-        {/* —— فیلترهای بیشتر (جنس پارچه و بقیه ویژگی‌ها) —— */}
+        {/* —— فیلترهای بیشتر (نوع آجیل و بقیه ویژگی‌ها) —— */}
         {facets.length > 0 ? (
           <div className="border-border border-t pt-3">
             <button

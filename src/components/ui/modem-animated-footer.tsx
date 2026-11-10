@@ -33,8 +33,8 @@ export function Footer({
   brandDescription = "فروشگاه تخصصی شادجیل — رسمی، اسپرت، ،  و سوغات",
   socialLinks = [],
   navLinks = [],
-  creatorName,
-  creatorUrl,
+  creatorName: _creatorName,
+  creatorUrl: _creatorUrl,
   brandIcon,
   className,
 }: FooterProps) {
@@ -61,7 +61,7 @@ export function Footer({
                     <Link
                       key={index}
                       href={link.href}
-                      className="text-muted-foreground hover:text-foreground transition-roasts"
+                      className="text-muted-foreground hover:text-foreground transition-colors"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -109,7 +109,7 @@ export function Footer({
         >
           <div className="bg-gradient-to-r from-transparent to-primary/70 h-px min-w-0 flex-1" />
           <div
-            className="border-border/60 bg-background/70 pointer-events-auto relative mx-0 flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border p-2 shadow-sm backdrop-blur-md transition-roasts duration-300 hover:border-primary supports-[backdrop-filter]:bg-background/60 sm:h-20 sm:w-20 md:h-24 md:w-24"
+            className="border-border/60 bg-background/70 pointer-events-auto relative mx-0 flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border p-2 shadow-sm backdrop-blur-md transition-colors duration-300 hover:border-primary supports-[backdrop-filter]:bg-background/60 sm:h-20 sm:w-20 md:h-24 md:w-24"
           >
             {brandIcon}
           </div>

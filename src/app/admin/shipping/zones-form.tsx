@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   listShippingZonesAdminAction,
   saveMethodProvincesAction,
@@ -20,8 +20,8 @@ export function ShippingZonesForm() {
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [methods, setMethods] = useState<Method[]>([]);
-  const [locations, setLocations] = useState<Loc[]>([]);
-  const [links, setLinks] = useState<Link[]>([]);
+  const [_locations, setLocations] = useState<Loc[]>([]);
+  const [_links, setLinks] = useState<Link[]>([]);
   /** methodId → set of selected province names */
   const [selected, setSelected] = useState<Record<string, string[]>>({});
   const [msg, setMsg] = useState<string | null>(null);
@@ -201,7 +201,7 @@ export function ShippingZonesForm() {
                     >
                       <input
                         type="checkbox"
-                        className="weight-4 shrink-0"
+                        className="size-4 shrink-0"
                         checked={checked}
                         onChange={() => toggle(m.id, p)}
                       />

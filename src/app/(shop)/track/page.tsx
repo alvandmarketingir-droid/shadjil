@@ -68,7 +68,7 @@ function TrackForm() {
 
   useEffect(() => {
     if (initial) void run(initial);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [initial]);
 
   useRtEvent(RT.orders, () => {
@@ -79,7 +79,7 @@ function TrackForm() {
     if (!result?.id) return;
     const iv = window.setInterval(() => void run(result.id), 15000);
     return () => window.clearInterval(iv);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [result?.id]);
 
   function onSubmit(e: FormEvent) {

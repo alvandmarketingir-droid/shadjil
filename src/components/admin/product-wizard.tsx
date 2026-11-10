@@ -34,7 +34,6 @@ import { AdminPageHeader } from "@/components/admin/page-header";
 import { LumaSpin } from "@/components/ui/luma-spin";
 import { parseLocaleNumber } from "@/lib/numbers";
 import { SeoAnalysisPanel, emptySeoValue, type SeoPanelValue } from "@/components/admin/seo-analysis-panel";
-import { ensureAlt } from "@/lib/seo/image-alt";
 import { resolveColorHex } from "@/lib/colors";
 
 type Opt = { id: string; name: string };
@@ -160,12 +159,12 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
   const [pickedColorIds, setPickedColorIds] = useState<string[]>([]);
   const pickedSizeOpts = weightOpts.filter((o) => pickedSizeIds.includes(o.id));
   const pickedColorOpts = roastOpts.filter((o) => pickedColorIds.includes(o.id));
-  const weightChoices = pickedSizeOpts.length ? pickedSizeOpts : weightOpts;
-  const roastChoices = pickedColorOpts.length ? pickedColorOpts : roastOpts;
+  const _weightChoices = pickedSizeOpts.length ? pickedSizeOpts : weightOpts;
+  const _roastChoices = pickedColorOpts.length ? pickedColorOpts : roastOpts;
   const [cats, setCats] = useState<Opt[]>([]);
   const [brands, setBrands] = useState<Opt[]>([]);
   const [tags, setTags] = useState<Opt[]>([]);
-  const [guides, setGuides] = useState<Opt[]>([]);
+  const [_guides, setGuides] = useState<Opt[]>([]);
   const [weightGuideId, setSizeGuideId] = useState("");
   const [publishedAt, setPublishedAt] = useState("");
   const [publishMode, setPublishMode] = useState<"draft" | "now" | "schedule">("draft");
@@ -362,14 +361,14 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
 
 
 
-  // همگام‌سازی مناسبت‌ها/وضعیت محصول انتخاب‌شده با مقادیر واقعی واریانت‌ها (بعد از ریلود خالی نماند)
+  // همگام‌سازی وزن/وضعیت محصول انتخاب‌شده با مقادیر واقعی واریانت‌ها (بعد از ریلود خالی نماند)
   useEffect(() => {
     if (!variants.length) return;
     if (weightOpts.length) {
       const vals = new Set(
         variants.map((v) => String(v.weight || "").trim()).filter(Boolean),
       );
-      if (vals.weight) {
+      if (vals.size) {
         setPickedSizeIds((prev) => {
           const fromVars = weightOpts
             .filter((o) => vals.has(String(o.value).trim()))
@@ -383,7 +382,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
       const vals = new Set(
         variants.map((v) => String(v.roast_name || "").trim()).filter(Boolean),
       );
-      if (vals.weight) {
+      if (vals.size) {
         setPickedColorIds((prev) => {
           const fromVars = roastOpts
             .filter((o) => vals.has(String(o.value).trim()))
@@ -445,7 +444,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
     if (s === 5) {
       if (!variants.length) return "حداقل یک واریانت لازم است";
       for (const v of variants) {
-        if (!v.weight && !v.roast_name) return "هر واریانت باید مناسبت‌ها یا وضعیت محصول داشته باشد";
+        if (!v.weight && !v.roast_name) return "هر واریانت باید وزن یا وضعیت محصول داشته باشد";
         const sale = parseLocaleNumber(v.price) ?? 0;
         const original = parseLocaleNumber(v.original_price) ?? 0;
         const main = original > 0 ? original : sale;
@@ -549,10 +548,9 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
       }
 
       // variants
-      const sp = sellingPrice;
-      const op = originalPrice;
-      let vPayload: Array<Record<string, unknown>>;
-      vPayload = variants
+      const _sp = sellingPrice;
+      const _op = originalPrice;
+      const vPayload: Array<Record<string, unknown>> = variants
         .map((v) => {
           const sale = parseLocaleNumber(v.price) ?? 0;
           const original = parseLocaleNumber(v.original_price) ?? 0;
@@ -592,7 +590,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
         if (mustHaveVariants) {
           return {
             ok: false as const,
-            error: "حداقل یک واریانت با مناسبت‌ها/وضعیت محصول و قیمت معتبر لازم است",
+            error: "حداقل یک واریانت با وزن/وضعیت محصول و قیمت معتبر لازم است",
           };
         }
         // draft: از sync واریانت رد شو
@@ -793,7 +791,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
       }
       setImageUrl("");
       setOkMsg("تصویر شاخص حذف شد");
-    } catch (e) {
+    } catch (_e) {
       setErr("حذف تصویر شاخص ناموفق");
     } finally {
       setBusy(false);
@@ -863,7 +861,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
     }
   }
 
-  async function onMainImage(file: File | null) {
+  async function _onMainImage(file: File | null) {
     if (!file) return;
     const id = await ensureProductId();
     if (!id) return;
@@ -885,7 +883,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
     }
   }
 
-  async function onGalleryImages(files: FileList | null) {
+  async function _onGalleryImages(files: FileList | null) {
     if (!files || files.length === 0) return;
     const id = await ensureProductId();
     if (!id) return;
@@ -951,7 +949,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
     if (errors.length) setErr("خطا در: " + errors.slice(0, 3).join("، "));
   }
 
-  async function onVariantImage(idx: number, file: File | null) {
+  async function _onVariantImage(idx: number, file: File | null) {
     if (!file) return;
     const id = await ensureProductId();
     if (!id) return;
@@ -1183,7 +1181,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
               </div>
             ) : null}
 
-            {/* مناسبت‌ها */}
+            {/* وزن */}
             {weightAttr ? (
               <div className="space-y-2">
                 <p className="text-sm font-medium">{weightAttr.name}</p>
@@ -1238,7 +1236,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
               </label>
             ))}
             <p className="text-muted-foreground text-xs">
-              وضعیت محصول و مناسبت‌ها انتخاب‌شده در فیلتر فروشگاه می‌آیند؛ در گام واریانت برای هر ردیف وضعیت محصول/مناسبت‌ها را جداگانه مشخص کنید.
+              وضعیت محصول و وزن انتخاب‌شده در فیلتر فروشگاه می‌آیند؛ در گام واریانت برای هر ردیف وضعیت محصول/وزن را جداگانه مشخص کنید.
             </p>
           </div>
         )}
@@ -1309,8 +1307,8 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
         {step === 5 && (
           <div className="space-y-4">
             <p className="text-muted-foreground text-xs">
-              برای هر ترکیب مناسبت‌ها/وضعیت محصول یک ردیف بسازید. قیمت اصلی و در صورت نیاز قیمت بعد از تخفیف را وارد کنید.
-              مناسبت‌ها و وضعیت محصول هر ردیف را از لیست زیر انتخاب کنید.
+              برای هر ترکیب وزن/وضعیت محصول یک ردیف بسازید. قیمت اصلی و در صورت نیاز قیمت بعد از تخفیف را وارد کنید.
+              وزن و وضعیت محصول هر ردیف را از لیست زیر انتخاب کنید.
             </p>
             <button
               type="button"
@@ -1381,7 +1379,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
                           );
                         }}
                       >
-                        <option value="">مناسبت‌ها…</option>
+                        <option value="">وزن…</option>
                         {weightOpts.map((o) => (
                           <option key={o.id} value={o.value}>
                             {o.value}

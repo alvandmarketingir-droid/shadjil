@@ -24,7 +24,7 @@ type Row = {
   category?: { name: string } | null;
 };
 
-function toLocalInputValue(iso: string | null): string {
+function _toLocalInputValue(iso: string | null): string {
   if (!iso) return "";
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
@@ -188,7 +188,7 @@ export default function AdminFlashSalePage() {
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="جستجوی آجیل، خشکبار، خرما..."ی آجیل و خشکبار..."
+              placeholder="جستجوی محصول..."
               className="border-input bg-background h-9 w-full max-w-xs rounded-xl border px-3 text-sm"
             />
           </div>

@@ -6,7 +6,7 @@ export function summarizeText(
   opts?: { maxPixels?: number; keyphrase?: string },
 ): string {
   const maxPx = opts?.maxPixels ?? PIXEL_LIMITS.descDesktop;
-  let t = (htmlOrText || "")
+  const t = (htmlOrText || "")
     .replace(/<script[\s\S]*?<\/script>/gi, " ")
     .replace(/<style[\s\S]*?<\/style>/gi, " ")
     .replace(/<[^>]+>/g, " ")

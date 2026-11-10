@@ -11,7 +11,7 @@ import {
 } from "@/app/admin/actions/orders";
 import { LumaSpin } from "@/components/ui/luma-spin";
 import { AdminBulkBar } from "@/components/admin/bulk-bar";
-import { formatJalaliDate, formatJalaliDateTime } from "@/lib/dates/jalali";
+import { formatJalaliDateTime } from "@/lib/dates/jalali";
 
 
 const STATUSES = [
@@ -248,7 +248,7 @@ export default function AdminOrdersPage() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="جستجوی آجیل، خشکبار، خرما..."ی آجیل و خشکبار نام یا موبایل گیرنده"
+            placeholder="جستجوی نام یا موبایل گیرنده"
             className="border-input bg-background h-10 min-w-[14rem] flex-1 rounded-xl border px-3 text-sm"
             dir="rtl"
           />

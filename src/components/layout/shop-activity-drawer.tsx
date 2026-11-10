@@ -3,7 +3,7 @@
 import { Price } from "@/components/ui/price";
 import { toast } from "@/lib/toaster";
 import { resolveColorHex } from "@/lib/colors";
-import { sizeAvailable, sameColor, colorAvailable, isVariantAvailable } from "@/lib/variant-availability";
+import { sizeAvailable, sameColor, colorAvailable } from "@/lib/variant-availability";
 import Link from "next/link";
 import {
   Drawer,
@@ -42,17 +42,17 @@ export function ShopActivityDrawer({
   onOpenChange: (open: boolean) => void;
   onTabChange?: (tab: ActivityTab) => void;
 }) {
-  const cart = useShopStore((s) => s.cart);
+  const _cart = useShopStore((s) => s.cart);
   const { lines: unifiedLines, total: unifiedTotal, isLoggedIn } = useUnifiedCart();
-  const setQuantityOptimistic = useServerCartStore((s) => s.setQuantityOptimistic);
-  const removeOptimistic = useServerCartStore((s) => s.removeOptimistic);
-  const refreshServer = useServerCartStore((s) => s.refresh);
+  const _setQuantityOptimistic = useServerCartStore((s) => s.setQuantityOptimistic);
+  const _removeOptimistic = useServerCartStore((s) => s.removeOptimistic);
+  const _refreshServer = useServerCartStore((s) => s.refresh);
   const wishlist = useShopStore((s) => s.wishlist);
   const compare = useShopStore((s) => s.compare);
   const recent = useShopStore((s) => s.recentlyViewed);
-  const removeFromCart = useShopStore((s) => s.removeFromCart);
+  const _removeFromCart = useShopStore((s) => s.removeFromCart);
   const updateCartItem = useShopStore((s) => s.updateCartItem);
-  const setCartQuantity = useShopStore((s) => s.setCartQuantity);
+  const _setCartQuantity = useShopStore((s) => s.setCartQuantity);
   const toggleWishlist = useShopStore((s) => s.toggleWishlist);
   const toggleCompare = useShopStore((s) => s.toggleCompare);
 
@@ -247,7 +247,7 @@ export function ShopActivityDrawer({
                                         title={
                                           ok
                                             ? c
-                                            : "این وضعیت محصول با مناسبت‌ها فعلی تعریف نشده"
+                                            : "این وضعیت محصول با وزن فعلی تعریف نشده"
                                         }
                                         onClick={() =>
                                           ok && void swap({ roastKey: c })
@@ -282,7 +282,7 @@ export function ShopActivityDrawer({
                                         title={
                                           ok
                                             ? sz
-                                            : `مناسبت‌ها ${sz} برای این وضعیت محصول تعریف نشده`
+                                            : `وزن ${sz} برای این وضعیت محصول تعریف نشده`
                                         }
                                         onClick={() =>
                                           ok && void swap({ weight: sz })

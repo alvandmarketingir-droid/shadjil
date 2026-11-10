@@ -240,7 +240,7 @@ export function SmartSearch({ className }: { className?: string }) {
 
   const chip = (active: boolean) =>
     cn(
-      "rounded-xl border px-3 py-1.5 text-xs transition-roasts",
+      "rounded-xl border px-3 py-1.5 text-xs transition-colors",
       active
         ? "border-primary bg-primary/10 text-primary"
         : "border-border hover:bg-muted"
@@ -616,7 +616,7 @@ export function SmartSearch({ className }: { className?: string }) {
 
             <div>
               <p className="text-muted-foreground mb-1.5 text-xs font-medium">
-                مناسبت‌ها
+                وزن
               </p>
               <div className="flex flex-wrap gap-2">
                 {facetWeights.map((s) => (

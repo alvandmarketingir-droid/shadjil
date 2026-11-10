@@ -15,11 +15,6 @@ import { HomeAfterHero } from "@/components/home/home-after-hero";
 import type { ProductWithRelations } from "@/repositories/product.repository";
 
 // Below-fold client islands — SSR HTML kept; JS deferred from critical path.
-const HomeClothingRail = dynamic(
-  () =>
-    import("@/components/home/home-clothing-rail").then((m) => m.HomeClothingRail),
-  { ssr: true },
-);
 const CarouselLinks = dynamic(
   () => import("@/components/ui/carousel-cards").then((m) => m.CarouselLinks),
   { ssr: true },
@@ -201,14 +196,12 @@ export default async function HomePage() {
                 key={f.title}
                 className="bg-card flex flex-col gap-2 rounded-2xl border p-4"
               >
-                <f.icon className="text-primary weight-6" />
+                <f.icon className="text-primary size-6" />
                 <h3 className="text-sm font-semibold text-primary">{f.title}</h3>
                 <p className="text-muted-foreground text-xs leading-6">{f.desc}</p>
               </div>
             ))}
           </section>
-
-          <HomeClothingRail />
 
           {brands.length > 0 ? (
             <CarouselLinks

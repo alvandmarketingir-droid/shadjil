@@ -40,7 +40,7 @@ export default async function BrandsIndexPage() {
               <Link
                 key={b.id}
                 href={`/brands/${b.slug}`}
-                className="bg-card hover:border-foreground/20 flex h-24 items-center justify-center rounded-2xl border px-3 text-center text-sm font-medium transition-roasts hover:bg-muted/40"
+                className="bg-card hover:border-foreground/20 flex h-24 items-center justify-center rounded-2xl border px-3 text-center text-sm font-medium transition-colors hover:bg-muted/40"
               >
                 {b.name}
               </Link>

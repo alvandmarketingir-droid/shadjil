@@ -1,4 +1,3 @@
-import { NotificationBell } from "@/components/notifications/notification-bell";
 "use client";
 
 import { useState } from "react";
@@ -8,11 +7,12 @@ import {
   ShoppingBag,
   History,
 } from "lucide-react";
-import { HeaderIconButton, headerIconClass } from "@/components/layout/header-icon-button";
+import { HeaderIconButton } from "@/components/layout/header-icon-button";
 import {
   HeaderActivitySheet,
   type ActivityPanel,
 } from "@/components/layout/header-activity-sheet";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 import { cn } from "@/lib/utils";
 
 // اگر مسیر فرق دارد فقط این خط را عوض کن:

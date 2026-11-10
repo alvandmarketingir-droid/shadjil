@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import {
   adminDeleteRedirectAction,
@@ -65,9 +66,9 @@ export default function AdminRedirectsPage() {
             آدرس قدیمی → آدرس جدید. برای سئو و لینک‌های شکسته.
           </p>
         </div>
-        <a href="/admin/seo" className="text-primary text-sm underline">
+        <Link href="/admin/seo" className="text-primary text-sm underline">
           سئو PLP
-        </a>
+        </Link>
       </div>
 
       <div className="border-border bg-card space-y-3 rounded-2xl border p-4">

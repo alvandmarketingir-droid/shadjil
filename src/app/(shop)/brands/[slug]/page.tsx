@@ -1,6 +1,6 @@
 import { CatalogRealtimeRefresh } from "@/components/shop/catalog-realtime-refresh";
 import type { Metadata } from "next";
-import { notFound, permanentRedirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { BrandService } from "@/services/brand.service";
 import { ProductService } from "@/services/product.service";

@@ -47,7 +47,7 @@ export default async function ContactPage() {
       <ContactWithGlobe
         subtitle="تماس"
         title="تماس با ما"
-        description="برای پشتیبانی سفارش، مرجوعی و مشاوره مناسبت‌ها از راه‌های زیر با ما در ارتباط باشید."
+        description="برای پشتیبانی سفارش، مرجوعی و مشاوره خرید از راه‌های زیر با ما در ارتباط باشید."
       />
     </>
   );

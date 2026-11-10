@@ -276,7 +276,7 @@ function StoreOpsSettingsForm() {
 export default function AdminSettingsPage() {
   const router = useRouter();
   useRtEvent(RT.catalog, () => { router.refresh(); });
-  const [env, setEnv] = useState<string>("—");
+  const [_env, setEnv] = useState<string>("—");
   const [checks, setChecks] = useState<Checks | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -382,7 +382,7 @@ export default function AdminSettingsPage() {
               ))}
             </ul>
             <p className="text-muted-foreground text-xs">
-              آپلودهای جدید از مسیر ادمین به R2 می‌روند (webp چندمناسبت‌هاه).
+              آپلودهای جدید از مسیر ادمین به R2 می‌روند (webp چندسایزه).
             </p>
           </div>
 

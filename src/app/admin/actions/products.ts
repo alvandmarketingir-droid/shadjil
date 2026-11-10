@@ -633,8 +633,8 @@ export async function adminUpdateProductAction(
         ? Number(input.price)
         : undefined;
 
-    // فقط اگر محصول هنوز «تک‌واریانت ساده» است (بدون مناسبت‌ها/وضعیت محصول) قیمت را روی همان یکی بنویس.
-    // اگر واریانت مناسبت‌ها/وضعیت محصول‌دار وجود دارد، هرگز این‌جا دست نزن — sync جداگانه مسئول است.
+    // فقط اگر محصول هنوز «تک‌واریانت ساده» است (بدون وزن/وضعیت محصول) قیمت را روی همان یکی بنویس.
+    // اگر واریانت وزن/وضعیت محصول‌دار وجود دارد، هرگز این‌جا دست نزن — sync جداگانه مسئول است.
     const { data: allVars } = await gate.supabase
       .from("product_variants")
       .select("id, weight, roast_name, is_active")

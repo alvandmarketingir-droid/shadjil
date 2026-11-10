@@ -110,7 +110,7 @@ export default function AdminDashboardPage() {
               <Link
                 key={c.href}
                 href={c.href}
-                className="border-border bg-card hover:border-primary/40 rounded-2xl border p-5 shadow-sm transition-roasts"
+                className="border-border bg-card hover:border-primary/40 rounded-2xl border p-5 shadow-sm transition-colors"
               >
                 <p className="text-muted-foreground text-xs">{c.label}</p>
                 <p className="mt-2 text-3xl font-bold tabular-nums">

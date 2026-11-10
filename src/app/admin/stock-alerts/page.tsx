@@ -68,7 +68,7 @@ export default function AdminStockAlertsPage() {
     setSelected([]);
     void load();
   }
-  async function archiveOne(id: string, name: string) {
+  async function _archiveOne(id: string, name: string) {
     if (!confirm(`آرشیو «${name}»؟`)) return;
     setBulkBusy(true);
     const res = await adminArchiveStockAlertsAction([id]);
@@ -76,7 +76,7 @@ export default function AdminStockAlertsPage() {
     if (!res.ok) { setError("آرشیو ناموفق"); return; }
     void load();
   }
-  async function hardDeleteOne(id: string, name: string) {
+  async function _hardDeleteOne(id: string, name: string) {
     if (!confirm(`حذف دائمی «${name}»؟`)) return;
     setBulkBusy(true);
     const res = await adminHardDeleteStockAlertsAction([id]);

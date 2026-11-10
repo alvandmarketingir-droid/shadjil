@@ -12,7 +12,7 @@ import { OrderRepository } from "@/repositories/order.repository";
 import { cookies } from "next/headers";
 import { assertNoLinkOrImage } from "@/lib/sanitize-user-text";
 import { randomUUID } from "crypto";
-import { normalizePhone, normalizeIranMobile, normalizeIranPostalCode, toEnglishDigits } from "@/lib/numbers";
+import { normalizeIranMobile, normalizeIranPostalCode } from "@/lib/numbers";
 import { checkRateLimit } from "@/lib/security/rate-limit";
 import { headers } from "next/headers";
 
@@ -310,7 +310,7 @@ export type CartLineDTO = {
   roastHex?: string;
   roasts?: string[];
   weights?: string[];
-  /** مناسبت‌ها یک واحد به گرم — برای محاسبه ارسال */
+  /** وزن یک واحد به گرم — برای محاسبه ارسال */
   weightGrams?: number;
 };
 
@@ -323,7 +323,7 @@ export async function getCartAction(): Promise<{
     const cartId = await resolveCartId();
     const cartRepo = new CartRepository();
     const rows = await cartRepo.listItems(cartId);
-    const cartItemsForDiscount = (rows as any[]).map((row) => {
+    const _cartItemsForDiscount = (rows as any[]).map((row) => {
       const v = row.product_variants;
       return {
         productId: String(v?.product_id ?? v?.products?.id ?? ""),
@@ -367,7 +367,7 @@ export async function getCartAction(): Promise<{
       };
     });
 
-    // گزینه‌های وضعیت محصول/مناسبت‌ها همه وریانت‌های همان محصول
+    // گزینه‌های وضعیت محصول/وزن همه وریانت‌های همان محصول
     const productIds = [...new Set(items.map((i) => i.productId).filter(Boolean))];
     if (productIds.length) {
       try {
@@ -1123,7 +1123,7 @@ async function eligibleDiscountBase(
       }
     }
   }
-  if (!allowed.weight) return { base: 0, error: "not_applicable" };
+  if (!allowed.size) return { base: 0, error: "not_applicable" };
 
   let base = 0;
   for (const line of lines) {

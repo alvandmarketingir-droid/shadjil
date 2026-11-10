@@ -33,7 +33,7 @@ function decodeSlug(raw: string): string {
 const RESERVED = new Set([
   "about", "blog", "brands", "cart", "categories", "checkout", "contact",
   "dashboard", "faq", "login", "products", "register", "privacy", "returns",
-  "shipping", "weight-guide", "terms", "track", "tag", "wishlist", "compare",
+  "shipping", "weight-guide", "size-guide", "terms", "track", "tag", "wishlist", "compare",
   "api", "admin", "ورود", "ثبت-نام", "علاقه-مندی-ها", "مقایسه", "سبد-خرید", "محصولات",
 ]);
 

@@ -7,7 +7,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { adminListLogsAction, type AdminLogRow } from "@/app/admin/actions/logs";
 import { LumaSpin } from "@/components/ui/luma-spin";
-import { formatJalaliDate, formatJalaliDateTime } from "@/lib/dates/jalali";
+import { formatJalaliDateTime } from "@/lib/dates/jalali";
 
 
 export default function AdminLogsPage() {

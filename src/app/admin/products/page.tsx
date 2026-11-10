@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { AdminBulkBar } from "@/components/admin/bulk-bar";
 import {
@@ -326,7 +325,7 @@ export default function AdminProductsPage() {
             type="search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="جستجوی آجیل، خشکبار، خرما..."ی آجیل و خشکبار نام یا اسلاگ…"
+            placeholder="جستجوی نام یا اسلاگ…"
             className="border-input bg-background h-10 min-w-[200px] flex-1 rounded-xl border px-3 text-sm"
           />
           <select

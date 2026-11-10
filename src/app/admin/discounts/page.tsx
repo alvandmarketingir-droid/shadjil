@@ -13,7 +13,7 @@ import {
   adminSetDiscountActiveAction,
 } from "@/app/admin/actions/discounts";
 import { LumaSpin } from "@/components/ui/luma-spin";
-import { formatJalaliDate, formatJalaliDateTime, jalaliInputToIso } from "@/lib/dates/jalali";
+import { formatJalaliDate, jalaliInputToIso } from "@/lib/dates/jalali";
 
 
 type Row = {
@@ -379,7 +379,7 @@ export default function AdminDiscountsPage() {
           type="search"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="جستجوی آجیل، خشکبار، خرما..."ی آجیل و خشکباری کد…"
+          placeholder="جستجوی کد…"
           className="border-input bg-background h-10 w-full max-w-xs rounded-xl border px-3 text-sm"
           dir="ltr"
         />

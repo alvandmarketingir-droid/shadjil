@@ -23,7 +23,8 @@ const PERSIAN_ROUTES: Record<string, string> = {
   "/حریم-خصوصی": "/privacy",
   "/ارسال": "/shipping",
   "/مرجوعی": "/returns",
-  "/راهنمای-مناسبت‌ها": "/weight-guide",
+  "/راهنمای-وزن": "/size-guide",
+  "/راهنمای-بسته-بندی": "/size-guide",
   "/پیگیری-سفارش": "/track",
   "/پیگیری": "/track",
 };
@@ -31,7 +32,7 @@ const PERSIAN_ROUTES: Record<string, string> = {
 const RESERVED = new Set([
   "", "admin", "api", "login", "register", "dashboard", "cart", "checkout",
   "products", "brands", "blog", "contact", "about", "faq", "terms", "privacy",
-  "shipping", "returns", "weight-guide", "track", "categories", "tag", "wishlist",
+  "shipping", "returns", "weight-guide", "size-guide", "track", "categories", "tag", "wishlist",
   "compare", "recently-viewed", "_next", "favicon.ico", "robots.txt",
   "sitemap.xml", "llms.txt", "ورود", "ثبت-نام", "علاقه-مندی-ها", "مقایسه",
   "سبد-خرید", "محصولات",
@@ -169,6 +170,17 @@ export async function proxy(request: NextRequest) {
     }
   }
 
+  // سازگاری مسیر قدیمی weight-guide با صفحه فعلی size-guide
+  if (pathname === "/weight-guide" || pathname === "/weight-guide/") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/size-guide";
+    const nonce = createCspNonce();
+    return applySecurityHeaders(NextResponse.redirect(url), {
+      requestId: rid,
+      nonce,
+    });
+  }
+
   // پنل ادمین: ریدایرکت سخت HTTP تا soft-redirect داخل RSC به ۵۰۰ تبدیل نشود
   if (pathname === "/admin" || pathname === "/admin/") {
     const url = request.nextUrl.clone();
@@ -181,9 +193,10 @@ export async function proxy(request: NextRequest) {
   }
   if (pathname.startsWith("/admin") && !hasSupabaseAuthCookie(request)) {
     const url = request.nextUrl.clone();
+    const nextPath = `${pathname}${request.nextUrl.search || ""}` || "/admin/dashboard";
     url.pathname = "/login";
     url.search = "";
-    url.searchParams.set("next", "/admin/dashboard");
+    url.searchParams.set("next", nextPath.startsWith("/admin") ? nextPath : "/admin/dashboard");
     const nonce = createCspNonce();
     return applySecurityHeaders(NextResponse.redirect(url), {
       requestId: rid,

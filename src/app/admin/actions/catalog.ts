@@ -19,7 +19,7 @@ async function uniqueSlug(
   base: string,
   excludeId?: string | null,
 ): Promise<string> {
-  let candidate = (base || "item").trim() || "item";
+  const candidate = (base || "item").trim() || "item";
   for (let i = 0; i < 50; i++) {
     const trySlug = i === 0 ? candidate : `${candidate}-${i + 1}`;
     let q = supabase.from(table).select("id").eq("slug", trySlug).limit(1);
