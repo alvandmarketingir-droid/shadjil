@@ -38,7 +38,7 @@ async function loadGuideById(
 
   return {
     id: guide.id as string,
-    name: (guide.name as string) || "راهنمای مناسبت‌ها بسته‌بندی",
+    name: (guide.name as string) || "راهنمای بسته‌بندی",
     description: (guide.description as string | null) ?? null,
     rows: (rows ?? []).map((r) => ({
       weight_label: String(r.weight_label ?? ""),

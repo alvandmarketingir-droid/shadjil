@@ -263,7 +263,7 @@ interface ContactWithGlobeProps {
 export default function ContactWithGlobe({
   title = "تماس با ما",
   subtitle = "تماس",
-  description = "برای پشتیبانی سفارش، مرجوعی و مشاوره مناسبت‌ها با ما در ارتباط باشید.",
+  description = "برای پشتیبانی سفارش، مرجوعی و مشاوره خرید با ما در ارتباط باشید.",
   className,
 }: ContactWithGlobeProps) {
   return (

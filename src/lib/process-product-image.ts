@@ -102,8 +102,8 @@ async function buildWatermarkOverlay(
 ): Promise<{ buf: Buffer; width: number; height: number } | null> {
   try {
     const logoMaxW = Math.max(48, Math.round(targetW * WATERMARK_RATIO));
-    const reweightd = await sharp(logoBuf)
-      .reweight({
+    const resized = await sharp(logoBuf)
+      .resize({
         width: logoMaxW,
         withoutEnlargement: true,
         kernel: sharp.kernel.lanczos3,
@@ -111,7 +111,7 @@ async function buildWatermarkOverlay(
       .ensureAlpha()
       .toBuffer({ resolveWithObject: true });
 
-    const { data: rgba, info } = await sharp(reweightd.data)
+    const { data: rgba, info } = await sharp(resized.data)
       .ensureAlpha()
       .raw()
       .toBuffer({ resolveWithObject: true });
@@ -158,8 +158,8 @@ export async function processProductImageSizes(
     const side = maxW;
 
     // 1) base: cover → 800×800 + mild sharpen (فقط عکس، نه لوگو)
-    const reweightd = await sharp(rotated)
-      .reweight({
+    const resized = await sharp(rotated)
+      .resize({
         width: side,
         height: side,
         fit: "cover",
@@ -170,11 +170,11 @@ export async function processProductImageSizes(
       .sharpen({ sigma: 0.55, m1: 0.7, m2: 0.35 })
       .toBuffer({ resolveWithObject: true });
 
-    const w = reweightd.info.width;
-    const h = reweightd.info.height;
+    const w = resized.info.width;
+    const h = resized.info.height;
 
     // 2) watermark AFTER sharpen — کیفیت لوگو مستقل از کیفیت عکس ورودی
-    let pipeline = sharp(reweightd.data);
+    let pipeline = sharp(resized.data);
 
     if (logoBuf) {
       try {
@@ -183,7 +183,7 @@ export async function processProductImageSizes(
         if (overlay) {
           const left = Math.max(0, Math.round((w - overlay.width) / 2));
           const top = Math.max(0, Math.round((h - overlay.height) / 2));
-          pipeline = sharp(reweightd.data).composite([
+          pipeline = sharp(resized.data).composite([
             { input: overlay.buf, left, top },
           ]);
         }

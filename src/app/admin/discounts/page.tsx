@@ -379,7 +379,7 @@ export default function AdminDiscountsPage() {
           type="search"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="جستجوی آجیل، خشکبار، خرما..."ی آجیل و خشکباری کد…"
+          placeholder="جستجوی کد…"
           className="border-input bg-background h-10 w-full max-w-xs rounded-xl border px-3 text-sm"
           dir="ltr"
         />

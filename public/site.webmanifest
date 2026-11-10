@@ -1,7 +1,7 @@
 {
-  "name": "پیراهن مردانه",
-  "short_name": "PM",
-  "description": "فروشگاه اینترنتی پیراهن مردانه",
+  "name": "شادجیل",
+  "short_name": "شادجیل",
+  "description": "فروشگاه تخصصی آجیل، خشکبار، خرما و سوغات",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#F8F9FA",

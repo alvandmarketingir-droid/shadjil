@@ -168,7 +168,7 @@ export function AdminMediaPicker({
               <input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="جستجوی آجیل، خشکبار، خرما..."ی آجیل و خشکبار در آلت / محصول / لینک…"
+                placeholder="جستجو در آلت / محصول / لینک…"
                 className="border-input bg-background flex-1 rounded-lg border px-3 py-1.5 text-sm"
               />
               <button

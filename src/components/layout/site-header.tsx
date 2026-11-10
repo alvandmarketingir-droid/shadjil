@@ -75,7 +75,7 @@ function ThemeToggle() { const [dark, setDark] = useState(false); useEffect(() =
         <div className="mb-4 flex items-center justify-between gap-3">
           <div>
             <p className="text-sm font-bold">دسته‌بندی‌ها</p>
-            <p className="text-muted-foreground text-xs">انتخاب بر اساس سبک، فیت و پارچه</p>
+            <p className="text-muted-foreground text-xs">انتخاب بر اساس آجیل، خشکبار، خرما و سوغات</p>
           </div>
           <Link
             href="/products"

@@ -310,7 +310,7 @@ export type CartLineDTO = {
   roastHex?: string;
   roasts?: string[];
   weights?: string[];
-  /** مناسبت‌ها یک واحد به گرم — برای محاسبه ارسال */
+  /** وزن یک واحد به گرم — برای محاسبه ارسال */
   weightGrams?: number;
 };
 
@@ -367,7 +367,7 @@ export async function getCartAction(): Promise<{
       };
     });
 
-    // گزینه‌های وضعیت محصول/مناسبت‌ها همه وریانت‌های همان محصول
+    // گزینه‌های وضعیت محصول/وزن همه وریانت‌های همان محصول
     const productIds = [...new Set(items.map((i) => i.productId).filter(Boolean))];
     if (productIds.length) {
       try {
@@ -1123,7 +1123,7 @@ async function eligibleDiscountBase(
       }
     }
   }
-  if (!allowed.weight) return { base: 0, error: "not_applicable" };
+  if (!allowed.size) return { base: 0, error: "not_applicable" };
 
   let base = 0;
   for (const line of lines) {

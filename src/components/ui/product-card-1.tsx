@@ -191,7 +191,7 @@ export function ProductCard1({
       return;
     }
     if ((weights?.length ?? 0) > 0 && !selectedSize) {
-      toast.error("مناسبت‌ها را انتخاب کنید");
+      toast.error("وزن را انتخاب کنید");
       return;
     }
     // match variant
@@ -497,7 +497,7 @@ if (res.ok === false && res.error === "login_required") {
                   key={weight}
                   type="button"
                   disabled={!ok}
-                  title={ok ? weight : `مناسبت‌ها ${weight} برای این وضعیت محصول تعریف نشده`}
+                  title={ok ? weight : `وزن ${weight} برای این وضعیت محصول تعریف نشده`}
                   className={cn(
                     "h-7 min-w-[2rem] rounded-md px-1.5 text-[11px] font-medium transition-all",
                     selectedSize === weight && ok

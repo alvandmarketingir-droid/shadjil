@@ -167,17 +167,13 @@ export function IconCategoryDefault(props: IconProps) {
 }
 
 const RULES: { test: (s: string) => boolean; Icon: (p: IconProps) => ReactElement }[] = [
-  { test: (s) => /پارچه|fabric|کتان|پنبه|نخ|لینن|پشم/.test(s), Icon: IconFabric },
-  { test: (s) => /فیت|fit|slim|regular|مناسبت‌ها/.test(s), Icon: IconFit },
-  { test: (s) => /|bow[- ]?tie|/.test(s), Icon: IconBowTie },
-  { test: (s) => /|necktie|\btie\b|کراوات/.test(s), Icon: IconTie },
-  { test: (s) => /سردست|cufflink|دکمه/.test(s), Icon: IconCufflink },
-  { test: (s) => /جین|denim|jean/.test(s), Icon: IconDenim },
-  { test: (s) => /سوغات|accessory|کمربند|جوراب|شال/.test(s), Icon: IconAccessory },
-  { test: (s) => /اسپرت|کار|sport|work|کارگری/.test(s), Icon: IconSportWork },
-  { test: (s) => /کژوال|casual|روزمره|اکسفورد|oxford/.test(s), Icon: IconShirtCasual },
-  { test: (s) => /رسمی|formal|مجلسی|اداری|dress/.test(s), Icon: IconShirtFormal },
-  { test: (s) => /آجیل|shirt/.test(s), Icon: IconShirtFormal },
+  { test: (s) => /آجیل|\bnuts?\b|پسته|بادام|فندق|گردو|cashew|pistachio|almond/.test(s), Icon: IconShirtFormal },
+  { test: (s) => /خشکبار|dried|کشمش|انجیر|برگه|میوه\s*خشک/.test(s), Icon: IconShirtCasual },
+  { test: (s) => /خرما|\bdates?\b/.test(s), Icon: IconSportWork },
+  { test: (s) => /سوغات|souvenir|هدیه|\bgift\b/.test(s), Icon: IconAccessory },
+  { test: (s) => /بسته|pack|وزن|weight|۵۰۰|250|1\s*kg|گرم/.test(s), Icon: IconFabric },
+  { test: (s) => /بو\s*داده|roast|شور|salted|خام|\braw\b/.test(s), Icon: IconFit },
+  { test: (s) => /ارگانیک|organic|ممتاز|premium|لوکس/.test(s), Icon: IconCufflink },
 ];
 
 export function CategorySvgIcon({

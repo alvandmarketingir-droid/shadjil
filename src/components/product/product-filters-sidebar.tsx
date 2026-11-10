@@ -395,7 +395,7 @@ export function ProductFiltersSidebar(props: Props) {
                       {c.hex ? (
                         <span
                           className="h-3.5 w-3.5 shrink-0 rounded-full border border-black/10"
-                          style={{ backgroundType: c.hex }}
+                          style={{ background: c.hex }}
                         />
                       ) : null}
                       <span className="leading-snug">{c.name}</span>
@@ -407,7 +407,7 @@ export function ProductFiltersSidebar(props: Props) {
           </div>
         ) : null}
 
-        {/* —— مناسبت‌ها —— */}
+        {/* —— وزن —— */}
         {(props.weights?.length ?? 0) > 0 ? (
           <div>
             <p className="mb-2 text-xs font-medium">موجودی</p>

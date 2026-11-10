@@ -25,7 +25,7 @@ jobs:
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder
-          NEXT_PUBLIC_SITE_URL: https://pirahanmardane.ir
+          NEXT_PUBLIC_SITE_URL: https://shadjil.ir
 
   lint:
     runs-on: ubuntu-latest
@@ -60,7 +60,7 @@ jobs:
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder
-          NEXT_PUBLIC_SITE_URL: https://pirahanmardane.ir
+          NEXT_PUBLIC_SITE_URL: https://shadjil.ir
 
   build:
     runs-on: ubuntu-latest
@@ -81,7 +81,7 @@ jobs:
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder
-          NEXT_PUBLIC_SITE_URL: https://pirahanmardane.ir
+          NEXT_PUBLIC_SITE_URL: https://shadjil.ir
           SENTRY_SUPPRESS_GLOBAL_ERROR_HANDLER_FILE_WARNING: "1"
 
   security-smoke:
@@ -94,7 +94,7 @@ jobs:
         run: chmod +x scripts/security-smoke.sh
       - name: Run security smoke
         env:
-          BASE_URL: https://pirahanmardane.ir
+          BASE_URL: https://shadjil.ir
         run: bash scripts/security-smoke.sh
 
   # E2E intentionally skipped (agent/user preference): do not require Playwright in CI.

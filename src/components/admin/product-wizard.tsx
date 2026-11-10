@@ -362,14 +362,14 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
 
 
 
-  // همگام‌سازی مناسبت‌ها/وضعیت محصول انتخاب‌شده با مقادیر واقعی واریانت‌ها (بعد از ریلود خالی نماند)
+  // همگام‌سازی وزن/وضعیت محصول انتخاب‌شده با مقادیر واقعی واریانت‌ها (بعد از ریلود خالی نماند)
   useEffect(() => {
     if (!variants.length) return;
     if (weightOpts.length) {
       const vals = new Set(
         variants.map((v) => String(v.weight || "").trim()).filter(Boolean),
       );
-      if (vals.weight) {
+      if (vals.size) {
         setPickedSizeIds((prev) => {
           const fromVars = weightOpts
             .filter((o) => vals.has(String(o.value).trim()))
@@ -383,7 +383,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
       const vals = new Set(
         variants.map((v) => String(v.roast_name || "").trim()).filter(Boolean),
       );
-      if (vals.weight) {
+      if (vals.size) {
         setPickedColorIds((prev) => {
           const fromVars = roastOpts
             .filter((o) => vals.has(String(o.value).trim()))
@@ -445,7 +445,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
     if (s === 5) {
       if (!variants.length) return "حداقل یک واریانت لازم است";
       for (const v of variants) {
-        if (!v.weight && !v.roast_name) return "هر واریانت باید مناسبت‌ها یا وضعیت محصول داشته باشد";
+        if (!v.weight && !v.roast_name) return "هر واریانت باید وزن یا وضعیت محصول داشته باشد";
         const sale = parseLocaleNumber(v.price) ?? 0;
         const original = parseLocaleNumber(v.original_price) ?? 0;
         const main = original > 0 ? original : sale;
@@ -592,7 +592,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
         if (mustHaveVariants) {
           return {
             ok: false as const,
-            error: "حداقل یک واریانت با مناسبت‌ها/وضعیت محصول و قیمت معتبر لازم است",
+            error: "حداقل یک واریانت با وزن/وضعیت محصول و قیمت معتبر لازم است",
           };
         }
         // draft: از sync واریانت رد شو
@@ -1183,7 +1183,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
               </div>
             ) : null}
 
-            {/* مناسبت‌ها */}
+            {/* وزن */}
             {weightAttr ? (
               <div className="space-y-2">
                 <p className="text-sm font-medium">{weightAttr.name}</p>
@@ -1238,7 +1238,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
               </label>
             ))}
             <p className="text-muted-foreground text-xs">
-              وضعیت محصول و مناسبت‌ها انتخاب‌شده در فیلتر فروشگاه می‌آیند؛ در گام واریانت برای هر ردیف وضعیت محصول/مناسبت‌ها را جداگانه مشخص کنید.
+              وضعیت محصول و وزن انتخاب‌شده در فیلتر فروشگاه می‌آیند؛ در گام واریانت برای هر ردیف وضعیت محصول/وزن را جداگانه مشخص کنید.
             </p>
           </div>
         )}
@@ -1309,8 +1309,8 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
         {step === 5 && (
           <div className="space-y-4">
             <p className="text-muted-foreground text-xs">
-              برای هر ترکیب مناسبت‌ها/وضعیت محصول یک ردیف بسازید. قیمت اصلی و در صورت نیاز قیمت بعد از تخفیف را وارد کنید.
-              مناسبت‌ها و وضعیت محصول هر ردیف را از لیست زیر انتخاب کنید.
+              برای هر ترکیب وزن/وضعیت محصول یک ردیف بسازید. قیمت اصلی و در صورت نیاز قیمت بعد از تخفیف را وارد کنید.
+              وزن و وضعیت محصول هر ردیف را از لیست زیر انتخاب کنید.
             </p>
             <button
               type="button"
@@ -1381,7 +1381,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
                           );
                         }}
                       >
-                        <option value="">مناسبت‌ها…</option>
+                        <option value="">وزن…</option>
                         {weightOpts.map((o) => (
                           <option key={o.id} value={o.value}>
                             {o.value}

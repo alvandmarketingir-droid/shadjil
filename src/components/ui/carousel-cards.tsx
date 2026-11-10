@@ -110,7 +110,7 @@ export function CarouselCards({
                       alt={item.imageAlt || item.title}
                       fill
                       className="object-contain transition-transform duration-300 group-hover:scale-105"
-                      weights="(max-width: 640px) 75vw, (max-width: 1024px) 33vw, 25vw"
+                      sizes="(max-width: 640px) 75vw, (max-width: 1024px) 33vw, 25vw"
                     />
                     {item.badge && (
                       <Badge className="absolute top-3 right-3">{item.badge}</Badge>

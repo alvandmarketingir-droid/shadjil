@@ -247,7 +247,7 @@ export function ShopActivityDrawer({
                                         title={
                                           ok
                                             ? c
-                                            : "این وضعیت محصول با مناسبت‌ها فعلی تعریف نشده"
+                                            : "این وضعیت محصول با وزن فعلی تعریف نشده"
                                         }
                                         onClick={() =>
                                           ok && void swap({ roastKey: c })
@@ -282,7 +282,7 @@ export function ShopActivityDrawer({
                                         title={
                                           ok
                                             ? sz
-                                            : `مناسبت‌ها ${sz} برای این وضعیت محصول تعریف نشده`
+                                            : `وزن ${sz} برای این وضعیت محصول تعریف نشده`
                                         }
                                         onClick={() =>
                                           ok && void swap({ weight: sz })

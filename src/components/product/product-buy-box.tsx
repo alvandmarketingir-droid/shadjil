@@ -125,7 +125,7 @@ export function ProductBuyBox({
       if (!a || !b) return false;
       return a.trim().replace(/^#/, "").toLowerCase() === b.trim().replace(/^#/, "").toLowerCase();
     };
-    // اول: مناسبت‌ها+وضعیت محصول دقیق
+    // اول: وزن+وضعیت محصول دقیق
     const exact = variants.find((v) => {
       const weightOk = !weights.length || (!!selectedSize && v.weight === selectedSize);
       const roastOk =
@@ -135,12 +135,12 @@ export function ProductBuyBox({
       return weightOk && roastOk;
     });
     if (exact) return exact;
-    // اگر مناسبت‌ها هنوز انتخاب نشده: اولین واریانت همان وضعیت محصول (برای قیمت زنده)
+    // اگر وزن هنوز انتخاب نشده: اولین واریانت همان وضعیت محصول (برای قیمت زنده)
     if (selectedColor && roasts.length) {
       const byColor = variants.find((v) => roastEq(v.roast, selectedColor));
       if (byColor) return byColor;
     }
-    // اگر فقط مناسبت‌ها انتخاب شده
+    // اگر فقط وزن انتخاب شده
     if (selectedSize && weights.length) {
       const bySize = variants.find((v) => v.weight === selectedSize);
       if (bySize) return bySize;
@@ -184,7 +184,7 @@ export function ProductBuyBox({
 
   async function handleAdd() {
     if (weights.length > 0 && !selectedSize) {
-      toast.error("مناسبت‌ها را انتخاب کنید");
+      toast.error("وزن را انتخاب کنید");
       return;
     }
     if (!match?.id) {
@@ -267,7 +267,7 @@ export function ProductBuyBox({
                   type="button"
                   disabled={!ok}
                   onClick={() => ok && setSelectedSize(s)}
-                  title={ok ? s : selectedColor ? `مناسبت‌ها ${s} برای وضعیت محصول ${selectedColor} موجود نیست` : "ناموجود"}
+                  title={ok ? s : selectedColor ? `وزن ${s} برای وضعیت محصول ${selectedColor} موجود نیست` : "ناموجود"}
                   className={cn(
                     "border-border rounded-xl border px-3 py-1.5 text-sm",
                     selectedSize === s && ok && "bg-primary text-primary-foreground border-primary",
@@ -339,7 +339,7 @@ export function ProductBuyBox({
             onClick={() => {
               void (async () => {
                 if (weights.length > 0 && !selectedSize) {
-                  toast.error("مناسبت‌ها را انتخاب کنید");
+                  toast.error("وزن را انتخاب کنید");
                   return;
                 }
                 if (!match?.id) {

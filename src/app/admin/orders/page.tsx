@@ -248,7 +248,7 @@ export default function AdminOrdersPage() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="جستجوی آجیل، خشکبار، خرما..."ی آجیل و خشکبار نام یا موبایل گیرنده"
+            placeholder="جستجوی نام یا موبایل گیرنده"
             className="border-input bg-background h-10 min-w-[14rem] flex-1 rounded-xl border px-3 text-sm"
             dir="rtl"
           />

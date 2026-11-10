@@ -185,7 +185,7 @@ export default function CartPage() {
         return roastOk && weightOk && (v.stock ?? 0) > 0;
       });
       if (!ok) {
-        setMsg("این ترکیب وضعیت محصول/مناسبت‌ها تعریف نشده یا موجود نیست.");
+        setMsg("این ترکیب وضعیت محصول/وزن تعریف نشده یا موجود نیست.");
         return;
       }
     }
@@ -232,7 +232,7 @@ export default function CartPage() {
             سبد خرید
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            وضعیت محصول، مناسبت‌ها و تعداد — فوری به‌روز می‌شود
+            وضعیت محصول، وزن و تعداد — فوری به‌روز می‌شود
           </p>
         </div>
         <Link
@@ -341,7 +341,7 @@ export default function CartPage() {
                                 key={sz}
                                 type="button"
                                 disabled={busy || !ok}
-                                title={ok ? sz : `مناسبت‌ها ${sz} ناموجود`}
+                                title={ok ? sz : `وزن ${sz} ناموجود`}
                                 onClick={() =>
                                   ok && void changeVariant(p, { weight: sz })
                                 }

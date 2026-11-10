@@ -176,19 +176,19 @@ export function PriceHistory({ points }: { points: PricePoint[] }) {
       <div className="grid grid-cols-3 gap-2 text-center text-xs">
         <div className="bg-muted/40 rounded-xl px-2 py-2.5">
           <p className="text-muted-foreground mb-0.5">کمترین</p>
-          <p className="font-semibold" style={{ roast: PASTEL_DOWN }}>
+          <p className="font-semibold" style={{ color: PASTEL_DOWN }}>
             {fmtPrice(min)}
           </p>
         </div>
         <div className="bg-muted/40 rounded-xl px-2 py-2.5">
           <p className="text-muted-foreground mb-0.5">بیشترین</p>
-          <p className="font-semibold" style={{ roast: PASTEL_UP }}>
+          <p className="font-semibold" style={{ color: PASTEL_UP }}>
             {fmtPrice(max)}
           </p>
         </div>
         <div className="bg-muted/40 rounded-xl px-2 py-2.5">
           <p className="text-muted-foreground mb-0.5">آخرین</p>
-          <p className="font-semibold" style={{ roast: stroke }}>
+          <p className="font-semibold" style={{ color: stroke }}>
             {fmtPrice(last.price)}
           </p>
         </div>

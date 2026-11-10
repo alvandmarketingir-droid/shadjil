@@ -260,7 +260,7 @@ export default function AdminBlogPage() {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="جستجوی آجیل، خشکبار، خرما..."ی آجیل و خشکبار عنوان یا اسلاگ…"
+          placeholder="جستجوی عنوان یا اسلاگ…"
           className="border-border bg-background w-full max-w-md rounded-xl border px-3 py-2 text-sm"
         />
         <select

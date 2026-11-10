@@ -616,7 +616,7 @@ export function SmartSearch({ className }: { className?: string }) {
 
             <div>
               <p className="text-muted-foreground mb-1.5 text-xs font-medium">
-                مناسبت‌ها
+                وزن
               </p>
               <div className="flex flex-wrap gap-2">
                 {facetWeights.map((s) => (

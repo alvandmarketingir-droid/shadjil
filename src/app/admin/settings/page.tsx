@@ -382,7 +382,7 @@ export default function AdminSettingsPage() {
               ))}
             </ul>
             <p className="text-muted-foreground text-xs">
-              آپلودهای جدید از مسیر ادمین به R2 می‌روند (webp چندمناسبت‌هاه).
+              آپلودهای جدید از مسیر ادمین به R2 می‌روند (webp چندسایزه).
             </p>
           </div>
 

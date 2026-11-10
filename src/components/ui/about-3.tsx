@@ -24,35 +24,35 @@ interface About3Props {
 
 const defaultAchievements = [
   { label: "تمرکز تخصصی", value: "آجیل" },
-  { label: "راهنمای مناسبت‌ها بسته‌بندی", value: "شفاف" },
+  { label: "راهنمای بسته‌بندی", value: "شفاف" },
   { label: "مرجوعی آسان", value: "آسوده" },
   { label: "پشتیبانی", value: "واقعی" },
 ];
 
 export function About3({
   title = "درباره ما",
-  description = "شادجیل؛ فروشگاه تخصصی آجیل، ،  و سوغات — با تمرکز روی کیفیت دوخت، فیت دقیق و تجربه خرید مطمئن.",
+  description = "شادجیل؛ فروشگاه تخصصی آجیل، خشکبار، خرما و سوغات — با تمرکز روی تازگی، بسته‌بندی شفاف و تجربه خرید مطمئن.",
   mainImage = {
-    src: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=1200&q=80",
+    src: "https://images.unsplash.com/photo-1599599810769-bcde5a160d32?auto=format&fit=crop&w=1200&q=80",
     alt: "شادجیل",
   },
   secondaryImage = {
-    src: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=800&q=80",
-    alt: "جزئیات دوخت",
+    src: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=800&q=80",
+    alt: "خشکبار و آجیل",
   },
   breakout = {
     src: "/brand/logo-light-transparent.webp",
     alt: "لوگو",
-    title: "اندازه درست، استایل درست",
+    title: "تازه، شفاف، قابل اعتماد",
     description:
-      "از راهنمای مناسبت‌ها بسته‌بندی شفاف تا تعویض آسان — هدف ما اعتماد به فیت قبل از خرید است.",
+      "از راهنمای بسته‌بندی شفاف تا مرجوعی آسان — هدف ما اعتماد قبل از خرید است.",
     buttonText: "مشاهده محصولات",
     buttonUrl: "/products",
   },
   companiesTitle = "تمرکز ما",
   companies = [],
   achievementsTitle = "آنچه برای خریدار مهم است",
-  achievementsDescription = "کیفیت دوخت، راهنمای مناسبت‌ها بسته‌بندی شفاف، ارسال مطمئن و پشتیبانی واقعی.",
+  achievementsDescription = "تازگی محصول، راهنمای بسته‌بندی شفاف، ارسال مطمئن و پشتیبانی واقعی.",
   achievements = defaultAchievements,
 }: About3Props = {}) {
   return (
