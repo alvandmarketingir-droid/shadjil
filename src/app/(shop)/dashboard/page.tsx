@@ -12,14 +12,11 @@ import { toast } from "@/lib/toaster";
 import { createClient } from "@/lib/supabase/client";
 import { useShopStore } from "@/lib/shop-store";
 import { useServerCartStore } from "@/lib/server-cart-store";
-import { cn } from "@/lib/utils";
 import { normalizeIranMobile } from "@/lib/numbers";
 import { useNotifications } from "@/lib/notifications/use-notifications";
 import { formatJalaliDate, formatJalaliDateTime } from "@/lib/dates/jalali";
 import { iranPostTrackingUrl } from "@/lib/iran-provinces";
-import { createTestNotificationAction } from "@/app/(shop)/actions/notifications";
 import {
-  getCartAction,
   removeCartItemAction,
   updateCartQuantityAction,
   listMyOrdersAction,
@@ -33,12 +30,10 @@ import {
   listShopProductsAction,
   trackOrderAction,
   createMyAddressAction,
-  updateMyAddressAction,
   deleteMyAddressAction,
   setDefaultAddressAction,
   listWishlistAction,
   toggleWishlistAction,
-  filterLiveProductIdsAction,
   getLiveRecentlyViewedAction,
   type CartLineDTO,
 } from "@/app/(shop)/actions/shop";
@@ -58,7 +53,6 @@ import {
   resendEmailVerificationAction,
   listMySessionsAction,
   revokeMySessionAction,
-  signOutOtherDevicesAction,
 } from "@/app/(shop)/actions/auth";
 
 const ProductCard = nextDynamic(
@@ -117,16 +111,16 @@ export default function BuyerDashboardPage() {
   const [myOrders, setMyOrders] = useState<any[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [reorderBusy, setReorderBusy] = useState<string | null>(null);
-  const [reorderMsg, setReorderMsg] = useState<string | null>(null);
+  const [_reorderMsg, setReorderMsg] = useState<string | null>(null);
   const [activeDiscounts, setActiveDiscounts] = useState<
     { code: string; type: string; value: number; min_order_amount?: number | null; ends_at?: string | null }[]
   >([]);
   const [couponsLoading, setCouponsLoading] = useState(false);
-  const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
+  const [_expandedOrderId, _setExpandedOrderId] = useState<string | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileMsg, setProfileMsg] = useState<string | null>(null);
-  const [profileEmail, setProfileEmail] = useState<string | null>(null);
+  const [_profileEmail, setProfileEmail] = useState<string | null>(null);
   const [emailDraft, setEmailDraft] = useState("");
   const [emailSaving, setEmailSaving] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState("");
@@ -156,7 +150,7 @@ export default function BuyerDashboardPage() {
   const [serverWishlist, setServerWishlist] = useState<
     { productId: string; title: string; slug: string; price: number; image?: string }[]
   >([]);
-  const [wishlistLoading, setWishlistLoading] = useState(false);
+  const [_wishlistLoading, setWishlistLoading] = useState(false);
   const [addressesList, setAddressesList] = useState<
     {
       id: string;
@@ -257,7 +251,7 @@ export default function BuyerDashboardPage() {
   >([]);
   const [ticketLoading, setTicketLoading] = useState(false);
   const [ticketSubject, setTicketSubject] = useState("");
-  const [ticketBody, setTicketBody] = useState("");
+  const [_ticketBody, _setTicketBody] = useState("");
   const [activeTicketId, setActiveTicketId] = useState<string | null>(null);
   const [ticketMsgs, setTicketMsgs] = useState<
     { id: string; body: string; is_staff: boolean; created_at: string }[]
@@ -464,7 +458,7 @@ useEffect(() => {
 
 
 
-  const counts = useMemo(
+  const _counts = useMemo(
     () => ({
       cart: serverCart.length > 0 ? serverCart.reduce((n, l) => n + (l.quantity || 1), 0) : cart.reduce((n, l) => n + (l.quantity ?? 1), 0),
       wishlist: serverWishlist.length > 0 ? serverWishlist.length : wishlist.length,

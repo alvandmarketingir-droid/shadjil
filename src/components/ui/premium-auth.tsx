@@ -230,7 +230,7 @@ export function AuthForm({
         }
 
         const tokenHash = (ver as { token_hash?: string }).token_hash;
-        const email = (ver as { email?: string }).email;
+        const _email = (ver as { email?: string }).email;
         try {
           const { createBrowserClient } = await import("@supabase/ssr");
           const browser = createBrowserClient(

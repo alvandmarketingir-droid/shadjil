@@ -13,7 +13,7 @@ import {
   adminSetDiscountActiveAction,
 } from "@/app/admin/actions/discounts";
 import { LumaSpin } from "@/components/ui/luma-spin";
-import { formatJalaliDate, formatJalaliDateTime, jalaliInputToIso } from "@/lib/dates/jalali";
+import { formatJalaliDate, jalaliInputToIso } from "@/lib/dates/jalali";
 
 
 type Row = {

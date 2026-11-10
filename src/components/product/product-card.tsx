@@ -1,10 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { ProductCard1 as ProductCardUI } from "@/components/ui/product-card-1";
 import type { ProductWithRelations } from "@/repositories/product.repository";
 import { resolveColorHex } from "@/lib/colors";
-import { getCardPrice, formatToman } from "@/lib/product/card-price";
 
 type Props = {
   product: ProductWithRelations;
@@ -24,7 +22,7 @@ export function ProductCard({ product }: Props) {
     .filter((n) => !Number.isNaN(n));
   const price = prices.length ? Math.min(...prices) : 0;
 
-  const compares = variants
+  const _compares = variants
     .map((v) => {
       const x = v as {
         original_price?: number | null;
@@ -45,7 +43,7 @@ export function ProductCard({ product }: Props) {
   const minCompare = minVariant
     ? Number(minVariant.original_price ?? minVariant.compare_at_price)
     : NaN;
-  let originalPrice =
+  const originalPrice =
     Number.isFinite(minCompare) && minCompare > price ? minCompare : null;
   const maxPrice = prices.length ? Math.max(...prices) : price;
   const showFrom = maxPrice > price;

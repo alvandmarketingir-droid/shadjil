@@ -11,7 +11,7 @@ type Props = {
 export function MenuToggleIcon({ open, className, duration = 300 }: Props) {
   return (
     <span
-      className={cn("relative inline-flex weight-5 items-center justify-center", className)}
+      className={cn("relative inline-flex size-5 items-center justify-center", className)}
       data-open={open ? "true" : "false"}
     >
       <span

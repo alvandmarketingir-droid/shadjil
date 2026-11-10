@@ -11,7 +11,7 @@ import {
 } from "@/app/admin/actions/orders";
 import { LumaSpin } from "@/components/ui/luma-spin";
 import { AdminBulkBar } from "@/components/admin/bulk-bar";
-import { formatJalaliDate, formatJalaliDateTime } from "@/lib/dates/jalali";
+import { formatJalaliDateTime } from "@/lib/dates/jalali";
 
 
 const STATUSES = [

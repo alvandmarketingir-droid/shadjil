@@ -1,12 +1,8 @@
-import { BlogRealtimeRefresh } from "@/components/shop/blog-realtime-refresh";
-import { RelatedStrip } from "@/components/shop/related-strip";
-import { getRelatedProducts } from "@/lib/related-products";
-import { getRelatedPosts } from "@/lib/related-posts";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getPublishedPostBySlugAction } from "@/app/(shop)/actions/blog-public";
-import { formatJalaliDate, formatJalaliDateTime } from "@/lib/dates/jalali";
+import { formatJalaliDate } from "@/lib/dates/jalali";
 import { JsonLd } from "@/components/seo/json-ld";
 import { articleSchema, breadcrumbSchema } from "@/lib/seo/schema";
 import { applySeoTemplate } from "@/lib/seo/template";

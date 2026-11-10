@@ -12,7 +12,7 @@ import {
   adminUpdateUserRoleAction,
 } from "@/app/admin/actions/users";
 import { LumaSpin } from "@/components/ui/luma-spin";
-import { formatJalaliDate, formatJalaliDateTime } from "@/lib/dates/jalali";
+import { formatJalaliDate } from "@/lib/dates/jalali";
 
 
 const ROLES = ["customer", "staff", "admin"] as const;
@@ -77,7 +77,7 @@ export default function AdminUsersPage() {
     setSelected([]);
     void load();
   }
-  async function archiveOne(id: string, name: string) {
+  async function _archiveOne(id: string, name: string) {
     if (!confirm(`آرشیو «${name}»؟`)) return;
     setBulkBusy(true);
     const res = await adminArchiveUsersAction([id]);
@@ -85,7 +85,7 @@ export default function AdminUsersPage() {
     if (!res.ok) { setError("آرشیو ناموفق"); return; }
     void load();
   }
-  async function hardDeleteOne(id: string, name: string) {
+  async function _hardDeleteOne(id: string, name: string) {
     if (!confirm(`حذف دائمی «${name}»؟`)) return;
     setBulkBusy(true);
     const res = await adminHardDeleteUsersAction([id]);

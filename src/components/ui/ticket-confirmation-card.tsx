@@ -4,7 +4,7 @@
 import { Price } from "@/components/ui/price";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { formatJalaliDate, formatJalaliDateTime } from "@/lib/dates/jalali";
+import { formatJalaliDate } from "@/lib/dates/jalali";
 type Props = {
   ticketId: string;
   amount: number;

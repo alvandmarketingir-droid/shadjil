@@ -42,7 +42,7 @@ const ToolbarButton = ({
   >
     <button
       type="button"
-      className={`flex h-8 w-8 items-center justify-center rounded-md transition-roasts duration-200 hover:bg-primary-foreground/15 focus:outline-none ${
+      className={`flex h-8 w-8 items-center justify-center rounded-md transition-colors duration-200 hover:bg-primary-foreground/15 focus:outline-none ${
         isActive ? "bg-primary-foreground/20" : ""
       }`}
       aria-label={label}

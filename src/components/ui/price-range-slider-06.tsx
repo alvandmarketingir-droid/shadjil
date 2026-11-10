@@ -142,7 +142,7 @@ export function PriceRangeSlider06({
           disabled={isDefault}
           className="text-muted-foreground hover:text-foreground h-8 shrink-0 gap-1 px-2 text-xs"
         >
-          <X className="weight-3" />
+          <X className="size-3" />
           پاک کردن
         </Button>
       </div>

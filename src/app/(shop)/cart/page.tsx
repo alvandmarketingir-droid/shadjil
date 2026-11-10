@@ -16,8 +16,6 @@ import { useShopStore } from "@/lib/shop-store";
 import { useServerCartStore } from "@/lib/server-cart-store";
 import { useUnifiedCart } from "@/lib/use-unified-cart";
 import {
-  removeCartItemAction,
-  updateCartQuantityAction,
   swapCartVariantAction,
 } from "@/app/(shop)/actions/shop";
 import { toPersianDigits } from "@/lib/numbers";
@@ -62,14 +60,14 @@ function toLikes(opts: VOpt[]) {
 }
 
 export default function CartPage() {
-  const localCart = useShopStore((s) => s.cart);
-  const removeFromCart = useShopStore((s) => s.removeFromCart);
-  const setCartQuantity = useShopStore((s) => s.setCartQuantity);
+  const _localCart = useShopStore((s) => s.cart);
+  const _removeFromCart = useShopStore((s) => s.removeFromCart);
+  const _setCartQuantity = useShopStore((s) => s.setCartQuantity);
   const updateCartItem = useShopStore((s) => s.updateCartItem);
   const setQuantityOptimistic = useServerCartStore((s) => s.setQuantityOptimistic);
-  const removeOptimistic = useServerCartStore((s) => s.removeOptimistic);
+  const _removeOptimistic = useServerCartStore((s) => s.removeOptimistic);
   const refreshServer = useServerCartStore((s) => s.refresh);
-  const { lines: unifiedLines, total: unifiedTotal, isLoggedIn } =
+  const { lines: unifiedLines, total: unifiedTotal, isLoggedIn: _isLoggedIn } =
     useUnifiedCart();
   const [busyMap, setBusyMap] = useState<Record<string, boolean>>({});
   const [msg, setMsg] = useState<string | null>(null);

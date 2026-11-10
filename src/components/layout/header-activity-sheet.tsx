@@ -10,7 +10,6 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import { Button } from "@/components/ui/button";
 import { Heart, ArrowLeftRight, ShoppingBag, History } from "lucide-react";
 
 export type ActivityPanel = "cart" | "wishlist" | "compare" | "recent" | null;
@@ -89,7 +88,7 @@ export function HeaderActivitySheet({ open, onOpenChange, items = [] }: Props) {
                     <a
                       key={item.id}
                       href={item.href ?? "#"}
-                      className="hover:bg-primary hover:text-primary-foreground block rounded-lg border p-3 text-sm transition-roasts"
+                      className="hover:bg-primary hover:text-primary-foreground block rounded-lg border p-3 text-sm transition-colors"
                     >
                       {item.title}
                     </a>

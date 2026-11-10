@@ -34,7 +34,6 @@ import { AdminPageHeader } from "@/components/admin/page-header";
 import { LumaSpin } from "@/components/ui/luma-spin";
 import { parseLocaleNumber } from "@/lib/numbers";
 import { SeoAnalysisPanel, emptySeoValue, type SeoPanelValue } from "@/components/admin/seo-analysis-panel";
-import { ensureAlt } from "@/lib/seo/image-alt";
 import { resolveColorHex } from "@/lib/colors";
 
 type Opt = { id: string; name: string };
@@ -160,12 +159,12 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
   const [pickedColorIds, setPickedColorIds] = useState<string[]>([]);
   const pickedSizeOpts = weightOpts.filter((o) => pickedSizeIds.includes(o.id));
   const pickedColorOpts = roastOpts.filter((o) => pickedColorIds.includes(o.id));
-  const weightChoices = pickedSizeOpts.length ? pickedSizeOpts : weightOpts;
-  const roastChoices = pickedColorOpts.length ? pickedColorOpts : roastOpts;
+  const _weightChoices = pickedSizeOpts.length ? pickedSizeOpts : weightOpts;
+  const _roastChoices = pickedColorOpts.length ? pickedColorOpts : roastOpts;
   const [cats, setCats] = useState<Opt[]>([]);
   const [brands, setBrands] = useState<Opt[]>([]);
   const [tags, setTags] = useState<Opt[]>([]);
-  const [guides, setGuides] = useState<Opt[]>([]);
+  const [_guides, setGuides] = useState<Opt[]>([]);
   const [weightGuideId, setSizeGuideId] = useState("");
   const [publishedAt, setPublishedAt] = useState("");
   const [publishMode, setPublishMode] = useState<"draft" | "now" | "schedule">("draft");
@@ -549,10 +548,9 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
       }
 
       // variants
-      const sp = sellingPrice;
-      const op = originalPrice;
-      let vPayload: Array<Record<string, unknown>>;
-      vPayload = variants
+      const _sp = sellingPrice;
+      const _op = originalPrice;
+      const vPayload: Array<Record<string, unknown>> = variants
         .map((v) => {
           const sale = parseLocaleNumber(v.price) ?? 0;
           const original = parseLocaleNumber(v.original_price) ?? 0;
@@ -793,7 +791,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
       }
       setImageUrl("");
       setOkMsg("تصویر شاخص حذف شد");
-    } catch (e) {
+    } catch (_e) {
       setErr("حذف تصویر شاخص ناموفق");
     } finally {
       setBusy(false);
@@ -863,7 +861,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
     }
   }
 
-  async function onMainImage(file: File | null) {
+  async function _onMainImage(file: File | null) {
     if (!file) return;
     const id = await ensureProductId();
     if (!id) return;
@@ -885,7 +883,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
     }
   }
 
-  async function onGalleryImages(files: FileList | null) {
+  async function _onGalleryImages(files: FileList | null) {
     if (!files || files.length === 0) return;
     const id = await ensureProductId();
     if (!id) return;
@@ -951,7 +949,7 @@ export function ProductWizard({ productId: initialId = null }: ProductWizardProp
     if (errors.length) setErr("خطا در: " + errors.slice(0, 3).join("، "));
   }
 
-  async function onVariantImage(idx: number, file: File | null) {
+  async function _onVariantImage(idx: number, file: File | null) {
     if (!file) return;
     const id = await ensureProductId();
     if (!id) return;

@@ -43,7 +43,7 @@ export function ProductSortBar(props: Props) {
           key={s.value}
           href={buildHref(s.value, props)}
           className={cn(
-            "shrink-0 rounded-full border px-3 py-1.5 text-xs whitespace-nowrap transition-roasts",
+            "shrink-0 rounded-full border px-3 py-1.5 text-xs whitespace-nowrap transition-colors",
             current === s.value
               ? "border-primary bg-primary text-primary-foreground"
               : "bg-background hover:bg-muted"

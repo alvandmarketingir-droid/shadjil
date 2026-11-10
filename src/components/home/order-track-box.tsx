@@ -87,7 +87,7 @@ export function OrderTrackBox() {
       void fetchTrack(result.id);
     }, 15000);
     return () => window.clearInterval(iv);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [result?.id]);
 
   return (

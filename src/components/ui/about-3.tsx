@@ -32,11 +32,11 @@ const defaultAchievements = [
 export function About3({
   title = "درباره ما",
   description = "شادجیل؛ فروشگاه تخصصی آجیل، خشکبار، خرما و سوغات — با تمرکز روی تازگی، بسته‌بندی شفاف و تجربه خرید مطمئن.",
-  mainImage = {
+  mainImage: _mainImage = {
     src: "https://images.unsplash.com/photo-1599599810769-bcde5a160d32?auto=format&fit=crop&w=1200&q=80",
     alt: "شادجیل",
   },
-  secondaryImage = {
+  secondaryImage: _secondaryImage = {
     src: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=800&q=80",
     alt: "خشکبار و آجیل",
   },

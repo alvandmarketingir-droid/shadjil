@@ -14,7 +14,7 @@ describe("productFilterSchema", () => {
 
   it("accepts valid categorySlug and sort", () => {
     const result = productFilterSchema.safeParse({
-      categorySlug: "dress-shirts",
+      categorySlug: "ajil",
       sort: "newest",
       page: 1,
       pageSize: 12,
@@ -26,8 +26,8 @@ describe("productFilterSchema", () => {
 describe("productCreateSchema", () => {
   it("requires name and valid slug", () => {
     const result = productCreateSchema.safeParse({
-      name: "آجیل رسمی سفید",
-      slug: "dress-shirt-white",
+      name: "پسته احمدآقایی ۵۰۰ گرم",
+      slug: "pistachio-500g",
       categoryId: "a1000001-0000-4000-8000-000000000011",
     });
     expect(result.success).toBe(true);

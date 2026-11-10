@@ -12,7 +12,7 @@ import { OrderRepository } from "@/repositories/order.repository";
 import { cookies } from "next/headers";
 import { assertNoLinkOrImage } from "@/lib/sanitize-user-text";
 import { randomUUID } from "crypto";
-import { normalizePhone, normalizeIranMobile, normalizeIranPostalCode, toEnglishDigits } from "@/lib/numbers";
+import { normalizeIranMobile, normalizeIranPostalCode } from "@/lib/numbers";
 import { checkRateLimit } from "@/lib/security/rate-limit";
 import { headers } from "next/headers";
 
@@ -323,7 +323,7 @@ export async function getCartAction(): Promise<{
     const cartId = await resolveCartId();
     const cartRepo = new CartRepository();
     const rows = await cartRepo.listItems(cartId);
-    const cartItemsForDiscount = (rows as any[]).map((row) => {
+    const _cartItemsForDiscount = (rows as any[]).map((row) => {
       const v = row.product_variants;
       return {
         productId: String(v?.product_id ?? v?.products?.id ?? ""),

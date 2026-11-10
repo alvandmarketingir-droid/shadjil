@@ -48,7 +48,7 @@ export function ProductCategoryChips({
       <Link
         href={buildHref(undefined, rest)}
         className={cn(
-          "shrink-0 rounded-full border px-3 py-1.5 text-xs whitespace-nowrap transition-roasts",
+          "shrink-0 rounded-full border px-3 py-1.5 text-xs whitespace-nowrap transition-colors",
           !currentCategory
             ? "border-primary bg-primary text-primary-foreground"
             : "bg-background hover:bg-muted"
@@ -61,7 +61,7 @@ export function ProductCategoryChips({
           key={c.slug}
           href={buildHref(c.slug, rest)}
           className={cn(
-            "shrink-0 rounded-full border px-3 py-1.5 text-xs whitespace-nowrap transition-roasts",
+            "shrink-0 rounded-full border px-3 py-1.5 text-xs whitespace-nowrap transition-colors",
             currentCategory === c.slug
               ? "border-primary bg-primary text-primary-foreground"
               : "bg-background hover:bg-muted"

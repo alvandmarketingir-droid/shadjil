@@ -71,7 +71,7 @@ const NAV: NavItem[] = [
 
 export function AdminShell({
   children,
-  role,
+  role: _role,
   permissions = [],
 }: {
   children: React.ReactNode;
@@ -99,7 +99,7 @@ export function AdminShell({
               href={item.href}
               onClick={() => setMobileNavOpen(false)}
               className={cn(
-                "flex items-center rounded-lg text-sm transition-roasts",
+                "flex items-center rounded-lg text-sm transition-colors",
                 compact
                   ? // حدود ۳.۵ تب در عرض موبایل + فاصله یکنواخت
                     "w-[calc((100%-18px)/3.5)] min-w-[calc((100%-18px)/3.5)] shrink-0 justify-center gap-1 px-1.5 py-2"

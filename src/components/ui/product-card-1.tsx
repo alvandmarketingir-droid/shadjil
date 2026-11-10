@@ -4,9 +4,6 @@
 import { Price } from "@/components/ui/price";
 import {
   sizeAvailable as sizeAvailableShared,
-  sameColor,
-  imageIndexForColor,
-  roastNorm,
 } from "@/lib/variant-availability";
 
 import Link from "next/link";
@@ -45,8 +42,6 @@ import {
 } from "lucide-react";
 import { toPersianDigits } from "@/lib/numbers";
 import { cn } from "@/lib/utils";
-import { resolveColorHex } from "@/lib/colors";
-import { getCardPrice, formatToman } from "@/lib/product/card-price";
 
 export interface ProductCard1Props {
   variantOptions?: { id: string; weight?: string | null; roast?: string | null; price?: number; stock?: number }[];
@@ -91,9 +86,9 @@ export function ProductCard1({
   images = [],
   roasts = [],
   weights = [],
-  isNew = false,
-  isBestSeller = false,
-  discount = 0,
+  isNew: _isNew = false,
+  isBestSeller: _isBestSeller = false,
+  discount: _discount = 0,
   freeShipping = false,
   category,
   categoryHref,
@@ -137,11 +132,11 @@ export function ProductCard1({
 
 
 
-    const router = useRouter();
+    const _router = useRouter();
   const toggleWishlistStore = useShopStore((s) => s.toggleWishlist);
   const toggleCompareStore = useShopStore((s) => s.toggleCompare);
-  const addToCartStore = useShopStore((s) => s.addToCart);
-  const refreshServerCart = useServerCartStore((s) => s.refresh);
+  const _addToCartStore = useShopStore((s) => s.addToCart);
+  const _refreshServerCart = useServerCartStore((s) => s.refresh);
   const compare = useShopStore((s) => s.compare);
   const wishlist = useShopStore((s) => s.wishlist);
   const isWishlisted = productId
@@ -159,7 +154,7 @@ export function ProductCard1({
   const [isAddedToCart, setIsAddedToCart] = useState(false);
 
   
-  function sameColor(a?: string | null, b?: string | null) {
+  function _sameColor(a?: string | null, b?: string | null) {
     if (!a || !b) return false;
     return (a || "").trim().replace(/^#/, "").toLowerCase() === (b || "").trim().replace(/^#/, "").toLowerCase();
   }
@@ -167,14 +162,14 @@ export function ProductCard1({
     return sizeAvailableShared(weight, variantOptions ?? [], selectedColor);
   }
 
-  const nextImage = (e: React.MouseEvent) => {
+  const _nextImage = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (!hasImage) return;
     setCurrentImageIndex((prev) => (prev + 1) % safeImages.length);
   };
 
-  const prevImage = (e: React.MouseEvent) => {
+  const _prevImage = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (!hasImage) return;

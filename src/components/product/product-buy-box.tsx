@@ -2,7 +2,6 @@
 
 
 import { Price } from "@/components/ui/price";
-import { sizeAvailable as sizeAvailableShared, sameColor, stockOf, findVariant, colorAvailable } from "@/lib/variant-availability";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "@/lib/toaster";
 import { useShopStore } from "@/lib/shop-store";
@@ -48,8 +47,8 @@ export function ProductBuyBox({
   variants: variantsProp,
   onColorChange,
 }: Props) {
-  const addToCartStore = useShopStore((s) => s.addToCart);
-  const refreshServerCart = useServerCartStore((s) => s.refresh);
+  const _addToCartStore = useShopStore((s) => s.addToCart);
+  const _refreshServerCart = useServerCartStore((s) => s.refresh);
 
   // موجودی زنده — بدون reload صفحه
   const [variants, setVariants] = useState<VariantOpt[]>(variantsProp);

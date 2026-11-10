@@ -43,7 +43,7 @@ export function ProductFiltersMobile(props: Props) {
         {/* بدون asChild و بدون Button تو در تو */}
         <SheetTrigger
           className={cn(
-            "border-input bg-background hover:bg-muted inline-flex h-8 items-center justify-center gap-2 rounded-md border px-3 text-sm font-medium transition-roasts"
+            "border-input bg-background hover:bg-muted inline-flex h-8 items-center justify-center gap-2 rounded-md border px-3 text-sm font-medium transition-colors"
           )}
         >
           <SlidersHorizontal className="h-4 w-4" />

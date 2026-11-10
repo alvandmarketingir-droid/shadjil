@@ -2,6 +2,7 @@
 
 import { requirePermission } from "@/lib/admin/require-permission";
 
+/** Legacy clothing demo slugs — wipe only; not seeded for شادجیل. */
 const DEMO_PRODUCT_SLUGS = [
   "classic-blue-dress-shirt",
   "black-slim-fit-dress-shirt",
@@ -14,6 +15,7 @@ const DEMO_PRODUCT_SLUGS = [
 
 const DEMO_BLOG_SLUGS = [
   "how-to-choose-shirt-weight",
+  "how-to-choose-shirt-size",
   "dress-vs-casual-shirt",
 ] as const;
 

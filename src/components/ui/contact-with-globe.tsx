@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { ArrowLeft, Mail, Clock, Headphones } from "lucide-react";
@@ -262,7 +262,7 @@ interface ContactWithGlobeProps {
 
 export default function ContactWithGlobe({
   title = "تماس با ما",
-  subtitle = "تماس",
+  subtitle: _subtitle = "تماس",
   description = "برای پشتیبانی سفارش، مرجوعی و مشاوره خرید با ما در ارتباط باشید.",
   className,
 }: ContactWithGlobeProps) {
@@ -326,10 +326,10 @@ export default function ContactWithGlobe({
                     delay: 0.3 + i * 0.1,
                     ease: smoothEase,
                   }}
-                  className="text-muted-foreground hover:text-foreground group flex w-fit items-center gap-3 text-sm transition-roasts duration-200"
+                  className="text-muted-foreground hover:text-foreground group flex w-fit items-center gap-3 text-sm transition-colors duration-200"
                 >
                   <div className="border-border bg-muted group-hover:border-secondary/40 group-hover:bg-secondary/10 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border transition-all duration-200">
-                    <Icon className="text-muted-foreground group-hover:text-secondary h-3.5 w-3.5 transition-roasts duration-200" />
+                    <Icon className="text-muted-foreground group-hover:text-secondary h-3.5 w-3.5 transition-colors duration-200" />
                   </div>
                   {label}
                 </motion.a>

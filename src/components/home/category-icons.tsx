@@ -10,7 +10,7 @@ type IconProps = SVGProps<SVGSVGElement> & { className?: string };
 function svgProps(props: IconProps) {
   const { className, ...rest } = props;
   return {
-    className: cn("weight-10 shrink-0 text-primary", className),
+    className: cn("size-10 shrink-0 text-primary", className),
     viewBox: "0 0 48 48",
     fill: "none",
     xmlns: "http://www.w3.org/2000/svg",
@@ -19,7 +19,7 @@ function svgProps(props: IconProps) {
   };
 }
 
-/** آجیل رسمی */
+/** آجیل */
 export function IconShirtFormal(props: IconProps) {
   return (
     <svg {...svgProps(props)}>
@@ -37,7 +37,7 @@ export function IconShirtFormal(props: IconProps) {
   );
 }
 
-/** آجیل کژوال */
+/** خشکبار */
 export function IconShirtCasual(props: IconProps) {
   return (
     <svg {...svgProps(props)}>
@@ -53,7 +53,7 @@ export function IconShirtCasual(props: IconProps) {
   );
 }
 
-/** اسپرت و کار */
+/** خرما */
 export function IconSportWork(props: IconProps) {
   return (
     <svg {...svgProps(props)}>
@@ -70,7 +70,7 @@ export function IconSportWork(props: IconProps) {
   );
 }
 
-/** بر اساس فیت */
+/** شور / بو‌داده */
 export function IconFit(props: IconProps) {
   return (
     <svg {...svgProps(props)}>
@@ -87,7 +87,7 @@ export function IconFit(props: IconProps) {
   );
 }
 
-/** بر اساس پارچه — بافت پارچه */
+/** بسته‌بندی / وزن */
 export function IconFabric(props: IconProps) {
   return (
     <svg {...svgProps(props)}>

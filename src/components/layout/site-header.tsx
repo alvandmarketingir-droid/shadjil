@@ -1,17 +1,15 @@
 "use client";
 import { NotificationCountBadge } from "@/components/notifications/notification-count-badge";
-import { NotificationBell } from "@/components/notifications/notification-bell";
  import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { HeaderAuthButton } from "@/components/layout/header-auth-button";
-import { Logo } from "@/components/brand/logo";
 import { SmartSearch } from "@/components/layout/smart-search";
 import { CountBadge, useShopCounts } from "@/components/layout/header-badges";
 import { useShopStore } from "@/lib/shop-store";
 import { ShopActivityDrawer, type ActivityTab } from "@/components/layout/shop-activity-drawer";
-import { Heart, GitCompareArrows, ShoppingCart, History, Menu, X, Sun, Moon, UserRound, ChevronDown, Sparkles, Bell} from "lucide-react";
+import { Heart, GitCompareArrows, ShoppingCart, History, Menu, X, Sun, Moon, ChevronDown, Sparkles, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CategorySvgIcon } from "@/components/home/category-icons"; const MAIN_NAV = [
   { href: "/", label: "خانه", mega: null as null | "categories" | "brands" | "sale" },

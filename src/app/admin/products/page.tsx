@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { AdminBulkBar } from "@/components/admin/bulk-bar";
 import {

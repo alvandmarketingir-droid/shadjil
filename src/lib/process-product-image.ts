@@ -2,9 +2,9 @@ import sharp from "sharp";
 import { existsSync, readFileSync } from "fs";
 import path from "path";
 
-const WEBP_QUALITY = 82;
+const _WEBP_QUALITY = 82;
 const WATERMARK_RATIO = 0.14; // smaller mark on product photos
-const MARGIN_RATIO = 0.03;
+const _MARGIN_RATIO = 0.03;
 const WATERMARK_OPACITY = 0.40;
 
 /** فقط این فایل — طبق درخواست */
@@ -149,6 +149,7 @@ export async function processProductImageSizes(
       Math.min(srcW, PRODUCT_IMAGE_SIZES.large),
     );
   }
+  void masterOverlay;
 
   for (const [name, maxW] of Object.entries(PRODUCT_IMAGE_SIZES) as [
     ProductImageSizeName,

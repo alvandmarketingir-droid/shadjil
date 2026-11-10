@@ -21,7 +21,7 @@ export const productFilterSchema = paginationSchema.extend({
     .enum(["newest", "price_asc", "price_desc", "popular"])
     .default("newest")
     .optional(),
-  /** فیلتر facet: { "pack-weight": "slim-fit", "weight": "cotton" } */
+  /** فیلتر facet: { "pack-weight": "500g", "roast-type": "salted" } */
   attrs: z.record(z.string(), z.string()).optional(),
 });
 

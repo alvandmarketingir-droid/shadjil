@@ -1,6 +1,5 @@
 "use client";
 
-import { getTrackingUrl } from "@/lib/iran-shipping-tracking";
 
 import { Price } from "@/components/ui/price";
 import { normalizeIranMobile, normalizeIranPostalCode } from "@/lib/numbers";
@@ -751,7 +750,7 @@ export default function CheckoutPage() {
                         if (def) applyAddress(def);
                         setAddressMode("default");
                       }}
-                      className={`rounded-xl border p-3 text-sm font-medium transition-roasts ${
+                      className={`rounded-xl border p-3 text-sm font-medium transition-colors ${
                         addressMode === "default"
                           ? "border-primary bg-primary/10 text-primary"
                           : "border-border hover:bg-muted/50"
@@ -772,7 +771,7 @@ export default function CheckoutPage() {
                           note: "",
                         }));
                       }}
-                      className={`rounded-xl border p-3 text-sm font-medium transition-roasts ${
+                      className={`rounded-xl border p-3 text-sm font-medium transition-colors ${
                         addressMode === "new"
                           ? "border-primary bg-primary/10 text-primary"
                           : "border-border hover:bg-muted/50"

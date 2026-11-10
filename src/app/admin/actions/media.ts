@@ -411,10 +411,10 @@ export async function adminSetPrimaryProductImageAction(input: {
     .eq("is_primary", true)
     .is("variant_id", null);
 
-  const oldPrimaryIds = new Set(
+  const _oldPrimaryIds = new Set(
     (oldPrimaries ?? []).map((r: { id: string }) => r.id),
   );
-  const oldPrimaryUrls = new Set(
+  const _oldPrimaryUrls = new Set(
     (oldPrimaries ?? []).map((r: { url: string }) => (r.url || "").split("?")[0]),
   );
 

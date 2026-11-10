@@ -1,15 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRtEvent } from "@/hooks/use-rt-event";
 import { RT } from "@/lib/realtime/events";
 
 type Brand = { id: string; name: string; slug: string };
 
-async function fetchBrands(): Promise<Brand[]> {
+async function _fetchBrands(): Promise<Brand[]> {
   try {
-    const res = await fetch("/api/nav/mega", { cache: "no-store" });
+    const _res = await fetch("/api/nav/mega", { cache: "no-store" });
     // fallback: page will still have SSR data; optional API may not list brands
   } catch {
     /* ignore */
@@ -47,7 +47,7 @@ export function LiveBrandsGrid({ initialBrands }: { initialBrands: Brand[] }) {
         <Link
           key={b.id}
           href={`/brands/${b.slug}`}
-          className="bg-card hover:border-foreground/20 flex h-24 items-center justify-center rounded-2xl border px-3 text-center text-sm font-medium transition-roasts hover:bg-muted/40"
+          className="bg-card hover:border-foreground/20 flex h-24 items-center justify-center rounded-2xl border px-3 text-center text-sm font-medium transition-colors hover:bg-muted/40"
         >
           {b.name}
         </Link>

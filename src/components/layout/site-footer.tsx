@@ -3,7 +3,7 @@
 import { Mail } from "lucide-react";
 import { Footer } from "@/components/ui/modem-animated-footer";
 
-function InstagramIcon({ className }: { className?: string }) {
+function _InstagramIcon({ className }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 24 24"
